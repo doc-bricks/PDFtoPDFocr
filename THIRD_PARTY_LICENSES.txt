@@ -1,0 +1,30 @@
+Third-Party Licenses — PDFtoPDFocr
+====================================
+
+PyQt5
+License: GPL v3
+URL: https://pypi.org/project/PyQt5/
+
+pytesseract
+License: Apache 2.0
+URL: https://pypi.org/project/pytesseract/
+
+Pillow
+License: HPND (Historical Permission Notice and Disclaimer)
+URL: https://pypi.org/project/Pillow/
+
+pdf2image
+License: MIT
+URL: https://pypi.org/project/pdf2image/
+
+pikepdf
+License: MPL 2.0
+URL: https://pypi.org/project/pikepdf/
+
+requests
+License: Apache 2.0
+URL: https://pypi.org/project/requests/
+
+Tesseract OCR (bundled portable)
+License: Apache 2.0
+URL: https://github.com/tesseract-ocr/tesseract

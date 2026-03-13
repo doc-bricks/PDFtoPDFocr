@@ -1,0 +1,14 @@
+{
+  "app_name": "PDFtoPDFocr",
+  "publisher": "CN=52596601-BAB4-4F3F-B182-E8F3F273B202",
+  "publisher_display": "Geiger",
+  "identity_name": "Geiger.PDFtoPDFocr",
+  "version": "1.0.0.0",
+  "description": "PDF-Dateien per OCR durchsuchbar machen. Batch-Processing, automatische Spracherkennung, portable Tesseract-Integration.",
+  "executable": "PDF2_ocr.exe",
+  "capabilities": "internetClient",
+  "category": "Productivity",
+  "age_rating": "3+",
+  "privacy_url": "https://raw.githubusercontent.com/doc-bricks/PDFtoPDFocr/master/PRIVACY_POLICY.md",
+  "support_url": "https://github.com/doc-bricks/PDFtoPDFocr/issues"
+}
