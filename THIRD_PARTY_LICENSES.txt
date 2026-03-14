@@ -1,30 +1,87 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
+Stand: 2026-03-14
+
+Dieses Dokument listet alle Drittanbieter-Bibliotheken auf,
+die von PDFtoPDFocr verwendet werden.
+
+================================================================================
 
 PyQt5
-License: GPL v3
+-----
+Lizenz: GPL v3 (kommerzielle Lizenz über Riverbank Computing erhältlich)
+Copyright: Riverbank Computing Limited
 URL: https://pypi.org/project/PyQt5/
+     https://www.riverbankcomputing.com/software/pyqt/
+
+Qt5 (Laufzeit-Bibliothek, über PyQt5)
+--------------------------------------
+Lizenz: GPL v3 / LGPL v3 (je nach Modul)
+Copyright: The Qt Company Ltd.
+URL: https://www.qt.io/
 
 pytesseract
-License: Apache 2.0
+-----------
+Lizenz: Apache License 2.0
+Copyright: Google Inc., Matthias Lee
 URL: https://pypi.org/project/pytesseract/
+     https://github.com/madmaze/pytesseract
 
-Pillow
-License: HPND (Historical Permission Notice and Disclaimer)
+Pillow (PIL Fork)
+-----------------
+Lizenz: HPND (Historical Permission Notice and Disclaimer)
+Copyright: Jeffrey A. Clark (Alex) and contributors
 URL: https://pypi.org/project/Pillow/
+     https://python-pillow.org/
 
 pdf2image
-License: MIT
+---------
+Lizenz: MIT
+Copyright: Edouard Belval
 URL: https://pypi.org/project/pdf2image/
+     https://github.com/Belval/pdf2image
+
+Poppler (Abhängigkeit von pdf2image)
+-------------------------------------
+Lizenz: GPL v2 or later
+Copyright: Glyph & Cog, LLC; The Poppler contributors
+URL: https://poppler.freedesktop.org/
+Hinweis: Poppler-Bibliotheken werden im Verzeichnis tesseract_portable/
+         mitgeliefert. Als GPL-Software unterliegt die Verteilung den
+         Bedingungen der GPL v2.
 
 pikepdf
-License: MPL 2.0
+-------
+Lizenz: Mozilla Public License 2.0 (MPL 2.0)
+Copyright: James R. Barlow and contributors
 URL: https://pypi.org/project/pikepdf/
+     https://github.com/pikepdf/pikepdf
+
+QPDF (Abhängigkeit von pikepdf)
+---------------------------------
+Lizenz: Apache License 2.0
+Copyright: Jay Berkenbilt
+URL: https://github.com/qpdf/qpdf
+     https://qpdf.readthedocs.io/
 
 requests
-License: Apache 2.0
+--------
+Lizenz: Apache License 2.0
+Copyright: Kenneth Reitz and contributors
 URL: https://pypi.org/project/requests/
+     https://requests.readthedocs.io/
 
-Tesseract OCR (bundled portable)
-License: Apache 2.0
+Tesseract OCR (portable Bündelung)
+------------------------------------
+Lizenz: Apache License 2.0
+Copyright: Google Inc.; Ray Smith; Hewlett-Packard Development Company, L.P.
 URL: https://github.com/tesseract-ocr/tesseract
+Hinweis: Die portable Tesseract-Installation befindet sich im Unterordner
+         tesseract_portable/. Die vollständige Lizenz ist unter
+         tesseract_portable/doc/LICENSE zu finden.
+
+================================================================================
+
+Vollständige Lizenztexte sind über die oben angegebenen URLs abrufbar.
+Für die GPL-lizenzierten Komponenten (PyQt5, Qt5, Poppler) steht der
+Quellcode über die angegebenen Projektseiten zur Verfügung.

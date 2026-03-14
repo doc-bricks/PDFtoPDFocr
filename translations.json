@@ -1,0 +1,78 @@
+{
+  "window_title": {
+    "de": "PDF OCR Werkzeug",
+    "en": "PDF OCR Tool"
+  },
+  "label_ocr_lang": {
+    "de": "OCR-Sprache:",
+    "en": "OCR Language:"
+  },
+  "btn_add_file": {
+    "de": "Datei hinzufügen",
+    "en": "Add File"
+  },
+  "btn_start": {
+    "de": "Start",
+    "en": "Start"
+  },
+  "btn_refresh": {
+    "de": "Aktualisieren",
+    "en": "Refresh"
+  },
+  "btn_delete": {
+    "de": "Löschen",
+    "en": "Delete"
+  },
+  "status_no_files": {
+    "de": "Keine neuen Dateien zum Verarbeiten.",
+    "en": "No new files to process."
+  },
+  "status_done": {
+    "de": "Prozess abgeschlossen!",
+    "en": "Process completed!"
+  },
+  "status_processing": {
+    "de": "Verarbeite: {filename} ...",
+    "en": "Processing: {filename} ..."
+  },
+  "dialog_select_files": {
+    "de": "Wähle PDF-Dateien",
+    "en": "Select PDF Files"
+  },
+  "filter_pdf": {
+    "de": "PDF-Dateien (*.pdf)",
+    "en": "PDF Files (*.pdf)"
+  },
+  "error_title": {
+    "de": "Fehler",
+    "en": "Error"
+  },
+  "info_download_title": {
+    "de": "Download",
+    "en": "Download"
+  },
+  "error_tesseract_not_found": {
+    "de": "Tesseract OCR wurde nicht gefunden.\nBitte installieren: https://tesseract-ocr.github.io/tessdoc/Installation.html",
+    "en": "Tesseract OCR was not found.\nPlease install it: https://tesseract-ocr.github.io/tessdoc/Installation.html"
+  },
+  "info_lang_downloaded": {
+    "de": "Sprachpaket '{lang}' wurde automatisch heruntergeladen.",
+    "en": "Language pack '{lang}' was downloaded automatically."
+  },
+  "error_lang_download_failed": {
+    "de": "Download von {lang}.traineddata fehlgeschlagen (HTTP {status}).",
+    "en": "Download of {lang}.traineddata failed (HTTP {status})."
+  },
+  "error_lang_load_failed": {
+    "de": "Sprachpaket '{lang}' konnte nicht geladen werden:\n{error}",
+    "en": "Language pack '{lang}' could not be loaded:\n{error}"
+  },
+  "error_katarakt_download_failed": {
+    "de": "Katarakt-Download fehlgeschlagen (HTTP {status}).",
+    "en": "Katarakt download failed (HTTP {status})."
+  },
+  "error_katarakt_load_failed": {
+    "de": "Katarakt konnte nicht geladen werden:\n{error}",
+    "en": "Katarakt could not be loaded:\n{error}"
+  }
+}

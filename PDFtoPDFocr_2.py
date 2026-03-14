@@ -10,6 +10,7 @@ Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
 import platform
+import logging
 import sys, os, io, shutil, subprocess, requests, tempfile, zipfile
 from pathlib import Path
 from typing import List
@@ -21,7 +22,7 @@ from PyQt5.QtWidgets import (
     QFileDialog, QLabel, QComboBox, QMessageBox
 )
 from PyQt5.QtGui import QColor
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
 # OCR / PDF libs
 import pytesseract
@@ -32,6 +33,51 @@ import pikepdf
 # Utilities
 ICON_OK, ICON_ERR, ICON_BROOM, ICON_TRASH = "✓", "⚠", "🧹", "🗑"
 SUPPORTED_EXTS = {".pdf"}
+
+# ===== i18n =====
+
+def _load_translations() -> dict:
+    """Laedt translations.json aus dem Skript-Verzeichnis."""
+    try:
+        base = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        path = os.path.join(base, "translations.json")
+        with open(path, "r", encoding="utf-8") as f:
+            import json
+            return json.load(f)
+    except Exception:
+        return {}
+
+_TRANSLATIONS = _load_translations()
+_LANG = "de"  # Standard: Deutsch; wechselbar via set_language()
+
+
+def set_language(lang: str) -> None:
+    """Setzt die aktive Sprache (z.B. 'de' oder 'en')."""
+    global _LANG
+    _LANG = lang
+
+
+def tr(key: str, **kwargs) -> str:
+    """Gibt den uebersetzten String fuer key in der aktuellen Sprache zurueck.
+
+    Falls kein Eintrag vorhanden ist, wird key als Fallback zurueckgegeben.
+    Unterstuetzt Platzhalter via str.format(**kwargs).
+
+    Args:
+        key: Schluessel aus translations.json.
+        **kwargs: Optionale Platzhalter-Werte (z.B. lang="deu").
+
+    Returns:
+        Uebersetzter String.
+    """
+    entry = _TRANSLATIONS.get(key, {})
+    text = entry.get(_LANG, entry.get("de", key))
+    if kwargs:
+        try:
+            text = text.format(**kwargs)
+        except KeyError:
+            pass
+    return text
 
 # Defaults
 DEFAULT_TESSDATA_CANDIDATES = [
@@ -80,12 +126,12 @@ def get_katarakt_path() -> str:
                 if exe_path.exists() and os.name != "nt":
                     exe_path.chmod(0o755)
             else:
-                QMessageBox.critical(None, "Fehler",
-                    f"Katarakt-Download fehlgeschlagen (HTTP {r.status_code}).")
+                QMessageBox.critical(None, tr("error_title"),
+                    tr("error_katarakt_download_failed", status=r.status_code))
                 return ""
         except Exception as e:
-            QMessageBox.critical(None, "Fehler",
-                f"Katarakt konnte nicht geladen werden:\n{e}")
+            QMessageBox.critical(None, tr("error_title"),
+                tr("error_katarakt_load_failed", error=e))
             return ""
 
     return str(exe_path)
@@ -130,8 +176,8 @@ def ensure_tesseract(lang: str) -> bool:
         True if Tesseract and the language pack are ready, False otherwise.
     """
     if not shutil.which("tesseract"):
-        QMessageBox.critical(None, "Fehler",
-            "Tesseract OCR wurde nicht gefunden.\nBitte installieren: https://tesseract-ocr.github.io/tessdoc/Installation.html")
+        QMessageBox.critical(None, tr("error_title"),
+            tr("error_tesseract_not_found"))
         return False
 
     tessdata_dir = get_tessdata_dir()
@@ -145,18 +191,87 @@ def ensure_tesseract(lang: str) -> bool:
             if r.status_code == 200:
                 with open(target, "wb") as f:
                     shutil.copyfileobj(r.raw, f)
-                QMessageBox.information(None, "Download",
-                    f"Sprachpaket '{lang}' wurde automatisch heruntergeladen.")
+                QMessageBox.information(None, tr("info_download_title"),
+                    tr("info_lang_downloaded", lang=lang))
             else:
-                QMessageBox.critical(None, "Fehler",
-                    f"Download von {lang}.traineddata fehlgeschlagen (HTTP {r.status_code}).")
+                QMessageBox.critical(None, tr("error_title"),
+                    tr("error_lang_download_failed", lang=lang, status=r.status_code))
                 return False
         except Exception as e:
-            QMessageBox.critical(None, "Fehler",
-                f"Sprachpaket '{lang}' konnte nicht geladen werden:\n{e}")
+            QMessageBox.critical(None, tr("error_title"),
+                tr("error_lang_load_failed", lang=lang, error=e))
             return False
 
     return True
+
+
+class OCRWorker(QThread):
+    """Fuehrt OCR-Verarbeitung im Hintergrund aus, sodass die GUI responsiv bleibt.
+
+    Signals:
+        file_done(str, bool): Pfad + Erfolgsstatus fuer jede fertige Datei.
+        progress(str): Statusmeldung fuer das Label.
+        finished_all(): Alle Dateien wurden verarbeitet.
+    """
+    file_done = pyqtSignal(str, bool)
+    progress = pyqtSignal(str)
+    finished_all = pyqtSignal()
+
+    def __init__(self, pending_paths: list, lang: str, poppler_path: str = "", parent=None):
+        super().__init__(parent)
+        self.pending_paths = pending_paths
+        self.lang = lang
+        self.poppler_path = poppler_path
+
+    def run(self):
+        for path in self.pending_paths:
+            self.progress.emit(f"Verarbeite: {os.path.basename(path)} ...")
+            success = self._ocr_pdf(path, self.lang)
+            self.file_done.emit(path, success)
+        self.finished_all.emit()
+
+    def _ocr_pdf(self, src_path: str, lang: str) -> bool:
+        """Fuehrt OCR auf einer PDF-Datei aus (laeuft im Worker-Thread)."""
+        try:
+            poppler_path = self.poppler_path or None
+            images: List[Image.Image] = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
+
+            out_pdf = pikepdf.Pdf.new()
+            try:
+                for img in images:
+                    if img.mode != "RGB":
+                        img = img.convert("RGB")
+                    pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, lang=lang, extension='pdf')
+                    if not pdf_bytes:
+                        continue
+                    try:
+                        src_pdf = pikepdf.Pdf.open(io.BytesIO(pdf_bytes))
+                        out_pdf.pages.extend(src_pdf.pages)
+                        src_pdf.close()
+                    except Exception as e:
+                        logging.warning(f"PDF operation failed: {e}")
+                        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+                        try:
+                            tmp.write(pdf_bytes)
+                            tmp.flush()
+                            tmp.close()
+                            src_pdf = pikepdf.Pdf.open(tmp.name)
+                            out_pdf.pages.extend(src_pdf.pages)
+                            src_pdf.close()
+                        finally:
+                            try:
+                                os.unlink(tmp.name)
+                            except Exception as e:
+                                logging.warning(f"PDF operation failed: {e}")
+
+                dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
+                out_pdf.save(dst_path)
+            finally:
+                out_pdf.close()
+            return True
+        except Exception as e:
+            print(f"OCR-Fehler bei {src_path}: {e}")
+            return False
 
 
 class PDFListWidget(QListWidget):
@@ -216,16 +331,17 @@ class OCRConverterGUI(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PDF OCR Tool (pdf2image + Tesseract)")
+        self.setWindowTitle(tr("window_title"))
         self.resize(640, 520)
         self.layout = QVBoxLayout(self)
+        self._ocr_worker = None  # Referenz auf laufenden QThread
 
         self.list_widget = PDFListWidget()
         self.layout.addWidget(self.list_widget)
 
         # Spracheinstellung
         lang_layout = QHBoxLayout()
-        lang_label = QLabel("OCR-Sprache:")
+        lang_label = QLabel(tr("label_ocr_lang"))
         self.lang_combo = QComboBox()
         self.lang_combo.addItems(["deu", "eng", "fra", "spa"])
         lang_layout.addWidget(lang_label)
@@ -234,10 +350,10 @@ class OCRConverterGUI(QWidget):
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.btn_add_file = QPushButton("Datei hinzufügen")
-        self.btn_start = QPushButton("Start")
-        self.btn_refresh = QPushButton(f"{ICON_BROOM} Refresh")
-        self.btn_delete = QPushButton(f"{ICON_TRASH} Delete")
+        self.btn_add_file = QPushButton(tr("btn_add_file"))
+        self.btn_start = QPushButton(tr("btn_start"))
+        self.btn_refresh = QPushButton(f"{ICON_BROOM} {tr('btn_refresh')}")
+        self.btn_delete = QPushButton(f"{ICON_TRASH} {tr('btn_delete')}")
         for b in (self.btn_add_file, self.btn_start, self.btn_refresh, self.btn_delete):
             btn_layout.addWidget(b)
         self.layout.addLayout(btn_layout)
@@ -252,58 +368,62 @@ class OCRConverterGUI(QWidget):
         self.btn_refresh.clicked.connect(self.on_refresh)
         self.btn_delete.clicked.connect(self.on_delete)
 
-        # Optional: Poppler-Pfad-Eingabe (falls gebraucht)
-        # Der Benutzer kann POPPLER_PATH als Umgebungsvariable setzen oder hier anpassen.
-        # Wenn leer, wird pdf2image versuchen, Poppler aus PATH zu nutzen.
-        self.poppler_path = ""  # leer = pdf2image nutzt System-Poppler
+        # Poppler-Pfad: leer = pdf2image nutzt System-Poppler
+        self.poppler_path = ""
 
     def open_file_dialog(self):
         """Opens a file dialog to select PDF files and adds them to the list."""
-        files, _ = QFileDialog.getOpenFileNames(self, "Wähle PDF-Dateien", "", "PDF-Dateien (*.pdf)")
+        files, _ = QFileDialog.getOpenFileNames(self, tr("dialog_select_files"), "", tr("filter_pdf"))
         for f in files:
             self.list_widget.add_file(f)
 
     def on_start(self):
-        """Starts OCR processing for all pending files in the list."""
+        """Startet OCR-Verarbeitung fuer alle ausstehenden Dateien in einem QThread (GUI bleibt responsiv)."""
         self.status_label.setText("")
-        pending = [self.list_widget.item(i) for i in range(self.list_widget.count())
-                   if self.list_widget.item(i).data(Qt.UserRole + 1) == 'pending']
-        if not pending:
-            self.status_label.setText("Keine neuen Dateien zum Verarbeiten.")
+        pending_items = [self.list_widget.item(i) for i in range(self.list_widget.count())
+                         if self.list_widget.item(i).data(Qt.UserRole + 1) == 'pending']
+        if not pending_items:
+            self.status_label.setText(tr("status_no_files"))
             return
 
         lang = self.lang_combo.currentText()
-
-        # Optional: Katarakt prüfen (nicht zwingend nötig hier)
-        # if not ensure_katarakt():
-        #     return
-
-        # Tesseract sicherstellen
         if not ensure_tesseract(lang):
             return
 
-        for item in pending:
-            path = item.data(Qt.UserRole)
-            self.status_label.setText(f"Verarbeite: {os.path.basename(path)} ...")
-            # Process pending GUI events so the window remains responsive
-            # between files. Full freeze during OCR of a single file is a known
-            # limitation (would require QThread refactor).
-            QApplication.processEvents()
-            success = self.ocr_pdf(path, lang)
-            if success:
-                item.setText(f"{ICON_OK} {os.path.basename(path)}")
-                item.setForeground(QColor('green'))
-                item.setData(Qt.UserRole + 1, 'done')
-            else:
-                item.setText(f"{ICON_ERR} {os.path.basename(path)}")
-                item.setForeground(QColor('orange'))
-                item.setData(Qt.UserRole + 1, 'error')
-            QApplication.processEvents()
+        # Worker starten
+        pending_paths = [it.data(Qt.UserRole) for it in pending_items]
+        self._ocr_worker = OCRWorker(pending_paths, lang, self.poppler_path, parent=self)
+        self._ocr_worker.progress.connect(self._on_ocr_progress)
+        self._ocr_worker.file_done.connect(self._on_file_done)
+        self._ocr_worker.finished_all.connect(self._on_ocr_finished)
+        self.btn_start.setEnabled(False)
+        self._ocr_worker.start()
 
-        if all(self.list_widget.item(i).data(Qt.UserRole + 1) != 'pending'
-               for i in range(self.list_widget.count())):
-            self.status_label.setText("Prozess abgeschlossen!")
-            self.status_label.setStyleSheet("color: green; font-weight: bold;")
+    def _on_ocr_progress(self, msg: str):
+        """Statusmeldung vom Worker empfangen."""
+        self.status_label.setText(msg)
+        self.status_label.setStyleSheet("")
+
+    def _on_file_done(self, path: str, success: bool):
+        """Ergebnis einer einzelnen Datei anzeigen."""
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if item.data(Qt.UserRole) == path:
+                if success:
+                    item.setText(f"{ICON_OK} {os.path.basename(path)}")
+                    item.setForeground(QColor('green'))
+                    item.setData(Qt.UserRole + 1, 'done')
+                else:
+                    item.setText(f"{ICON_ERR} {os.path.basename(path)}")
+                    item.setForeground(QColor('orange'))
+                    item.setData(Qt.UserRole + 1, 'error')
+                break
+
+    def _on_ocr_finished(self):
+        """Alle Dateien verarbeitet."""
+        self.btn_start.setEnabled(True)
+        self.status_label.setText(tr("status_done"))
+        self.status_label.setStyleSheet("color: green; font-weight: bold;")
 
     def on_refresh(self):
         """Clears the file list and resets the status label."""
@@ -315,70 +435,6 @@ class OCRConverterGUI(QWidget):
         """Removes the currently selected entries from the file list."""
         for item in self.list_widget.selectedItems():
             self.list_widget.takeItem(self.list_widget.row(item))
-
-    def ocr_pdf(self, src_path: str, lang: str) -> bool:
-        """Converts a PDF to a searchable OCR PDF and saves it with the suffix ``_ocred.pdf``.
-
-        Pipeline: pdf2image renders pages → pytesseract generates per-page PDFs
-        → pikepdf merges all pages into one output file.
-
-        Args:
-            src_path: Absolute path to the source PDF.
-            lang: Tesseract language code (e.g. "deu", "eng").
-
-        Returns:
-            True on success, False if an exception occurred.
-        """
-        try:
-            poppler_path = self.poppler_path or None
-
-            # Rendern aller Seiten als PIL-Images
-            images: List[Image.Image] = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
-
-            # Prepare an empty pikepdf document for the merged result
-            out_pdf = pikepdf.Pdf.new()
-            try:
-                for img in images:
-                    if img.mode != "RGB":
-                        img = img.convert("RGB")
-
-                    # OCR auf dem Bild -> PDF-Bytes
-                    pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, lang=lang, extension='pdf')
-                    if not pdf_bytes:
-                        continue
-
-                    # Öffne die von Tesseract erzeugte Ein-Seiten-PDF mit pikepdf und hänge die Seiten an
-                    try:
-                        src_pdf = pikepdf.Pdf.open(io.BytesIO(pdf_bytes))
-                        out_pdf.pages.extend(src_pdf.pages)
-                        src_pdf.close()
-                    except Exception:
-                        # Fallback über temporäre Datei falls pikepdf Probleme macht
-                        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                        try:
-                            tmp.write(pdf_bytes)
-                            tmp.flush()
-                            tmp.close()
-                            src_pdf = pikepdf.Pdf.open(tmp.name)
-                            out_pdf.pages.extend(src_pdf.pages)
-                            src_pdf.close()
-                        finally:
-                            try:
-                                os.unlink(tmp.name)
-                            except Exception:
-                                pass
-
-                # Ergebnis speichern
-                dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
-                out_pdf.save(dst_path)
-            finally:
-                out_pdf.close()
-            return True
-
-        except Exception as e:
-            print(f"OCR-Fehler bei {src_path}: {e}")
-            return False
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

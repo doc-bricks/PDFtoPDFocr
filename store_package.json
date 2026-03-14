@@ -6,7 +6,7 @@
   "version": "1.0.0.0",
   "description": "PDF-Dateien per OCR durchsuchbar machen. Batch-Processing, automatische Spracherkennung, portable Tesseract-Integration.",
   "executable": "PDF2_ocr.exe",
-  "capabilities": "internetClient",
+  "capabilities": "internetClient,runFullTrust",
   "category": "Productivity",
   "age_rating": "3+",
   "privacy_url": "https://raw.githubusercontent.com/doc-bricks/PDFtoPDFocr/master/PRIVACY_POLICY.md",
