@@ -18,10 +18,8 @@ We will respond as soon as possible.
 
 ## Scope
 
-<!-- Adjust scope for your project -->
-- File system access
-- Database access
-- External API connections
+- File system access (PDF reading/writing)
+- Network requests (Tesseract language pack downloads from GitHub)
 
 ## Response
 

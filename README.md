@@ -20,7 +20,7 @@ Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um — per OCR (Texterkennun
 ## Installation
 
 ```bash
-pip install PyQt5 pytesseract Pillow pdf2image pikepdf requests
+pip install PySide6 pytesseract Pillow pdf2image pikepdf requests
 ```
 
 Poppler muss fuer `pdf2image` verfuegbar sein (als PATH-Variable oder portable im Projektordner).
@@ -39,7 +39,7 @@ python PDFtoPDFocr_2.py
 
 | Paket | Lizenz | Zweck |
 |---|---|---|
-| PyQt5 | GPL v3 | GUI-Framework |
+| PySide6 | LGPL v3 | GUI-Framework |
 | pytesseract | Apache 2.0 | Tesseract-OCR-Wrapper |
 | Pillow | HPND | Bildverarbeitung |
 | pdf2image | MIT | PDF zu Bild-Konvertierung |
@@ -78,7 +78,7 @@ Converts scanned PDF files into searchable PDFs using OCR (text recognition) wit
 ## Installation
 
 ```bash
-pip install PyQt5 pytesseract Pillow pdf2image pikepdf requests
+pip install PySide6 pytesseract Pillow pdf2image pikepdf requests
 ```
 
 Poppler must be available for `pdf2image` (via PATH variable or portable in the project folder).
@@ -97,7 +97,7 @@ python PDFtoPDFocr_2.py
 
 | Package | License | Purpose |
 |---|---|---|
-| PyQt5 | GPL v3 | GUI framework |
+| PySide6 | LGPL v3 | GUI framework |
 | pytesseract | Apache 2.0 | Tesseract OCR wrapper |
 | Pillow | HPND | Image processing |
 | pdf2image | MIT | PDF to image conversion |

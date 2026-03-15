@@ -3,7 +3,7 @@
 
 """PDFtoPDFocr - OCR processing GUI for PDF files.
 
-A PyQt5 application that processes PDF files using OCR (text recognition)
+A PySide6 application that processes PDF files using OCR (text recognition)
 and saves the result as a new PDF with the suffix "_ocred.pdf" in the same folder.
 Uses pdf2image + pytesseract + pikepdf (no PyMuPDF required).
 Missing Tesseract language packs are automatically downloaded from GitHub.
@@ -11,18 +11,17 @@ Missing Tesseract language packs are automatically downloaded from GitHub.
 
 import platform
 import logging
-import sys, os, io, shutil, subprocess, requests, tempfile, zipfile
-from pathlib import Path
+import sys, os, io, shutil, requests, tempfile
 from typing import List
 
-# PyQt5
-from PyQt5.QtWidgets import (
+# PySide6
+from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QListWidget, QListWidgetItem,
     QFileDialog, QLabel, QComboBox, QMessageBox
 )
-from PyQt5.QtGui import QColor
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt, QThread, Signal
 
 # OCR / PDF libs
 import pytesseract
@@ -87,64 +86,6 @@ DEFAULT_TESSDATA_CANDIDATES = [
     "/usr/share/tesseract-ocr/tessdata",
     "/usr/local/share/tessdata"
 ]
-
-
-def get_katarakt_path() -> str:
-    """Returns the path to the katarakt executable, downloading it if not present.
-
-    Optional helper; retained for compatibility.
-
-    Returns:
-        Absolute path to the katarakt binary, or empty string on failure.
-    """
-    if os.name == "nt":
-        base_dir = Path(os.getenv("LOCALAPPDATA", Path.home()))
-        exe_name = "katarakt.exe"
-    else:
-        base_dir = Path.home() / ".local" / "share"
-        exe_name = "katarakt"
-
-    katarakt_dir = base_dir / "pdfocr" / "katarakt"
-    katarakt_dir.mkdir(parents=True, exist_ok=True)
-
-    exe_path = katarakt_dir / exe_name
-
-    if not exe_path.exists():
-        try:
-            url = ("https://github.com/JKamlah/katarakt/releases/latest/download/katarakt-windows.zip"
-                   if os.name == "nt" else
-                   "https://github.com/JKamlah/katarakt/releases/latest/download/katarakt-linux.zip")
-
-            zip_path = katarakt_dir / "katarakt.zip"
-            r = requests.get(url, stream=True, timeout=30)
-            if r.status_code == 200:
-                with open(zip_path, "wb") as f:
-                    shutil.copyfileobj(r.raw, f)
-                with zipfile.ZipFile(zip_path, "r") as zip_ref:
-                    zip_ref.extractall(katarakt_dir)
-                zip_path.unlink()
-                if exe_path.exists() and os.name != "nt":
-                    exe_path.chmod(0o755)
-            else:
-                QMessageBox.critical(None, tr("error_title"),
-                    tr("error_katarakt_download_failed", status=r.status_code))
-                return ""
-        except Exception as e:
-            QMessageBox.critical(None, tr("error_title"),
-                tr("error_katarakt_load_failed", error=e))
-            return ""
-
-    return str(exe_path)
-
-
-def ensure_katarakt() -> bool:
-    """Checks whether katarakt is available, downloading it if necessary.
-
-    Returns:
-        True if the binary exists after the check, False otherwise.
-    """
-    exe = get_katarakt_path()
-    return bool(exe and os.path.exists(exe))
 
 
 def get_tessdata_dir() -> str:
@@ -213,9 +154,9 @@ class OCRWorker(QThread):
         progress(str): Statusmeldung fuer das Label.
         finished_all(): Alle Dateien wurden verarbeitet.
     """
-    file_done = pyqtSignal(str, bool)
-    progress = pyqtSignal(str)
-    finished_all = pyqtSignal()
+    file_done = Signal(str, bool)
+    progress = Signal(str)
+    finished_all = Signal()
 
     def __init__(self, pending_paths: list, lang: str, poppler_path: str = "", parent=None):
         super().__init__(parent)
@@ -440,4 +381,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     gui = OCRConverterGUI()
     gui.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
