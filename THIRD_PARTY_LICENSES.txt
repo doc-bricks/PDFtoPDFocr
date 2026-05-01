@@ -1,22 +1,22 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
-Stand: 2026-03-14
+Stand: 2026-05-01
 
 Dieses Dokument listet alle Drittanbieter-Bibliotheken auf,
 die von PDFtoPDFocr verwendet werden.
 
 ================================================================================
 
-PyQt5
------
-Lizenz: GPL v3 (kommerzielle Lizenz über Riverbank Computing erhältlich)
-Copyright: Riverbank Computing Limited
-URL: https://pypi.org/project/PyQt5/
-     https://www.riverbankcomputing.com/software/pyqt/
+PySide6
+-------
+Lizenz: LGPL v3 / GPL v3 (Qt for Python)
+Copyright: The Qt Company Ltd.
+URL: https://pypi.org/project/PySide6/
+     https://www.qt.io/qt-for-python
 
-Qt5 (Laufzeit-Bibliothek, über PyQt5)
---------------------------------------
-Lizenz: GPL v3 / LGPL v3 (je nach Modul)
+Qt6 (Laufzeit-Bibliothek, über PySide6)
+---------------------------------------
+Lizenz: LGPL v3 / GPL v3 (je nach Modul)
 Copyright: The Qt Company Ltd.
 URL: https://www.qt.io/
 
@@ -46,7 +46,7 @@ Poppler (Abhängigkeit von pdf2image)
 Lizenz: GPL v2 or later
 Copyright: Glyph & Cog, LLC; The Poppler contributors
 URL: https://poppler.freedesktop.org/
-Hinweis: Poppler-Bibliotheken werden im Verzeichnis tesseract_portable/
+Hinweis: Poppler-Bibliotheken können im Verzeichnis poppler/
          mitgeliefert. Als GPL-Software unterliegt die Verteilung den
          Bedingungen der GPL v2.
 
@@ -83,5 +83,5 @@ Hinweis: Die portable Tesseract-Installation befindet sich im Unterordner
 ================================================================================
 
 Vollständige Lizenztexte sind über die oben angegebenen URLs abrufbar.
-Für die GPL-lizenzierten Komponenten (PyQt5, Qt5, Poppler) steht der
+Für die GPL-lizenzierten Komponenten (Qt6/ausgewählte PySide6-Module, Poppler) steht der
 Quellcode über die angegebenen Projektseiten zur Verfügung.

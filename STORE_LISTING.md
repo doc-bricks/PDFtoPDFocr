@@ -17,7 +17,7 @@ FEATURES:
 - Einfache Bedienung: Dateien auswaehlen, Sprache waehlen, Start klicken — fertig
 - Originaldatei bleibt erhalten: Das Ergebnis wird als neue Datei mit dem Suffix "_ocred.pdf" gespeichert
 - Fortschrittsanzeige: Status jeder Datei wird farblich angezeigt (Gruen = fertig, Orange = Fehler)
-- Offline-faehig: Nach dem ersten Sprachpaket-Download funktioniert alles ohne Internet
+- Offline-faehig: Nach dem ersten Sprachpaket-Download funktioniert die OCR-Verarbeitung ohne Internet
 
 FUER WEN:
 - Alle, die gescannte Dokumente (Vertraege, Rechnungen, Briefe, Formulare) durchsuchbar machen wollen
@@ -56,7 +56,7 @@ FEATURES:
 - Easy to Use: Select files, choose language, click start — done
 - Original File Preserved: Result is saved as a new file with "_ocred.pdf" suffix
 - Progress Indication: Status of each file shown with color coding (green = done, orange = error)
-- Works Offline: After the first language pack download, everything works without internet
+- Works Offline: After the first language pack download, OCR processing works without internet
 
 FOR WHOM:
 - Anyone who wants to make scanned documents (contracts, invoices, letters, forms) searchable

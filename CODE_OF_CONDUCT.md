@@ -26,8 +26,9 @@ Inakzeptables Verhalten umfasst:
 
 ### Durchsetzung
 
-Faelle von missbräuchlichem Verhalten koennen dem Projektteam unter
-**lukas@geiger.sh** gemeldet werden. Alle Beschwerden werden geprueft und untersucht.
+Faelle von missbräuchlichem Verhalten koennen vertraulich an die Repository-Maintainer
+gemeldet werden. Bitte veroeffentlichen Sie keine privaten Informationen in Issues.
+Alle Beschwerden werden geprueft und untersucht.
 
 ---
 
@@ -56,8 +57,9 @@ Unacceptable behavior includes:
 
 ### Enforcement
 
-Instances of abusive behavior may be reported to the project team at
-**lukas@geiger.sh**. All complaints will be reviewed and investigated.
+Instances of abusive behavior may be reported privately to the repository
+maintainers. Do not publish private information in issues. All complaints
+will be reviewed and investigated.
 
 ---
 

@@ -5,13 +5,16 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-05-01
+
 ### Hinzugefügt / Added
 - Pytest-Abdeckung für portable Tesseract- und tessdata-Erkennung ergänzt.
-- GitHub-Actions-Testworkflow für Python 3.10 bis 3.12 ergänzt.
+- GitHub-Actions-Testworkflow für Python 3.10 bis 3.12 und `requirements-dev.txt` ergänzt.
 
 ### Behoben / Fixed
 - Tesseract wird beim Start bevorzugt aus `TESSERACT_CMD`, dem portablen Runtime-Ordner oder `PATH` konfiguriert.
 - `TESSDATA_PREFIX` wird für gebündelte Sprachpakete gesetzt, damit portable Builds ohne globale Tesseract-Installation funktionieren.
+- Datenschutz-, Store- und Drittanbieter-Lizenzdateien an PySide6, optionale Sprachpaket-Downloads und den aktuellen EXE-Namen angepasst.
 
 ## [1.0.3] - 2026-05-01
 

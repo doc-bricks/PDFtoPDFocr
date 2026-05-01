@@ -63,6 +63,10 @@ mit dem Build-Workflow synchron.
 
 Optional lokal gebündelt: **Tesseract OCR** (Apache 2.0) und Poppler. Die großen Runtime-Ordner `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/` und `releases/` sind bewusst per `.gitignore` ausgeschlossen.
 
+## Datenschutz / Netzwerkzugriff
+
+PDF-Dateien werden lokal verarbeitet und nicht hochgeladen. Netzwerkzugriff wird nur genutzt, wenn ein fehlendes Tesseract-Sprachpaket automatisch von GitHub nachgeladen wird.
+
 ## EXE / Portable Build
 
 ```bash
@@ -150,6 +154,10 @@ with the build workflow.
 
 Can use a local portable **Tesseract OCR** (Apache 2.0) and Poppler setup.
 Local runtime assets such as `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, and `releases/` stay out of Git via `.gitignore`.
+
+## Privacy / Network Access
+
+PDF files are processed locally and are not uploaded. Network access is only used when a missing Tesseract language pack is downloaded from GitHub.
 
 ## EXE / Portable Build
 
