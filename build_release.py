@@ -57,19 +57,17 @@ def main():
     if not VENV_DIR.exists():
         run([sys.executable, "-m", "venv", str(VENV_DIR)])
 
-    # Pip im venv
+    # Python im venv
     if os.name == "nt":
-        pip = str(VENV_DIR / "Scripts" / "pip.exe")
         python = str(VENV_DIR / "Scripts" / "python.exe")
     else:
-        pip = str(VENV_DIR / "bin" / "pip")
         python = str(VENV_DIR / "bin" / "python")
 
     # Schritt 2: Dependencies installieren
     print("[2/4] Installiere Dependencies...")
-    run([pip, "install", "--upgrade", "pip"])
+    run([python, "-m", "pip", "install", "--upgrade", "pip"])
     for pkg in REQUIRED_PACKAGES:
-        run([pip, "install", pkg])
+        run([python, "-m", "pip", "install", pkg])
 
     # Schritt 3: PyInstaller ausfuehren
     print("[3/4] Starte PyInstaller Build...")

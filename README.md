@@ -64,6 +64,10 @@ build_exe.bat
 python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec
 ```
 
+`build_release.py` legt dafür ein isoliertes `.build_venv` an, installiert nur
+die nötigen Runtime-/Build-Abhängigkeiten und startet PyInstaller mit der
+versionierten Spec-Datei.
+
 Die Ausgabe landet in `dist/PDFtoPDFocr/`. Falls vorhanden, werden `tesseract_portable/` und `poppler/` automatisch mit in den Build aufgenommen.
 
 ## Lizenz
@@ -136,6 +140,9 @@ build_exe.bat
 # or directly with dependencies already installed
 python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec
 ```
+
+`build_release.py` creates an isolated `.build_venv`, installs only the
+runtime/build dependencies, and runs PyInstaller with the versioned spec file.
 
 The packaged build is written to `dist/PDFtoPDFocr/`. When present, `tesseract_portable/` and `poppler/` are bundled automatically.
 
