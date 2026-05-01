@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 dist/
 build/
 .build_venv/
@@ -24,6 +27,7 @@ Thumbs.db
 # Application
 *.db
 *.log
+*.tmp
 *.exe
 *.msi
 *.msix

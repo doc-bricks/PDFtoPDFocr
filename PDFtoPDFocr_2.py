@@ -9,9 +9,9 @@ Uses pdf2image + pytesseract + pikepdf (no PyMuPDF required).
 Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
-import platform
 import logging
 import sys, os, io, shutil, requests, tempfile
+from pathlib import Path
 from typing import List
 
 # PySide6
@@ -88,6 +88,39 @@ DEFAULT_TESSDATA_CANDIDATES = [
 ]
 
 
+def _app_base_dir() -> Path:
+    """Returns the script or PyInstaller extraction directory."""
+    return Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+
+
+def _portable_tesseract_cmd() -> str | None:
+    """Finds a bundled Tesseract executable if the portable runtime exists."""
+    exe_name = "tesseract.exe" if os.name == "nt" else "tesseract"
+    candidates = [
+        _app_base_dir() / "tesseract_portable" / exe_name,
+        _app_base_dir() / exe_name,
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
+def configure_tesseract() -> str | None:
+    """Configures pytesseract to use portable Tesseract before PATH fallback."""
+    env_cmd = os.environ.get("TESSERACT_CMD")
+    candidates = [
+        env_cmd if env_cmd and os.path.isfile(env_cmd) else None,
+        _portable_tesseract_cmd(),
+        shutil.which("tesseract"),
+    ]
+    for cmd in candidates:
+        if cmd:
+            pytesseract.pytesseract.tesseract_cmd = cmd
+            return cmd
+    return None
+
+
 def get_tessdata_dir() -> str:
     """Locates the Tesseract tessdata directory, or creates a local fallback.
 
@@ -97,12 +130,19 @@ def get_tessdata_dir() -> str:
     env_dir = os.environ.get("TESSDATA_PREFIX")
     if env_dir and os.path.isdir(env_dir):
         return env_dir
+    base_dir = _app_base_dir()
+    bundled_tessdata = base_dir / "tesseract_portable" / "tessdata"
+    if bundled_tessdata.is_dir():
+        return str(bundled_tessdata)
+    local_tessdata = base_dir / "tessdata"
+    if local_tessdata.is_dir():
+        return str(local_tessdata)
     for c in DEFAULT_TESSDATA_CANDIDATES:
         if os.path.isdir(c):
             return c
-    fallback = os.path.join(os.getcwd(), "tessdata")
-    os.makedirs(fallback, exist_ok=True)
-    return fallback
+    fallback = base_dir / "tessdata"
+    fallback.mkdir(exist_ok=True)
+    return str(fallback)
 
 
 def ensure_tesseract(lang: str) -> bool:
@@ -116,13 +156,14 @@ def ensure_tesseract(lang: str) -> bool:
     Returns:
         True if Tesseract and the language pack are ready, False otherwise.
     """
-    if not shutil.which("tesseract"):
+    if not configure_tesseract():
         QMessageBox.critical(None, tr("error_title"),
             tr("error_tesseract_not_found"))
         return False
 
     tessdata_dir = get_tessdata_dir()
     os.makedirs(tessdata_dir, exist_ok=True)
+    os.environ["TESSDATA_PREFIX"] = tessdata_dir
     target = os.path.join(tessdata_dir, f"{lang}.traineddata")
 
     if not os.path.exists(target):

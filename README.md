@@ -39,6 +39,17 @@ Unter Windows funktioniert außerdem `START.bat` als Doppelklick-Einstieg.
 2. OCR-Sprache auswählen (fehlende Pakete werden automatisch geladen)
 3. "Start" klicken — fertig
 
+## Tests / Verifikation
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
+
+Der aktuelle lokale Check prüft die Tesseract-Konfiguration über
+`tests/test_tesseract_config.py` und hält die Packaging-/Runtime-Pfade
+mit dem Build-Workflow synchron.
+
 ## Abhängigkeiten
 
 | Paket | Lizenz | Zweck |
@@ -50,7 +61,7 @@ Unter Windows funktioniert außerdem `START.bat` als Doppelklick-Einstieg.
 | pikepdf | MPL 2.0 | PDF-Zusammenführung |
 | requests | Apache 2.0 | Sprachpaket-Download |
 
-Optional lokal gebündelt: **Tesseract OCR** (Apache 2.0) und Poppler. Die großen Runtime-Ordner `tesseract_portable/`, `tessdata/`, `dist/`, `build/` und `releases/` sind bewusst per `.gitignore` ausgeschlossen.
+Optional lokal gebündelt: **Tesseract OCR** (Apache 2.0) und Poppler. Die großen Runtime-Ordner `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/` und `releases/` sind bewusst per `.gitignore` ausgeschlossen.
 
 ## EXE / Portable Build
 
@@ -115,6 +126,17 @@ python PDFtoPDFocr_2.py
 2. Select OCR language (missing packs are downloaded automatically)
 3. Click "Start" — done
 
+## Tests / Verification
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
+
+The current local check covers the Tesseract configuration through
+`tests/test_tesseract_config.py` and keeps packaging/runtime paths aligned
+with the build workflow.
+
 ## Dependencies
 
 | Package | License | Purpose |
@@ -127,7 +149,7 @@ python PDFtoPDFocr_2.py
 | requests | Apache 2.0 | Language pack download |
 
 Can use a local portable **Tesseract OCR** (Apache 2.0) and Poppler setup.
-Local runtime assets such as `tesseract_portable/`, `tessdata/`, `dist/`, `build/`, and `releases/` stay out of Git via `.gitignore`.
+Local runtime assets such as `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, and `releases/` stay out of Git via `.gitignore`.
 
 ## EXE / Portable Build
 
