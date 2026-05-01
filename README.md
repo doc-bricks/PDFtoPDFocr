@@ -2,13 +2,15 @@
 
 Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um — per OCR (Texterkennung) mit Tesseract. Batch-Verarbeitung, automatischer Sprachpaket-Download, portable Tesseract-Integration.
 
+![PDFtoPDFocr Hauptfenster](README/screenshots/main.png)
+
 ## Features
 
 - **Batch-Verarbeitung** — Mehrere PDFs auf einmal konvertieren (Dateiauswahl oder Drag & Drop)
 - **Automatische Spracherkennung** — Sprache wird automatisch erkannt
-- **Multi-Language** — Unterstuetzung fuer dutzende Sprachen (deu, eng, fra, spa, ...)
+- **Multi-Language** — Unterstützung für dutzende Sprachen (deu, eng, fra, spa, ...)
 - **Auto-Download** — Fehlende Sprachpakete werden automatisch von GitHub geladen
-- **Portable Tesseract** — Tesseract OCR ist integriert, keine separate Installation noetig
+- **Portable Tesseract** — Tesseract OCR ist integriert, keine separate Installation nötig
 - **Originaldatei erhalten** — Ergebnis als neue Datei mit Suffix `_ocred.pdf`
 - **Fortschrittsanzeige** — Farbige Statusanzeige pro Datei
 
@@ -20,10 +22,10 @@ Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um — per OCR (Texterkennun
 ## Installation
 
 ```bash
-pip install PySide6 pytesseract Pillow pdf2image pikepdf requests
+pip install -r requirements.txt
 ```
 
-Poppler muss fuer `pdf2image` verfuegbar sein (als PATH-Variable oder portable im Projektordner).
+Poppler muss für `pdf2image` verfügbar sein (als PATH-Variable oder portable im Projektordner).
 
 ## Verwendung
 
@@ -31,11 +33,13 @@ Poppler muss fuer `pdf2image` verfuegbar sein (als PATH-Variable oder portable i
 python PDFtoPDFocr_2.py
 ```
 
-1. PDFs per Dateiauswahl oder Drag & Drop hinzufuegen
-2. OCR-Sprache auswaehlen (fehlende Pakete werden automatisch geladen)
+Unter Windows funktioniert außerdem `START.bat` als Doppelklick-Einstieg.
+
+1. PDFs per Dateiauswahl oder Drag & Drop hinzufügen
+2. OCR-Sprache auswählen (fehlende Pakete werden automatisch geladen)
 3. "Start" klicken — fertig
 
-## Abhaengigkeiten
+## Abhängigkeiten
 
 | Paket | Lizenz | Zweck |
 |---|---|---|
@@ -43,10 +47,24 @@ python PDFtoPDFocr_2.py
 | pytesseract | Apache 2.0 | Tesseract-OCR-Wrapper |
 | Pillow | HPND | Bildverarbeitung |
 | pdf2image | MIT | PDF zu Bild-Konvertierung |
-| pikepdf | MPL 2.0 | PDF-Zusammenfuehrung |
+| pikepdf | MPL 2.0 | PDF-Zusammenführung |
 | requests | Apache 2.0 | Sprachpaket-Download |
 
-Ausserdem gebundelt: **Tesseract OCR** (Apache 2.0) als portable Version.
+Optional lokal gebündelt: **Tesseract OCR** (Apache 2.0) und Poppler. Die großen Runtime-Ordner `tesseract_portable/`, `tessdata/`, `dist/`, `build/` und `releases/` sind bewusst per `.gitignore` ausgeschlossen.
+
+## EXE / Portable Build
+
+```bash
+python build_release.py --clean
+
+# oder unter Windows per Doppelklick/Terminal
+build_exe.bat
+
+# oder direkt mit vorhandenen Abhängigkeiten
+python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec
+```
+
+Die Ausgabe landet in `dist/PDFtoPDFocr/`. Falls vorhanden, werden `tesseract_portable/` und `poppler/` automatisch mit in den Build aufgenommen.
 
 ## Lizenz
 
@@ -78,7 +96,7 @@ Converts scanned PDF files into searchable PDFs using OCR (text recognition) wit
 ## Installation
 
 ```bash
-pip install PySide6 pytesseract Pillow pdf2image pikepdf requests
+pip install -r requirements.txt
 ```
 
 Poppler must be available for `pdf2image` (via PATH variable or portable in the project folder).
@@ -104,7 +122,22 @@ python PDFtoPDFocr_2.py
 | pikepdf | MPL 2.0 | PDF merging |
 | requests | Apache 2.0 | Language pack download |
 
-Also bundled: **Tesseract OCR** (Apache 2.0) as portable version.
+Can use a local portable **Tesseract OCR** (Apache 2.0) and Poppler setup.
+Local runtime assets such as `tesseract_portable/`, `tessdata/`, `dist/`, `build/`, and `releases/` stay out of Git via `.gitignore`.
+
+## EXE / Portable Build
+
+```bash
+python build_release.py --clean
+
+# or on Windows via double-click/terminal
+build_exe.bat
+
+# or directly with dependencies already installed
+python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec
+```
+
+The packaged build is written to `dist/PDFtoPDFocr/`. When present, `tesseract_portable/` and `poppler/` are bundled automatically.
 
 ## License
 

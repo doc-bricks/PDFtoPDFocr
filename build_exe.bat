@@ -1,0 +1,13 @@
+@echo off
+cd /d "%~dp0"
+set PYTHONIOENCODING=utf-8
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo [FEHLER] Python nicht gefunden!
+    pause
+    exit /b 1
+)
+echo Baue PDFtoPDFocr...
+powershell -NoProfile -Command "Get-ChildItem -LiteralPath 'build','dist' -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force"
+python -m PyInstaller --noconfirm PDFtoPDFocr.spec
+if errorlevel 1 pause

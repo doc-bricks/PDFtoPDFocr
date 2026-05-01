@@ -5,7 +5,7 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-*.spec
+.build_venv/
 
 # Virtual Environments
 venv/
@@ -24,12 +24,16 @@ Thumbs.db
 # Application
 *.db
 *.log
+*.exe
+*.msi
+*.msix
 logs/
 releases/
 
 # Bundled binaries (too large for git)
 tessdata/
 tesseract_portable/
+poppler/
 _alt/
 
 # Internal
@@ -37,7 +41,17 @@ _internal/
 _WARTUNG/
 AUFGABEN.txt
 TEST.txt
+TESTS.txt
 TESTERGEBNISSE.txt
 tmpclaude-*
 .claude/
 store_package/
+
+# Secrets / local config
+.env
+.env.*
+credentials.json
+client_secret*.json
+token.json
+*.pem
+*.key
