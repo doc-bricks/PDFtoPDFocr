@@ -57,18 +57,18 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
-        # GUI-Frameworks die nicht benoetigt werden
+        # GUI-Frameworks, die nicht benötigt werden
         'tkinter', 'PyQt5', 'PyQt6',
         # Wissenschaftliche Pakete
         'matplotlib', 'numpy', 'pandas', 'scipy', 'sklearn',
-        # Andere nicht benoetigte Pakete
+        # Andere nicht benötigte Pakete
         'cv2', 'docx', 'openpyxl', 'xlrd',
         'IPython', 'jupyter', 'notebook',
         'pytest', 'unittest',
         'setuptools', 'pip', 'wheel',
         'cryptography', 'paramiko',
         'asyncio', 'aiohttp',
-        # PySide6 Module die nicht benoetigt werden
+        # PySide6-Module, die nicht benötigt werden
         'PySide6.QtWebEngine', 'PySide6.QtWebEngineWidgets',
         'PySide6.QtMultimedia', 'PySide6.QtMultimediaWidgets',
         'PySide6.Qt3DCore', 'PySide6.Qt3DRender',

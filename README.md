@@ -1,13 +1,13 @@
-# PDFtoPDFocr — PDF OCR Converter
+# PDFtoPDFocr - PDF OCR Converter
 
-Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um — per OCR (Texterkennung) mit Tesseract. Batch-Verarbeitung, automatischer Sprachpaket-Download, portable Tesseract-Integration.
+Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um: per OCR (Texterkennung) mit Tesseract. Batch-Verarbeitung, auswählbare OCR-Sprache, automatischer Sprachpaket-Download und portable Tesseract-Integration.
 
 ![PDFtoPDFocr Hauptfenster](README/screenshots/main.png)
 
 ## Features
 
 - **Batch-Verarbeitung** — Mehrere PDFs auf einmal konvertieren (Dateiauswahl oder Drag & Drop)
-- **Automatische Spracherkennung** — Sprache wird automatisch erkannt
+- **Auswählbare OCR-Sprache** — Schnellwahl für Deutsch, Englisch, Französisch und Spanisch
 - **Multi-Language** — Unterstützung für dutzende Sprachen (deu, eng, fra, spa, ...)
 - **Auto-Download** — Fehlende Sprachpakete werden automatisch von GitHub geladen
 - **Portable Tesseract** — Tesseract OCR ist integriert, keine separate Installation nötig
@@ -37,7 +37,9 @@ Unter Windows funktioniert außerdem `START.bat` als Doppelklick-Einstieg.
 
 1. PDFs per Dateiauswahl oder Drag & Drop hinzufügen
 2. OCR-Sprache auswählen (fehlende Pakete werden automatisch geladen)
-3. "Start" klicken — fertig
+3. "Start" klicken - fertig
+
+Hinweis: PDFtoPDFocr erkennt die Dokumentsprache nicht automatisch. Wählen Sie vor dem Start die passende OCR-Sprache aus; fehlende Tesseract-Sprachpakete werden bei Bedarf nachgeladen.
 
 ## Tests / Verifikation
 
@@ -46,7 +48,7 @@ python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-Der aktuelle lokale Check prüft die Tesseract-Konfiguration über
+Der aktuelle lokale Check vom 2026-05-15 prüft die Tesseract-Konfiguration über
 `tests/test_tesseract_config.py` und hält die Packaging-/Runtime-Pfade
 mit dem Build-Workflow synchron.
 
@@ -66,6 +68,8 @@ Optional lokal gebündelt: **Tesseract OCR** (Apache 2.0) und Poppler. Die groß
 ## Datenschutz / Netzwerkzugriff
 
 PDF-Dateien werden lokal verarbeitet und nicht hochgeladen. Netzwerkzugriff wird nur genutzt, wenn ein fehlendes Tesseract-Sprachpaket automatisch von GitHub nachgeladen wird.
+
+Lokale Runtime-Ordner, Build-Artefakte, Releases, interne Wartungsnotizen und Secrets werden per `.gitignore` ausgeschlossen.
 
 ## EXE / Portable Build
 
@@ -93,14 +97,14 @@ MIT License
 
 ## English
 
-# PDFtoPDFocr — PDF OCR Converter
+# PDFtoPDFocr - PDF OCR Converter
 
-Converts scanned PDF files into searchable PDFs using OCR (text recognition) with Tesseract. Batch processing, automatic language pack download, portable Tesseract integration.
+Converts scanned PDF files into searchable PDFs using OCR (text recognition) with Tesseract. Batch processing, selectable OCR language, automatic language pack download, and portable Tesseract integration.
 
 ## Features
 
 - **Batch Processing** — Convert multiple PDFs at once (file picker or drag & drop)
-- **Automatic Language Detection** — Language is detected automatically
+- **Selectable OCR Language** — Quick selection for German, English, French, and Spanish
 - **Multi-Language** — Support for dozens of languages (deu, eng, fra, spa, ...)
 - **Auto-Download** — Missing language packs are downloaded automatically from GitHub
 - **Portable Tesseract** — Tesseract OCR is bundled, no separate installation needed
@@ -128,7 +132,9 @@ python PDFtoPDFocr_2.py
 
 1. Add PDFs via file picker or drag & drop
 2. Select OCR language (missing packs are downloaded automatically)
-3. Click "Start" — done
+3. Click "Start" - done
+
+Note: PDFtoPDFocr does not auto-detect the document language. Select the matching OCR language before starting; missing Tesseract language packs are downloaded when needed.
 
 ## Tests / Verification
 
@@ -137,7 +143,7 @@ python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-The current local check covers the Tesseract configuration through
+The current local check from 2026-05-15 covers the Tesseract configuration through
 `tests/test_tesseract_config.py` and keeps packaging/runtime paths aligned
 with the build workflow.
 
@@ -158,6 +164,8 @@ Local runtime assets such as `tesseract_portable/`, `tessdata/`, `poppler/`, `di
 ## Privacy / Network Access
 
 PDF files are processed locally and are not uploaded. Network access is only used when a missing Tesseract language pack is downloaded from GitHub.
+
+Local runtime folders, build artifacts, releases, internal maintenance notes, and secrets are excluded through `.gitignore`.
 
 ## EXE / Portable Build
 

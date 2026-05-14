@@ -36,7 +36,7 @@ SUPPORTED_EXTS = {".pdf"}
 # ===== i18n =====
 
 def _load_translations() -> dict:
-    """Laedt translations.json aus dem Skript-Verzeichnis."""
+    """Lädt translations.json aus dem Skript-Verzeichnis."""
     try:
         base = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
         path = os.path.join(base, "translations.json")
@@ -57,17 +57,17 @@ def set_language(lang: str) -> None:
 
 
 def tr(key: str, **kwargs) -> str:
-    """Gibt den uebersetzten String fuer key in der aktuellen Sprache zurueck.
+    """Gibt den übersetzten String für key in der aktuellen Sprache zurück.
 
-    Falls kein Eintrag vorhanden ist, wird key als Fallback zurueckgegeben.
-    Unterstuetzt Platzhalter via str.format(**kwargs).
+    Falls kein Eintrag vorhanden ist, wird key als Fallback zurückgegeben.
+    Unterstützt Platzhalter via str.format(**kwargs).
 
     Args:
-        key: Schluessel aus translations.json.
+        key: Schlüssel aus translations.json.
         **kwargs: Optionale Platzhalter-Werte (z.B. lang="deu").
 
     Returns:
-        Uebersetzter String.
+        Übersetzter String.
     """
     entry = _TRANSLATIONS.get(key, {})
     text = entry.get(_LANG, entry.get("de", key))
@@ -188,11 +188,11 @@ def ensure_tesseract(lang: str) -> bool:
 
 
 class OCRWorker(QThread):
-    """Fuehrt OCR-Verarbeitung im Hintergrund aus, sodass die GUI responsiv bleibt.
+    """Führt OCR-Verarbeitung im Hintergrund aus, sodass die GUI responsiv bleibt.
 
     Signals:
-        file_done(str, bool): Pfad + Erfolgsstatus fuer jede fertige Datei.
-        progress(str): Statusmeldung fuer das Label.
+        file_done(str, bool): Pfad + Erfolgsstatus für jede fertige Datei.
+        progress(str): Statusmeldung für das Label.
         finished_all(): Alle Dateien wurden verarbeitet.
     """
     file_done = Signal(str, bool)
@@ -213,7 +213,7 @@ class OCRWorker(QThread):
         self.finished_all.emit()
 
     def _ocr_pdf(self, src_path: str, lang: str) -> bool:
-        """Fuehrt OCR auf einer PDF-Datei aus (laeuft im Worker-Thread)."""
+        """Führt OCR auf einer PDF-Datei aus (läuft im Worker-Thread)."""
         try:
             poppler_path = self.poppler_path or None
             images: List[Image.Image] = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
@@ -360,7 +360,7 @@ class OCRConverterGUI(QWidget):
             self.list_widget.add_file(f)
 
     def on_start(self):
-        """Startet OCR-Verarbeitung fuer alle ausstehenden Dateien in einem QThread (GUI bleibt responsiv)."""
+        """Startet OCR-Verarbeitung für alle ausstehenden Dateien in einem QThread (GUI bleibt responsiv)."""
         self.status_label.setText("")
         pending_items = [self.list_widget.item(i) for i in range(self.list_widget.count())
                          if self.list_widget.item(i).data(Qt.UserRole + 1) == 'pending']

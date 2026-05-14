@@ -1,6 +1,6 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
-Stand: 2026-05-01
+Stand: 2026-05-15
 
 Dieses Dokument listet alle Drittanbieter-Bibliotheken auf,
 die von PDFtoPDFocr verwendet werden.
@@ -47,7 +47,7 @@ Lizenz: GPL v2 or later
 Copyright: Glyph & Cog, LLC; The Poppler contributors
 URL: https://poppler.freedesktop.org/
 Hinweis: Poppler-Bibliotheken können im Verzeichnis poppler/
-         mitgeliefert. Als GPL-Software unterliegt die Verteilung den
+         mitgeliefert werden. Als GPL-Software unterliegt die Verteilung den
          Bedingungen der GPL v2.
 
 pikepdf

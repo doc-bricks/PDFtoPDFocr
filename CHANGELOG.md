@@ -5,6 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Geändert / Changed
+- README und Store-Listing präzisieren auswählbare OCR-Sprache statt automatischer Spracherkennung.
+- Datenschutz-, Release- und Drittanbieter-Hinweise auf den Wartungscheck vom 2026-05-15 synchronisiert.
+- Deutsche Endnutzertexte auf echte Umlaute geprüft und bereinigt.
+
 ## [1.0.4] - 2026-05-01
 
 ### Hinzugefügt / Added

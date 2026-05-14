@@ -18,6 +18,7 @@
 
 ### Notes
 
-- The Windows build is produced from `PDFtoPDFocr.spec` and staged via `_tools/release_sync.py`.
+- The Windows build is produced from `PDFtoPDFocr.spec` via `build_release.py`.
 - The desktop ZIP contains the packaged application directory for portable local use.
 - The source archive is created from the current working tree so the local release bundle matches the current repository state.
+- Local release artifacts stay ignored by Git and are listed here only as the expected release layout.

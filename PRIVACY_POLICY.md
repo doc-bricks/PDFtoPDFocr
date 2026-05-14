@@ -1,6 +1,6 @@
 # Privacy Policy / Datenschutzerklärung
 
-**PDFtoPDFocr** – Last updated: 2026-05-01
+**PDFtoPDFocr** - Last updated: 2026-05-15
 
 ---
 
@@ -13,6 +13,7 @@
 - **Local file processing:** Your PDF files stay on your device and are processed locally.
 - **Local processing only:** All OCR processing is performed locally on your computer using the bundled Tesseract engine.
 - **Limited network use:** If a selected Tesseract language pack is missing, the app can download that public language data from GitHub. PDF files are not uploaded.
+- **Ignored local artifacts:** Build folders, release bundles, runtime binaries, logs, and local secrets are excluded from the repository.
 
 ---
 
@@ -25,6 +26,7 @@
 - **Lokale Dateiverarbeitung:** Ihre PDF-Dateien bleiben auf Ihrem Gerät und werden lokal verarbeitet.
 - **Nur lokale Verarbeitung:** Alle OCR-Verarbeitungen erfolgen lokal auf Ihrem Computer mit der integrierten Tesseract-Engine.
 - **Begrenzter Netzwerkzugriff:** Wenn ein ausgewähltes Tesseract-Sprachpaket fehlt, kann die App diese öffentlichen Sprachdaten von GitHub herunterladen. PDF-Dateien werden nicht hochgeladen.
+- **Ausgeschlossene lokale Artefakte:** Build-Ordner, Release-Bundles, Runtime-Binaries, Logs und lokale Secrets sind vom Repository ausgeschlossen.
 
 ---
 

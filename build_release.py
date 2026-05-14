@@ -50,7 +50,7 @@ def main():
         for d in [DIST_DIR, BUILD_DIR, VENV_DIR]:
             if d.exists():
                 shutil.rmtree(d, ignore_errors=True)
-                print(f"  Geloescht: {d}")
+                print(f"  Gelöscht: {d}")
 
     # Schritt 1: Sauberes venv erstellen
     print("[1/4] Erstelle sauberes Build-venv...")
@@ -69,13 +69,13 @@ def main():
     for pkg in REQUIRED_PACKAGES:
         run([python, "-m", "pip", "install", pkg])
 
-    # Schritt 3: PyInstaller ausfuehren
+    # Schritt 3: PyInstaller ausführen
     print("[3/4] Starte PyInstaller Build...")
     pyinstaller = str(VENV_DIR / ("Scripts" if os.name == "nt" else "bin") / "pyinstaller")
     run([pyinstaller, str(SPEC_FILE), "--noconfirm"], cwd=str(SCRIPT_DIR))
 
-    # Schritt 4: Ergebnis pruefen
-    print("[4/4] Pruefe Build-Ergebnis...")
+    # Schritt 4: Ergebnis prüfen
+    print("[4/4] Prüfe Build-Ergebnis...")
     exe_path = DIST_DIR / "PDFtoPDFocr" / ("PDFtoPDFocr.exe" if os.name == "nt" else "PDFtoPDFocr")
     if exe_path.exists():
         size_mb = exe_path.stat().st_size / (1024 * 1024)
