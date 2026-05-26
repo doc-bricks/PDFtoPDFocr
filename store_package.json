@@ -4,7 +4,7 @@
   "publisher_display": "Geiger",
   "identity_name": "Geiger.PDFtoPDFocr",
   "version": "1.0.4.0",
-  "description": "PDF-Dateien per OCR durchsuchbar machen. Batch-Processing, automatische Spracherkennung, portable Tesseract-Integration.",
+  "description": "PDF-Dateien per OCR durchsuchbar machen. Batch-Processing, auswählbare OCR-Sprache, portable Tesseract-Integration.",
   "executable": "PDFtoPDFocr.exe",
   "capabilities": "internetClient,runFullTrust",
   "category": "Productivity",
