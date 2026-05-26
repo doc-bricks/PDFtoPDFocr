@@ -9,6 +9,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - README und Store-Listing präzisieren auswählbare OCR-Sprache statt automatischer Spracherkennung.
 - Datenschutz-, Release- und Drittanbieter-Hinweise auf den Wartungscheck vom 2026-05-15 synchronisiert.
 - Deutsche Endnutzertexte auf echte Umlaute geprüft und bereinigt.
+- Portierungsstrategie ergänzt: Windows Store zuerst, Web/PWA-Companion mit `pdftopdfocr-job-v1.json`, Android/iOS über PWA-Testpfad, macOS/Linux als Source-Smoke-Ziele.
 
 ## [1.0.4] - 2026-05-01
 

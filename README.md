@@ -89,6 +89,12 @@ versionierten Spec-Datei.
 
 Die Ausgabe landet in `dist/PDFtoPDFocr/`. Falls vorhanden, werden `tesseract_portable/` und `poppler/` automatisch mit in den Build aufgenommen.
 
+## Portierung / Plattformstrategie
+
+Die aktuelle Portierungsentscheidung steht in `PORTIERUNGSPLAN.md`: Windows Store bleibt der erste Release-Kanal, weil die App lokale Batch-OCR mit Tesseract, Poppler und PySide6 bündelt. Android, iOS und Web sollen nicht als sofortige native Clones entstehen, sondern über einen Web/PWA-Companion mit dem geplanten Austauschformat `pdftopdfocr-job-v1.json` vorbereitet werden.
+
+macOS und Linux bleiben zunächst Source- und Smoke-Test-Ziele aus derselben Desktop-Codebasis. Eine eigene Desktop-Paketierung folgt erst, wenn Windows Store und PWA-Linie stabil sind.
+
 ## Lizenz
 
 MIT License
@@ -183,6 +189,12 @@ python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec
 runtime/build dependencies, and runs PyInstaller with the versioned spec file.
 
 The packaged build is written to `dist/PDFtoPDFocr/`. When present, `tesseract_portable/` and `poppler/` are bundled automatically.
+
+## Porting / Platform Strategy
+
+The current porting decision is documented in `PORTIERUNGSPLAN.md`: Windows Store remains the first release channel because the app bundles local batch OCR with Tesseract, Poppler, and PySide6. Android, iOS, and web should start through a Web/PWA companion and the planned `pdftopdfocr-job-v1.json` exchange format, not through immediate native clones.
+
+macOS and Linux stay source and smoke-test targets from the same desktop codebase for now. Dedicated desktop packaging should follow only after the Windows Store and PWA paths are stable.
 
 ## License
 
