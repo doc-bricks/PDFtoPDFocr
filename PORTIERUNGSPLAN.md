@@ -1,6 +1,6 @@
 # Portierungsplan - PDFtoPDFocr
 
-Stand: 2026-05-26
+Stand: 2026-05-28
 
 ## Kurzentscheidung
 
@@ -71,4 +71,4 @@ Wichtig sind dabei:
 
 ## Nächster konkreter Schritt
 
-Als nächstes sollte der Desktop einen kleinen JSON-Export für Job-Voreinstellungen und Ergebnis-Metadaten erhalten. Das ist der günstigste Brückenschritt zu Web/PWA, ohne den OCR-Kern zu duplizieren.
+Der Desktop-Export `pdftopdfocr-job-v1.json` ist jetzt umgesetzt. Als nächstes sollte der Web/PWA-Companion diesen Export lesen und für kleine Browser-Jobs, Vorprüfung und Ergebnisansicht nutzbar machen.

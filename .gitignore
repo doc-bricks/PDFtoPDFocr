@@ -33,6 +33,7 @@ Thumbs.db
 *.msix
 logs/
 releases/
+pdftopdfocr-job-v1.json
 
 # Bundled binaries (too large for git)
 tessdata/

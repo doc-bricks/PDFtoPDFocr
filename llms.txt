@@ -1,0 +1,43 @@
+# PDFtoPDFocr
+
+## Canonical Links
+
+- Repository: https://github.com/doc-bricks/PDFtoPDFocr
+- Primary app: `PDFtoPDFocr_2.py`
+- Export contract: `EXPORTFORMAT.md`
+- Privacy policy: `PRIVACY_POLICY.md`
+- Store listing draft: `STORE_LISTING.md`
+
+## Summary
+
+PDFtoPDFocr is a local-first Windows desktop tool for converting scanned PDF files into searchable PDFs with Tesseract OCR. It uses PySide6 for the GUI, pdf2image/Poppler for page rasterization, pytesseract/Tesseract for OCR, and pikepdf/QPDF for PDF output.
+
+The app is designed for private document workflows such as invoices, letters, contracts, forms, and archive scans. PDF files are processed locally and are not uploaded. Network access is limited to downloading missing public Tesseract language packs from GitHub.
+
+## Interfaces
+
+- Desktop GUI: `python PDFtoPDFocr_2.py`
+- Windows launcher: `START.bat`
+- Portable build: `python build_release.py --clean`
+- Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
+- Test suite: `python -m pytest -q`
+
+## Data And Export Format
+
+- OCR outputs are written beside the source PDF with the `_ocred.pdf` suffix.
+- `Job-Export` writes `pdftopdfocr-job-v1.json`.
+- The job manifest stores OCR language, local path references, file metadata, status, messages, and output hints.
+- The job manifest does not embed PDF bytes or Base64 document contents.
+- `EXPORTFORMAT.md` is the source of truth for the v1 manifest fields.
+
+## Packaging Notes
+
+- `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, `.build_venv/`, and `releases/` are local runtime/build artifacts and stay out of Git.
+- `store_package.json`, `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `THIRD_PARTY_LICENSES.txt`, and `RELEASES.md` document the Windows Store and release path.
+- The current release line is `1.0.4`.
+
+## Safety Boundaries
+
+- Do not commit PDFs, OCR outputs, user job manifests, bundled runtime binaries, release bundles, credentials, or local maintenance notes.
+- Keep German end-user documentation with real umlauts when German text is edited.
+- Keep README claims aligned with the implementation: the app supports selectable OCR language, not automatic document language detection.

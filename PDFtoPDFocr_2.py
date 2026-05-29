@@ -9,8 +9,10 @@ Uses pdf2image + pytesseract + pikepdf (no PyMuPDF required).
 Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
+import json
 import logging
 import sys, os, io, shutil, requests, tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
 
@@ -32,6 +34,10 @@ import pikepdf
 # Utilities
 ICON_OK, ICON_ERR, ICON_BROOM, ICON_TRASH = "✓", "⚠", "🧹", "🗑"
 SUPPORTED_EXTS = {".pdf"}
+APP_NAME = "PDFtoPDFocr"
+APP_VERSION = "1.0.4"
+EXPORT_SCHEMA = "pdftopdfocr-job-v1"
+DEFAULT_OCR_DPI = 300
 
 # ===== i18n =====
 
@@ -187,6 +193,87 @@ def ensure_tesseract(lang: str) -> bool:
     return True
 
 
+def _utc_now_iso() -> str:
+    """Returns a stable UTC timestamp for export payloads."""
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _manifest_path(raw_path: str) -> str:
+    """Normalizes file paths for JSON manifests while preserving relativity."""
+    return Path(raw_path).as_posix()
+
+
+def _export_status(status: str) -> str:
+    """Maps internal UI states to the public export schema."""
+    return {
+        "done": "success",
+        "error": "failed",
+        "pending": "pending",
+    }.get(status, "pending")
+
+
+def build_job_export_payload(
+    file_entries: list[dict],
+    ocr_language: str,
+    created_at: str | None = None,
+) -> dict:
+    """Builds the portable OCR job manifest without embedding PDF content."""
+    input_files = []
+    outputs = []
+
+    for entry in file_entries:
+        raw_path = entry["path"]
+        source_path = Path(raw_path)
+        output_path = source_path.with_name(f"{source_path.stem}_ocred.pdf")
+        source_exists = source_path.exists()
+        output_exists = output_path.exists()
+
+        input_files.append(
+            {
+                "name": source_path.name,
+                "local_path": _manifest_path(raw_path),
+                "size_bytes": source_path.stat().st_size if source_exists else None,
+                "missing": not source_exists,
+            }
+        )
+        outputs.append(
+            {
+                "input_name": source_path.name,
+                "output_name": output_path.name,
+                "status": _export_status(entry.get("status", "pending")),
+                "message": entry.get("message", ""),
+                "output_local_path": output_path.as_posix(),
+                "output_exists": output_exists,
+            }
+        )
+
+    return {
+        "schema": EXPORT_SCHEMA,
+        "app": APP_NAME,
+        "app_version": APP_VERSION,
+        "created_at": created_at or _utc_now_iso(),
+        "ocr_language": ocr_language,
+        "input_files": input_files,
+        "outputs": outputs,
+        "settings": {
+            "dpi": DEFAULT_OCR_DPI,
+            "preserve_original": True,
+            "download_missing_language_pack": True,
+        },
+    }
+
+
+def write_job_export(target_path: str | Path, payload: dict) -> Path:
+    """Writes the OCR job manifest as UTF-8 JSON without BOM."""
+    export_path = Path(target_path)
+    export_path.parent.mkdir(parents=True, exist_ok=True)
+    export_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return export_path
+
+
 class OCRWorker(QThread):
     """Führt OCR-Verarbeitung im Hintergrund aus, sodass die GUI responsiv bleibt.
 
@@ -305,6 +392,7 @@ class PDFListWidget(QListWidget):
         item = QListWidgetItem(os.path.basename(filepath))
         item.setData(Qt.UserRole, filepath)
         item.setData(Qt.UserRole + 1, 'pending')
+        item.setData(Qt.UserRole + 2, "")
         self.addItem(item)
 
 
@@ -334,9 +422,16 @@ class OCRConverterGUI(QWidget):
         btn_layout = QHBoxLayout()
         self.btn_add_file = QPushButton(tr("btn_add_file"))
         self.btn_start = QPushButton(tr("btn_start"))
+        self.btn_export = QPushButton(tr("btn_export_job"))
         self.btn_refresh = QPushButton(f"{ICON_BROOM} {tr('btn_refresh')}")
         self.btn_delete = QPushButton(f"{ICON_TRASH} {tr('btn_delete')}")
-        for b in (self.btn_add_file, self.btn_start, self.btn_refresh, self.btn_delete):
+        for b in (
+            self.btn_add_file,
+            self.btn_start,
+            self.btn_export,
+            self.btn_refresh,
+            self.btn_delete,
+        ):
             btn_layout.addWidget(b)
         self.layout.addLayout(btn_layout)
 
@@ -347,6 +442,7 @@ class OCRConverterGUI(QWidget):
         # Events
         self.btn_add_file.clicked.connect(self.open_file_dialog)
         self.btn_start.clicked.connect(self.on_start)
+        self.btn_export.clicked.connect(self.export_job_manifest)
         self.btn_refresh.clicked.connect(self.on_refresh)
         self.btn_delete.clicked.connect(self.on_delete)
 
@@ -395,10 +491,12 @@ class OCRConverterGUI(QWidget):
                     item.setText(f"{ICON_OK} {os.path.basename(path)}")
                     item.setForeground(QColor('green'))
                     item.setData(Qt.UserRole + 1, 'done')
+                    item.setData(Qt.UserRole + 2, tr("message_ocr_success"))
                 else:
                     item.setText(f"{ICON_ERR} {os.path.basename(path)}")
                     item.setForeground(QColor('orange'))
                     item.setData(Qt.UserRole + 1, 'error')
+                    item.setData(Qt.UserRole + 2, tr("message_ocr_failed"))
                 break
 
     def _on_ocr_finished(self):
@@ -417,6 +515,54 @@ class OCRConverterGUI(QWidget):
         """Removes the currently selected entries from the file list."""
         for item in self.list_widget.selectedItems():
             self.list_widget.takeItem(self.list_widget.row(item))
+
+    def _collect_job_entries(self) -> list[dict]:
+        """Collects the current GUI state for export and later companion use."""
+        entries = []
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            entries.append(
+                {
+                    "path": item.data(Qt.UserRole),
+                    "status": item.data(Qt.UserRole + 1) or "pending",
+                    "message": item.data(Qt.UserRole + 2) or "",
+                }
+            )
+        return entries
+
+    def export_job_manifest(
+        self,
+        checked: bool = False,
+        target_path: str | Path | None = None,
+        show_feedback: bool = True,
+    ) -> Path | None:
+        """Exports the current OCR job state to the portable JSON manifest."""
+        del checked
+        entries = self._collect_job_entries()
+        if target_path is None:
+            default_dir = Path(entries[0]["path"]).parent if entries else Path.cwd()
+            default_name = default_dir / f"{EXPORT_SCHEMA}.json"
+            chosen_path, _ = QFileDialog.getSaveFileName(
+                self,
+                tr("dialog_export_job"),
+                str(default_name),
+                tr("filter_json"),
+            )
+            if not chosen_path:
+                return None
+            target_path = chosen_path
+
+        payload = build_job_export_payload(entries, self.lang_combo.currentText())
+        written_path = write_job_export(target_path, payload)
+        self.status_label.setText(tr("status_export_saved", filename=written_path.name))
+        self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
+        if show_feedback:
+            QMessageBox.information(
+                self,
+                tr("info_export_title"),
+                tr("info_export_saved", filename=written_path.name),
+            )
+        return written_path
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

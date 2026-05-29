@@ -1,10 +1,10 @@
 # Exportformat - PDFtoPDFocr
 
-Stand: 2026-05-26
+Stand: 2026-05-28
 
 ## `pdftopdfocr-job-v1.json`
 
-Dieses Format ist der geplante Vertrag zwischen Desktop-App und Web/PWA-Companion. Es enthält keine PDF-Inhalte, sondern nur Einstellungen, lokale Pfadreferenzen, Metadaten und Ergebnis-Hinweise.
+Dieses Format ist der Vertrag zwischen Desktop-App und Web/PWA-Companion. Es enthält keine PDF-Inhalte, sondern nur Einstellungen, lokale Pfadreferenzen, Metadaten und Ergebnis-Hinweise.
 
 ## Ziele
 
@@ -13,20 +13,27 @@ Dieses Format ist der geplante Vertrag zwischen Desktop-App und Web/PWA-Companio
 - Datenschutz wahren, indem PDF-Dateien nicht ungefragt eingebettet oder hochgeladen werden.
 - Versionierte Grundlage für Android-/iOS-Wrapper schaffen.
 
-## Entwurf
+## Aktueller Stand
+
+- Desktop-Export ist in der App als Button `Job-Export` umgesetzt.
+- Die JSON-Datei wird als UTF-8 ohne BOM geschrieben.
+- Fehlende Dateien bleiben im Manifest sichtbar (`missing: true`), statt den Export abzubrechen.
+
+## Schema
 
 ```json
 {
   "schema": "pdftopdfocr-job-v1",
   "app": "PDFtoPDFocr",
-  "created_at": "2026-05-26T00:00:00Z",
+  "app_version": "1.0.4",
+  "created_at": "2026-05-28T00:00:00Z",
   "ocr_language": "deu",
   "input_files": [
     {
       "name": "scan.pdf",
       "local_path": "C:/Users/User/Documents/scan.pdf",
       "size_bytes": 123456,
-      "sha256": "optional"
+      "missing": false
     }
   ],
   "outputs": [
@@ -34,7 +41,9 @@ Dieses Format ist der geplante Vertrag zwischen Desktop-App und Web/PWA-Companio
       "input_name": "scan.pdf",
       "output_name": "scan_ocred.pdf",
       "status": "pending|success|failed",
-      "message": ""
+      "message": "",
+      "output_local_path": "C:/Users/User/Documents/scan_ocred.pdf",
+      "output_exists": false
     }
   ],
   "settings": {
@@ -52,9 +61,9 @@ Dieses Format ist der geplante Vertrag zwischen Desktop-App und Web/PWA-Companio
 - PDF-Dateien werden nicht als Base64 eingebettet.
 - Mobile und Web-Clients müssen unbekannte Felder ignorieren.
 - Lokale Pfade sind Hinweise für denselben Rechner und dürfen auf anderen Geräten fehlen.
+- Fehlende Eingabedateien werden mit `missing: true` und `size_bytes: null` exportiert.
 
-## Offene Umsetzung
+## Nächste sinnvolle Schritte
 
-- Desktop-Menüpunkt für Job-Export ergänzen.
 - Import eines Job-Manifests optional prüfen.
 - PWA kann mit denselben Feldern kleine Browser-Jobs vorbereiten oder Ergebnislisten anzeigen.

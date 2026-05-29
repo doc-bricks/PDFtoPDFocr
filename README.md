@@ -2,6 +2,8 @@
 
 Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um: per OCR (Texterkennung) mit Tesseract. Batch-Verarbeitung, auswählbare OCR-Sprache, automatischer Sprachpaket-Download und portable Tesseract-Integration.
 
+Maschinenlesbarer Projektkontext: [`llms.txt`](llms.txt)
+
 ![PDFtoPDFocr Hauptfenster](README/screenshots/main.png)
 
 ## Features
@@ -38,6 +40,7 @@ Unter Windows funktioniert außerdem `START.bat` als Doppelklick-Einstieg.
 1. PDFs per Dateiauswahl oder Drag & Drop hinzufügen
 2. OCR-Sprache auswählen (fehlende Pakete werden automatisch geladen)
 3. "Start" klicken - fertig
+4. Bei Bedarf `Job-Export` nutzen, um ein portables `pdftopdfocr-job-v1.json` mit Einstellungen, Dateimetadaten und Ergebnis-Hinweisen zu speichern.
 
 Hinweis: PDFtoPDFocr erkennt die Dokumentsprache nicht automatisch. Wählen Sie vor dem Start die passende OCR-Sprache aus; fehlende Tesseract-Sprachpakete werden bei Bedarf nachgeladen.
 
@@ -48,8 +51,9 @@ python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-Der aktuelle lokale Check vom 2026-05-15 prüft die Tesseract-Konfiguration über
-`tests/test_tesseract_config.py` und hält die Packaging-/Runtime-Pfade
+Der aktuelle lokale Check deckt die Tesseract-Konfiguration über
+`tests/test_tesseract_config.py` sowie den Job-Export über
+`tests/test_export_format.py` ab und hält Packaging-/Runtime-Pfade
 mit dem Build-Workflow synchron.
 
 ## Abhängigkeiten
@@ -107,6 +111,8 @@ MIT License
 
 Converts scanned PDF files into searchable PDFs using OCR (text recognition) with Tesseract. Batch processing, selectable OCR language, automatic language pack download, and portable Tesseract integration.
 
+Machine-readable project context: [`llms.txt`](llms.txt)
+
 ## Features
 
 - **Batch Processing** — Convert multiple PDFs at once (file picker or drag & drop)
@@ -139,6 +145,7 @@ python PDFtoPDFocr_2.py
 1. Add PDFs via file picker or drag & drop
 2. Select OCR language (missing packs are downloaded automatically)
 3. Click "Start" - done
+4. Use `Job-Export` when needed to save a portable `pdftopdfocr-job-v1.json` with settings, file metadata, and result hints.
 
 Note: PDFtoPDFocr does not auto-detect the document language. Select the matching OCR language before starting; missing Tesseract language packs are downloaded when needed.
 
@@ -149,8 +156,9 @@ python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-The current local check from 2026-05-15 covers the Tesseract configuration through
-`tests/test_tesseract_config.py` and keeps packaging/runtime paths aligned
+The current local checks cover the Tesseract configuration through
+`tests/test_tesseract_config.py` plus the portable job export through
+`tests/test_export_format.py`, and keep packaging/runtime paths aligned
 with the build workflow.
 
 ## Dependencies
