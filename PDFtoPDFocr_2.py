@@ -239,6 +239,7 @@ def build_job_export_payload(
         outputs.append(
             {
                 "input_name": source_path.name,
+                "input_local_path": _manifest_path(raw_path),
                 "output_name": output_path.name,
                 "status": _export_status(entry.get("status", "pending")),
                 "message": entry.get("message", ""),
@@ -294,7 +295,7 @@ class OCRWorker(QThread):
 
     def run(self):
         for path in self.pending_paths:
-            self.progress.emit(f"Verarbeite: {os.path.basename(path)} ...")
+            self.progress.emit(tr("status_processing", filename=os.path.basename(path)))
             success = self._ocr_pdf(path, self.lang)
             self.file_done.emit(path, success)
         self.finished_all.emit()
@@ -320,14 +321,16 @@ class OCRWorker(QThread):
                     except Exception as e:
                         logging.warning(f"PDF operation failed: {e}")
                         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+                        src_pdf = None
                         try:
                             tmp.write(pdf_bytes)
                             tmp.flush()
                             tmp.close()
                             src_pdf = pikepdf.Pdf.open(tmp.name)
                             out_pdf.pages.extend(src_pdf.pages)
-                            src_pdf.close()
                         finally:
+                            if src_pdf is not None:
+                                src_pdf.close()
                             try:
                                 os.unlink(tmp.name)
                             except Exception as e:
@@ -510,6 +513,12 @@ class OCRConverterGUI(QWidget):
         self.list_widget.clear()
         self.status_label.setText("")
         self.status_label.setStyleSheet("")
+
+    def closeEvent(self, event):
+        """Wartet auf laufenden OCR-Worker bevor das Fenster geschlossen wird."""
+        if self._ocr_worker is not None and self._ocr_worker.isRunning():
+            self._ocr_worker.wait()
+        event.accept()
 
     def on_delete(self):
         """Removes the currently selected entries from the file list."""

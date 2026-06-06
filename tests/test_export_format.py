@@ -1,5 +1,6 @@
 import codecs
 import json
+from unittest.mock import MagicMock
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
@@ -58,6 +59,31 @@ def test_write_job_export_uses_utf8_without_bom(tmp_path):
     assert json.loads(raw.decode("utf-8"))["schema"] == "pdftopdfocr-job-v1"
 
 
+def test_build_job_export_payload_disambiguates_duplicate_file_names(tmp_path):
+    first = tmp_path / "one" / "scan.pdf"
+    second = tmp_path / "two" / "scan.pdf"
+    first.parent.mkdir(parents=True)
+    second.parent.mkdir(parents=True)
+    first.write_bytes(b"%PDF-first\n")
+    second.write_bytes(b"%PDF-second\n")
+
+    payload = app.build_job_export_payload(
+        [
+            {"path": str(first), "status": "done", "message": "Erster Lauf"},
+            {"path": str(second), "status": "error", "message": "Zweiter Lauf"},
+        ],
+        "deu",
+        created_at="2026-06-04T00:00:00Z",
+    )
+
+    first_output, second_output = payload["outputs"]
+    assert first_output["input_name"] == "scan.pdf"
+    assert second_output["input_name"] == "scan.pdf"
+    assert first_output["input_local_path"] == first.as_posix()
+    assert second_output["input_local_path"] == second.as_posix()
+    assert first_output["output_local_path"] != second_output["output_local_path"]
+
+
 def test_export_job_manifest_supports_empty_project_state(tmp_path):
     _qapp()
     gui = app.OCRConverterGUI()
@@ -94,3 +120,89 @@ def test_export_job_manifest_collects_current_gui_status(tmp_path):
     assert data["outputs"][0]["output_exists"] is True
     assert data["outputs"][0]["message"] == "OCR erfolgreich abgeschlossen."
     gui.close()
+
+
+def test_close_event_waits_for_running_worker():
+    _qapp()
+    gui = app.OCRConverterGUI()
+
+    mock_worker = MagicMock()
+    mock_worker.isRunning.return_value = True
+    gui._ocr_worker = mock_worker
+
+    mock_event = MagicMock()
+    gui.closeEvent(mock_event)
+
+    mock_worker.wait.assert_called_once()
+    mock_event.accept.assert_called_once()
+
+    gui._ocr_worker = None
+    gui.close()
+
+
+def test_ocr_worker_progress_uses_tr_for_localization():
+    _qapp()
+    app.set_language("en")
+
+    emitted = []
+    worker = app.OCRWorker(pending_paths=["scan.pdf"], lang="eng")
+    worker.progress.connect(emitted.append)
+    worker._ocr_pdf = lambda path, lang: True
+
+    worker.run()
+
+    app.set_language("de")
+
+    assert len(emitted) == 1
+    assert emitted[0].startswith("Processing:"), (
+        f"Expected localized 'Processing:' but got: {emitted[0]!r}"
+    )
+
+
+def test_ocr_pdf_fallback_closes_src_pdf_before_unlink(tmp_path, monkeypatch):
+    """Bug #3: src_pdf.close() muss vor os.unlink() im Fallback-Temp-Pfad kommen."""
+    from PIL import Image as PILImage
+    import pikepdf
+
+    _qapp()
+    worker = app.OCRWorker(pending_paths=[], lang="eng")
+
+    fake_image = PILImage.new("RGB", (10, 10))
+    monkeypatch.setattr("PDFtoPDFocr_2.convert_from_path", lambda *a, **kw: [fake_image])
+    monkeypatch.setattr(
+        "PDFtoPDFocr_2.pytesseract.image_to_pdf_or_hocr",
+        lambda *a, **kw: b"%PDF-fake",
+    )
+
+    events = []
+    mock_src_pdf = MagicMock()
+    mock_src_pdf.pages = []
+    mock_src_pdf.close = lambda: events.append("close")
+
+    open_calls = [0]
+
+    def patched_open(source, *a, **kw):
+        open_calls[0] += 1
+        if open_calls[0] == 1:
+            raise Exception("forced BytesIO failure")
+        return mock_src_pdf
+
+    monkeypatch.setattr(pikepdf.Pdf, "open", patched_open)
+
+    _original_unlink = app.os.unlink
+
+    def patched_unlink(p):
+        events.append("unlink")
+        _original_unlink(p)
+
+    monkeypatch.setattr(app.os, "unlink", patched_unlink)
+
+    src = tmp_path / "test.pdf"
+    src.write_bytes(b"%PDF-1.4\n")
+    worker._ocr_pdf(str(src), "eng")
+
+    assert "close" in events, "src_pdf.close() wurde im Fallback-Pfad nie aufgerufen"
+    assert "unlink" in events, "os.unlink() wurde nie aufgerufen — Temp-Datei wurde nicht gelöscht"
+    assert events.index("close") < events.index("unlink"), (
+        f"src_pdf.close() muss vor os.unlink() kommen; Reihenfolge war: {events}"
+    )
