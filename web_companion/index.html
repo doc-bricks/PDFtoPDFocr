@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PDFtoPDFocr Companion</title>
+    <meta
+      name="description"
+      content="Offline-Companion für PDFtoPDFocr: Job-Manifeste importieren, mobile Vorprüfung durchführen und Browser-Entwürfe exportieren."
+    >
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./icons/Icon-192.png">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div class="shell">
+      <header class="hero">
+        <p class="eyebrow">PDFtoPDFocr Web/PWA-Companion</p>
+        <h1>Job-Manifeste lesen, prüfen und mobil vorbereiten</h1>
+        <p class="lead">
+          Diese Companion-Linie ersetzt nicht die Desktop-OCR. Sie zeigt
+          `pdftopdfocr-job-v1.json` offline an, baut Browser-Entwürfe für kleine
+          Vorab-Jobs und hält PDF-Inhalte bewusst aus dem Browser fern.
+        </p>
+        <div class="hero-actions">
+          <label class="button primary" for="manifest-input">Manifest importieren</label>
+          <button class="button ghost" id="demo-button" type="button">Demo laden</button>
+          <button class="button ghost" id="export-button" type="button">Aktuellen Stand exportieren</button>
+          <input id="manifest-input" type="file" accept=".json,application/json" hidden>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel-accent">
+          <div class="panel-header">
+            <h2>Browser-Vorprüfung</h2>
+            <p>Kleine lokale PDFs oder Bilder als Entwurf erfassen, ohne Dateien hochzuladen.</p>
+          </div>
+          <div class="draft-grid">
+            <label>
+              OCR-Sprache
+              <select id="language-select">
+                <option value="deu">Deutsch (deu)</option>
+                <option value="eng">English (eng)</option>
+                <option value="fra">Français (fra)</option>
+                <option value="spa">Español (spa)</option>
+              </select>
+            </label>
+            <label>
+              Browser-Dateien
+              <input id="draft-files" type="file" accept=".pdf,image/*" multiple>
+            </label>
+            <button class="button primary" id="draft-button" type="button">Browser-Entwurf bauen</button>
+          </div>
+          <p class="note">
+            Hinweis: Browser-Dateien liefern nur Name und Größe. Absolute Pfade,
+            echte OCR-Läufe und Ergebnis-PDFs bleiben Aufgabe der Desktop-App.
+          </p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Job-Überblick</h2>
+            <p id="status-line">Noch kein Manifest geladen.</p>
+          </div>
+          <div class="stats" id="stats"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Filter und Grenzen</h2>
+            <p>Vorprüfung für mobil, Browser und kleine lokale Jobs.</p>
+          </div>
+          <div class="filters">
+            <label>
+              Suche
+              <input id="search-input" type="search" placeholder="Dateiname, Pfad oder Meldung">
+            </label>
+            <label>
+              Status
+              <select id="status-filter">
+                <option value="all">Alle</option>
+                <option value="pending">Ausstehend</option>
+                <option value="success">Erfolgreich</option>
+                <option value="failed">Fehlgeschlagen</option>
+              </select>
+            </label>
+            <label class="checkbox">
+              <input id="missing-toggle" type="checkbox" checked>
+              Fehlende Eingaben zeigen
+            </label>
+          </div>
+          <ul class="limits">
+            <li>Keine automatische OCR im Browser.</li>
+            <li>Keine PDF-Inhalte im Manifest oder Local Storage.</li>
+            <li>Mobile Geräte erst über denselben PWA-Pfad prüfen, nicht nativ duplizieren.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Einträge</h2>
+            <p id="results-meta">0 Einträge sichtbar.</p>
+          </div>
+          <div id="results" class="result-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
