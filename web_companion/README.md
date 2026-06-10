@@ -1,24 +1,45 @@
 # PDFtoPDFocr Web/PWA Companion
 
-Stand: 2026-05-26
+Stand: 2026-06-02
 
-Dieser Ordner hält die geplante mobile und webbasierte Begleitlinie für PDFtoPDFocr fest. Hier soll später ein kleiner PWA-Prototyp entstehen, nicht sofort ein vollständiger Ersatz der Desktop-App.
+Dieser Ordner enthält jetzt einen lauffähigen PWA-Prototyp für die Companion-Linie von PDFtoPDFocr. Er ersetzt die Desktop-App nicht, sondern ergänzt sie um eine mobile und browserbasierte Vorprüfung für `pdftopdfocr-job-v1.json`.
 
-## Ziel
+## Enthaltene Funktionen
 
-- OCR-Sprache und Job-Einstellungen mobil vorbereiten.
-- Kleine PDFs oder Bilder im Browser testen, sofern Laufzeit und Speicher ausreichen.
-- `pdftopdfocr-job-v1.json` lesen und schreiben.
-- Android/iOS über PWA testen, bevor native Apps begonnen werden.
+- Offline-Import eines Desktop-Manifests `pdftopdfocr-job-v1.json`
+- Demo-Modus für schnelle Browser- und Mobile-Smokes
+- Filterbare Ergebnisansicht nach Status, Suche und fehlenden Eingabedateien
+- Browser-Entwurf für kleine lokale Vorab-Jobs aus Dateinamen, Größen und OCR-Sprache
+- Export des aktuellen Browser- oder Desktop-Stands zurück als JSON
+- Service Worker und Web App Manifest für PWA-Tests auf Android, iOS und Desktop
 
-## Nicht-Ziel für die erste Stufe
+## Start
 
-- Keine vollständige native Android- oder iOS-Neuentwicklung.
-- Kein automatischer Upload privater PDF-Dateien.
-- Keine Server-OCR ohne ausdrückliche Datenschutzentscheidung.
+Für einen lokalen Test reicht ein einfacher statischer Server, zum Beispiel:
 
-## Nächste Schritte
+```bash
+python -m http.server 8768
+```
 
-1. Minimale PWA-Struktur entwerfen.
-2. Beispielmanifest aus `EXPORTFORMAT.md` laden.
-3. Browser-Grenzen für Dateigröße, Speicher und OCR-Laufzeit testen.
+Dann `http://127.0.0.1:8768/web_companion/` öffnen oder `?demo=1` anhängen.
+
+## Tests
+
+```bash
+node --test web_companion/tests/library.test.mjs
+node --check web_companion/app.js
+node --check web_companion/library.js
+```
+
+## Grenzen der ersten Stufe
+
+- Keine echte OCR im Browser
+- Keine PDF-Inhalte im Manifest oder Local Storage
+- Keine automatische Server-OCR und kein Datei-Upload
+- Keine native Android- oder iOS-Codebasis
+
+## Nächste sinnvolle Schritte
+
+1. Browser-Grenzen für kleine PDF- und Bildmengen empirisch testen.
+2. Optionalen Re-Import in die Desktop-App bewerten.
+3. Android/iOS-PWA-Smoke mit Kamera-/Dateiworkflow dokumentieren.

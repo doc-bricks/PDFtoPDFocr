@@ -95,7 +95,9 @@ Die Ausgabe landet in `dist/PDFtoPDFocr/`. Falls vorhanden, werden `tesseract_po
 
 ## Portierung / Plattformstrategie
 
-Die aktuelle Portierungsentscheidung steht in `PORTIERUNGSPLAN.md`: Windows Store bleibt der erste Release-Kanal, weil die App lokale Batch-OCR mit Tesseract, Poppler und PySide6 bündelt. Android, iOS und Web sollen nicht als sofortige native Clones entstehen, sondern über einen Web/PWA-Companion mit dem geplanten Austauschformat `pdftopdfocr-job-v1.json` vorbereitet werden.
+Die aktuelle Portierungsentscheidung steht in `PORTIERUNGSPLAN.md`: Windows Store bleibt der erste Release-Kanal, weil die App lokale Batch-OCR mit Tesseract, Poppler und PySide6 bündelt. Android, iOS und Web sollen nicht als sofortige native Clones entstehen, sondern über einen Web/PWA-Companion mit dem Austauschformat `pdftopdfocr-job-v1.json` vorbereitet werden.
+
+Der Companion-Prototyp in `web_companion/` kann dieses Manifest jetzt offline importieren, filtern und als Browser-Entwurf für kleine Vorab-Jobs erneut exportieren. So lassen sich mobile PWA-Smokes und Ergebnisprüfungen vorbereiten, ohne PDF-Inhalte in den Browser hochzuladen.
 
 macOS und Linux bleiben zunächst Source- und Smoke-Test-Ziele aus derselben Desktop-Codebasis. Eine eigene Desktop-Paketierung folgt erst, wenn Windows Store und PWA-Linie stabil sind.
 
@@ -200,7 +202,9 @@ The packaged build is written to `dist/PDFtoPDFocr/`. When present, `tesseract_p
 
 ## Porting / Platform Strategy
 
-The current porting decision is documented in `PORTIERUNGSPLAN.md`: Windows Store remains the first release channel because the app bundles local batch OCR with Tesseract, Poppler, and PySide6. Android, iOS, and web should start through a Web/PWA companion and the planned `pdftopdfocr-job-v1.json` exchange format, not through immediate native clones.
+The current porting decision is documented in `PORTIERUNGSPLAN.md`: Windows Store remains the first release channel because the app bundles local batch OCR with Tesseract, Poppler, and PySide6. Android, iOS, and web should start through a Web/PWA companion and the `pdftopdfocr-job-v1.json` exchange format, not through immediate native clones.
+
+The prototype inside `web_companion/` can now import that manifest offline, filter the job state, and export a browser-side draft for small preview jobs without uploading PDF contents.
 
 macOS and Linux stay source and smoke-test targets from the same desktop codebase for now. Dedicated desktop packaging should follow only after the Windows Store and PWA paths are stable.
 

@@ -1,6 +1,6 @@
 # Exportformat - PDFtoPDFocr
 
-Stand: 2026-05-28
+Stand: 2026-06-02
 
 ## `pdftopdfocr-job-v1.json`
 
@@ -18,6 +18,7 @@ Dieses Format ist der Vertrag zwischen Desktop-App und Web/PWA-Companion. Es ent
 - Desktop-Export ist in der App als Button `Job-Export` umgesetzt.
 - Die JSON-Datei wird als UTF-8 ohne BOM geschrieben.
 - Fehlende Dateien bleiben im Manifest sichtbar (`missing: true`), statt den Export abzubrechen.
+- `web_companion/` liest das Format jetzt offline ein, filtert Status und kann Browser-Entwürfe im selben Schema exportieren.
 
 ## Schema
 
@@ -39,6 +40,7 @@ Dieses Format ist der Vertrag zwischen Desktop-App und Web/PWA-Companion. Es ent
   "outputs": [
     {
       "input_name": "scan.pdf",
+      "input_local_path": "C:/Users/User/Documents/scan.pdf",
       "output_name": "scan_ocred.pdf",
       "status": "pending|success|failed",
       "message": "",
@@ -58,12 +60,19 @@ Dieses Format ist der Vertrag zwischen Desktop-App und Web/PWA-Companion. Es ent
 
 - `schema` bleibt für die v1-Linie exakt `pdftopdfocr-job-v1`.
 - Neue Felder dürfen ergänzt werden, bestehende Felder behalten ihre Bedeutung.
+- `outputs[].input_local_path` darf zur eindeutigen Zuordnung gleichnamiger Dateien ergänzt werden.
 - PDF-Dateien werden nicht als Base64 eingebettet.
 - Mobile und Web-Clients müssen unbekannte Felder ignorieren.
 - Lokale Pfade sind Hinweise für denselben Rechner und dürfen auf anderen Geräten fehlen.
 - Fehlende Eingabedateien werden mit `missing: true` und `size_bytes: null` exportiert.
 
+## Companion-Stand 2026-06-02
+
+- Der Web/PWA-Companion zeigt OCR-Sprache, Status, fehlende Dateien und Ergebnis-Hinweise filterbar an.
+- Browser-Dateien können als Entwurf mit Name und Größe in dasselbe Schema geschrieben werden.
+- Im Browser bleiben PDF-Inhalte weiterhin ausgeschlossen; nur Metadaten und Job-Hinweise werden verwendet.
+
 ## Nächste sinnvolle Schritte
 
-- Import eines Job-Manifests optional prüfen.
-- PWA kann mit denselben Feldern kleine Browser-Jobs vorbereiten oder Ergebnislisten anzeigen.
+- Optionalen Desktop-Re-Import eines Job-Manifests prüfen.
+- Browser-Grenzen für kleine PDF-/Bildmengen empirisch dokumentieren.

@@ -1,5 +1,7 @@
 # PDFtoPDFocr
 
+Last-checked: 2026-06-10
+
 ## Canonical Links
 
 - Repository: https://github.com/doc-bricks/PDFtoPDFocr
@@ -21,6 +23,8 @@ The app is designed for private document workflows such as invoices, letters, co
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
 - Test suite: `python -m pytest -q`
+- Web/PWA companion: `web_companion/index.html` (offline PWA prototype for importing/filtering `pdftopdfocr-job-v1.json` and drafting small local jobs)
+- Companion test suite: `node --test web_companion/tests/library.test.mjs`
 
 ## Data And Export Format
 
