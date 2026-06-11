@@ -10,6 +10,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - `llms.txt` als maschinenlesbaren Projektkontext für Repo-Checks und LLM-Crawler ergänzt.
 - Regressionstests für Export-Schema, UTF-8 ohne BOM, fehlende Dateien, relative Pfade und leeren Projektstand ergänzt.
 - `web_companion/` als statischen Offline-Prototyp ergänzt: Import von `pdftopdfocr-job-v1.json`, Demo-Modus, Filteransicht, Browser-Entwurf aus lokalen Dateimetadaten, Service Worker und Node-Tests.
+- macOS/Linux source-platform smoke CI ergänzt: `source_platform_smoke.py` testet Source-Platform-Builds ohne Tesseract/Poppler-Binärdateien; `.github/workflows/source-platform-smoke.yml` führt die Checks auf ubuntu-latest und macos-latest aus.
 
 ### Geändert / Changed
 - README und Store-Listing präzisieren auswählbare OCR-Sprache statt automatischer Spracherkennung.
@@ -19,6 +20,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Exportformat und Companion-Doku beschreiben jetzt den realen Browser-Prototyp statt nur eines Platzhalters.
 
 ### Behoben / Fixed
+- web_companion bugsweep (8 Bugs): `caches.match` ohne `{ignoreSearch: true}`, fehlendes `skipWaiting()` und `clients.claim()` im Service Worker, `escHtml` in `renderResults` (`entry.name`, `output.message`) und `buildStatCards` (`ocr_language`) fehlte, 4 Manifest-Icons (any+maskable 192/512 px) fehlten in `manifest.webmanifest`, `apple-touch-icon` fehlte, `exportCurrentState`-Anchor wurde nicht ins DOM eingehängt.
 - Gleichnamige Quelldateien aus verschiedenen Ordnern kollidieren im Job-Export und Web-Companion nicht mehr; `outputs[].input_local_path` ordnet Status und Ausgabepfade jetzt eindeutig dem jeweiligen Input zu.
 
 ## [1.0.4] - 2026-05-01

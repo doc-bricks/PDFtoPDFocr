@@ -1,6 +1,6 @@
 # PDFtoPDFocr
 
-Last-checked: 2026-06-10
+## Last-checked: 2026-06-11
 
 ## Canonical Links
 
@@ -45,3 +45,22 @@ The app is designed for private document workflows such as invoices, letters, co
 - Do not commit PDFs, OCR outputs, user job manifests, bundled runtime binaries, release bundles, credentials, or local maintenance notes.
 - Keep German end-user documentation with real umlauts when German text is edited.
 - Keep README claims aligned with the implementation: the app supports selectable OCR language, not automatic document language detection.
+
+## Audience
+
+- Windows users with scanned PDF documents (invoices, letters, contracts, forms, archive scans) who need full-text search without cloud upload
+- Developers looking for a PySide6 desktop app reference with portable Tesseract/Poppler bundling, PyInstaller packaging, and a fire-and-forget CLI/GUI workflow
+- IT automation engineers running batch OCR pipelines on managed Windows desktops using the `pdftopdfocr-job-v1.json` exchange format
+- PWA/web developers evaluating offline-first companion patterns alongside a desktop source app
+
+## Search Phrases
+
+```
+PDFtoPDFocr scanned PDF OCR searchable Windows
+Tesseract OCR batch PDF converter PySide6 Python
+PDF OCR converter portable Tesseract Poppler Windows desktop
+offline PDF OCR no cloud local file processing
+pdftopdfocr-job-v1.json PWA companion offline batch
+PyInstaller PySide6 Tesseract portable Windows app
+scanned invoice OCR searchable PDF automation
+```
