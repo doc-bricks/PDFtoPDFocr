@@ -1,74 +1,83 @@
 # Portierungsplan - PDFtoPDFocr
 
-Stand: 2026-05-28
+Stand: 2026-06-12
 
 ## Kurzentscheidung
 
-PDFtoPDFocr bleibt zuerst eine lokale Desktop-App für Windows, weil der Kernnutzen aus datenschutzfreundlicher Batch-OCR mit Tesseract, Poppler und lokalen PDF-Dateien entsteht. Die plattformübergreifende Erweiterung soll nicht als kompletter nativer Mobile-Clone starten, sondern als Web/PWA-Companion für kleine OCR-Jobs, Job-Manifeste und mobile Vorprüfung.
+PDFtoPDFocr bleibt zuerst eine lokale Desktop-App für Windows, weil der Kernnutzen aus datenschutzfreundlicher Batch-OCR mit Tesseract, Poppler, PySide6 und lokalen PDF-Dateien entsteht. Die plattformübergreifende Erweiterung ist keine native Mobile-Voll-App, sondern ein Web/PWA-Companion für Job-Manifeste, mobile Vorprüfung und kleine Browser-Entwürfe über `pdftopdfocr-job-v1.json`.
 
-## Zweck und Nachfrage
+## Feature-zu-Usecase-Ableitung
 
-Das Projekt richtet sich an Nutzer, die gescannte Verträge, Rechnungen, Briefe oder Formulare lokal in durchsuchbare PDFs umwandeln wollen. Der Bedarf ist hoch, weil solche Dokumente häufig mobil entstehen, aber später am Desktop archiviert, durchsucht oder weiterverarbeitet werden.
+| Feature der besten Version | Wann braucht man das? | Usecase |
+|---|---|---|
+| Lokale Batch-OCR für mehrere PDFs | Gescannte Unterlagen sollen lokal durchsuchbar gemacht und archiviert werden | Desktop-OCR-Arbeitsplatz |
+| Tesseract-/Poppler-/PySide6-Bündelung | Nutzer sollen ohne manuelle Systeminstallation arbeiten können | Windows-Store-Distribution |
+| OCR-Sprache und Ergebnisstatus | Nutzer müssen Jobs reproduzierbar dokumentieren und Fehler nachverfolgen | Job-Protokoll und Wiederaufnahme |
+| `pdftopdfocr-job-v1.json` ohne PDF-Inhalte | Ein Desktop-Job soll auf anderem Gerät geprüft oder vorbereitet werden, ohne Dokumente hochzuladen | Datei-Companion und mobiler Review |
+| Web/PWA-Companion mit Offline-Import und Demo-Modus | Smartphone, Tablet oder Browser sollen kleine Job-Stände anzeigen, filtern und vorbereiten | Read-mostly Mobile/Web-Companion |
+| Source-Platform-Smoke für Linux/macOS | Entwickler und Power-User sollen die Codebasis ohne eigene Desktop-Paketlinie prüfen können | Source-/CI-Portabilität |
 
-Wichtig sind dabei:
+## Usecase-Settings
 
-- Datenschutz: PDF-Dateien sollen standardmäßig lokal bleiben.
-- Mobilität: Nutzer fotografieren oder erhalten Dokumente oft auf Smartphone oder Tablet.
-- Archiv-Workflow: Ergebnisdateien müssen auf Desktop, NAS, Cloud-Ordner oder Dokumenten-Tools übertragbar sein.
-- Einfache Distribution: Windows Store und später PWA senken die Einstiegshürde.
+### Setting 1: Desktop-OCR-Arbeitsplatz
+
+Nutzer arbeiten mit lokalen PDFs, Tesseract/Poppler, Dateidialogen, Batch-Status und Ergebnisdateien. Dieses Setting braucht eine vollwertige Desktop-App. Windows ist die Referenzplattform und der erste Store-Kanal; macOS und Linux bleiben zunächst Source-/Smoke-Ziele derselben Codebasis.
+
+### Setting 2: Mobiler oder browserbasierter Job-Review
+
+Dieselben Nutzer wollen unterwegs oder auf einem zweiten Gerät Job-Stände ansehen, Sprache/Dateiliste prüfen, fehlende Eingaben erkennen und kleine Entwürfe exportieren. Dieses Setting braucht keinen nativen Mobile-Klon, sondern einen secrets- und PDF-freien Companion. Der Austausch ist dateibasiert über `pdftopdfocr-job-v1.json`; direkte Server-Synchronisierung ist aktuell kein Usecase.
 
 ## Plattformbewertung
 
-| Option | Bewertung | Entscheidung |
+| Plattform | Bewertung | Entscheidung |
 |---|---|---|
-| Windows Store | Sehr sinnvoll: Kernplattform, vorhandenes MSIX, vorhandene Store-Artefakte. | P0: Store-Einreichung vorbereiten, öffentliches Repo und WACK/Testprotokoll abschließen. |
-| Android | Sinnvoll für Scan- und Kurz-OCR-Workflows, aber native Tesseract/Poppler-Portierung wäre hoher Aufwand. | P2: zunächst über PWA/Capacitor prüfen, keine native Android-Codebasis starten. |
-| Webapp | Sinnvoll als gemeinsame Linie für Web, Android und iOS; bei kleinen Dateien optional clientseitig. | P1/P2: Web/PWA-Companion planen, später prototypisieren. |
-| iOS | Gleicher Bedarf wie Android, native Datei-/OCR-Integration aber aufwendig. | P2: über PWA testen, native App nur bei echter Nachfrage. |
-| Mac App | Technisch möglich, aber Tesseract/Poppler-Bundling und Signierung erhöhen Aufwand. | P3: Source-/Build-Smoke-Test, keine eigene App-Linie vor Windows Store. |
-| Linux Version | Technisch naheliegend durch Python/PySide6 und systemweite OCR-Pakete. | P3: Source-Smoke-Test und Installationshinweise, keine eigene Release-Linie vor Windows Store. |
+| Windows Store | Sinnvoller Hauptkanal, weil die App lokale OCR-Runtime, Privacy-Framing und Ein-Klick-Installation braucht. Store-Artefakte sind vorhanden; offen bleiben aktuelle Screenshots, WACK/Testprotokoll und Quellcode-/Store-Konformität. | P0: Windows-Store-Pfad weiterführen |
+| Web/PWA | Bereits als statischer Offline-Companion umgesetzt: Manifest-Import, Demo-Modus, Filteransicht, Browser-Entwurf und JSON-Export ohne PDF-Inhalte. | P1: Companion beibehalten und per Browser-/Mobile-Smokes härten |
+| Android | Sinnvoll für Job-Vorprüfung, Kamera-/Dateiübergabe und Statusansicht; native OCR wäre hoher Runtime- und Wartungsaufwand. | P2: über PWA/Capacitor prüfen, keine native Voll-App starten |
+| iOS | Gleicher Review-Usecase wie Android, aber mit stärkerem Sandbox-/Dateizugriffslimit. | P2: Safari-PWA und später optional Capacitor/TestFlight, keine native Voll-App |
+| macOS | Fachlich plausibel für Desktop-Nutzer, aber Tesseract/Poppler-Bundling, Signierung und Notarisierung sind eigener Aufwand. | P3: Source-Smoke vorhanden; Paketierung erst nach Store/PWA-Stabilität |
+| Linux | Technisch naheliegend für Power-User mit Systempaketen. | P3: Source-Smoke vorhanden; AppImage/Flatpak nur bei belegtem Bedarf |
 
 ## Zielarchitektur
 
 1. Desktop bleibt autoritativ: PySide6-App, lokale OCR, Batch-Verarbeitung, portable Runtime.
-2. Gemeinsames Austauschformat `pdftopdfocr-job-v1.json` beschreibt Job-Einstellungen, Quellen-Metadaten, Sprache, Status und Ergebnis-Hinweise ohne PDF-Inhalte.
-3. Web/PWA-Companion startet als kleine Oberfläche für mobile Job-Vorbereitung und optional kleine clientseitige OCR-Tests.
-4. Android/iOS nutzen dieselbe PWA-Linie; Capacitor wird erst geprüft, wenn Kamera-/Datei-Workflows stabil sind.
-5. macOS/Linux bleiben Source-/Smoke-Ziele aus derselben Desktop-Codebasis.
+2. `pdftopdfocr-job-v1.json` beschreibt Job-Einstellungen, Quellen-Metadaten, OCR-Sprache, Status und Ergebnis-Hinweise ohne PDF-Inhalte.
+3. Web/PWA importiert und exportiert dasselbe Schema offline; LocalStorage und Manifest dürfen keine PDF-Inhalte speichern.
+4. Android/iOS nutzen zunächst dieselbe PWA-Linie; Capacitor wird erst geprüft, wenn Kamera-/Datei-Smokes stabil sind.
+5. macOS/Linux bleiben Source-/Smoke-Ziele aus derselben Codebasis, keine eigene Paketlinie vor belegtem Bedarf.
 
-## Umsetzungspfad
+## Umsetzungsstatus
 
-### P0 - Windows Store finalisieren
+| Bereich | Status | Nächster Schritt |
+|---|---|---|
+| Desktop Windows | vorhanden; v1.0.4 privat released, Store-Basis vorhanden | aktuelle Store-Screenshots, EXE/MSIX und WACK/Testprotokoll erneuern |
+| Exportformat | implementiert und dokumentiert | optionalen Desktop-Re-Import eines Job-Manifests bewerten |
+| Web/PWA | Prototyp umgesetzt; Import, Filter, Demo, Browser-Entwurf, Export, Manifest und Service Worker vorhanden | Browser-Grenzen und echte Android-/iOS-PWA-Smokes dokumentieren |
+| Android/iOS | über PWA-Testpfad geplant | Import, Suche/Filter, Dateiübergabe und Offline-Start auf echten Geräten prüfen |
+| macOS/Linux | `source_platform_smoke.py` und GitHub-Actions-Matrix für Ubuntu/macOS vorhanden | CI-Ergebnisse beobachten; eigene Builds nur bei Nachfrage |
+| Direkte Synchronisierung | nicht umgesetzt | Nicht-Ziel bis ein echter Mehrgeräte-Live-Usecase belegt ist |
 
-- Öffentliches GitHub-Repo oder Store-konforme Quellcode-Zugänglichkeit klären.
-- Store-Screenshot-Set vervollständigen.
-- WACK/Testprotokoll mit aktuellem Build durchführen.
-- `STORE_LISTING.md`, `PRIVACY_POLICY.md` und `store_package.json` vor Einreichung final prüfen.
+## Nicht-Ziele
 
-### P1 - Austauschformat stabilisieren
-
-- `EXPORTFORMAT.md` als Vertrag für `pdftopdfocr-job-v1.json` pflegen.
-- Desktop-Export für Job-Profil und letzte Ergebnisliste planen.
-- Keine PDF-Inhalte in JSON schreiben; nur Metadaten und lokale Pfadreferenzen.
-
-### P2 - Web/PWA-Companion
-
-- `web_companion/` als Planungs- und späterer Prototypordner nutzen.
-- PWA zuerst für kleine Dateien, Spracheinstellung, Job-Vorbereitung und Ergebnis-Check.
-- Android/iOS als PWA-Testziele aufnehmen; Capacitor erst nach PWA-Smoke-Test.
-
-### P3 - macOS/Linux
-
-- Start- und Import-Smoke-Tests für PySide6, Tesseract und Poppler dokumentieren.
-- macOS-Bundling und Linux-AppImage/Flatpak nur prüfen, wenn Windows Store und PWA stabil sind.
+- Keine öffentliche Upload-Webapp für vertrauliche PDFs.
+- Kein nativer Android-/iOS-Vollklon mit gebündelter OCR-Runtime.
+- Keine direkte Server-Synchronisierung für PDF-Jobs ohne separate Datenschutz-, Konflikt- und Kostenstrategie.
+- Keine macOS-/Linux-Paketlinie, solange Source-Smokes und Windows/PWA den Bedarf decken.
 
 ## Risiken
 
 - Große PDFs sind im Browser speicher- und laufzeitkritisch.
-- Native Mobile-OCR dupliziert viel Runtime- und Dateisystemarbeit.
-- Store-Veröffentlichung braucht saubere Datenschutz- und Drittanbieter-Lizenzkommunikation, insbesondere für gebündelte Runtime-Komponenten.
-- Das bestehende Projekt ist als privates Release geführt; Store-Einreichung erfordert vorab eine klare Veröffentlichungsentscheidung.
+- Native Mobile-OCR würde Tesseract/Poppler-Bündelung und Dateisystemlogik duplizieren.
+- Store-Veröffentlichung braucht klare Quellcode-/Lizenzkommunikation und aktuelle Datenschutz-/Support-URLs.
+- Lokale Pfade im Job-Manifest sind nur Hinweise und auf anderen Geräten nicht garantiert auflösbar.
 
-## Nächster konkreter Schritt
+## Priorisierte Aufgaben
 
-Der Desktop-Export `pdftopdfocr-job-v1.json` ist jetzt umgesetzt. Als nächstes sollte der Web/PWA-Companion diesen Export lesen und für kleine Browser-Jobs, Vorprüfung und Ergebnisansicht nutzbar machen.
+1. DONE 2026-05-28: Desktop-Export `pdftopdfocr-job-v1.json` implementiert.
+2. DONE 2026-06-02: Web/PWA-Companion als statischer Offline-Prototyp umgesetzt.
+3. DONE 2026-06-04: Job-Manifest und Companion trennen gleichnamige Quelldateien über `outputs[].input_local_path`.
+4. DONE 2026-06-07: Source-Platform-Smoke für Ubuntu/macOS ergänzt.
+5. P0: Aktuelles Store-Screenshot-Set erstellen.
+6. P0: Reproduzierbaren EXE-/MSIX-Buildpfad und WACK/Testprotokoll für den aktuellen Stand erneuern.
+7. P2: Echte Android-/iOS-PWA-Smokes für Import, Filter/Suche, Dateiübergabe und Offline-Start durchführen.
+8. P3: Optionalen Desktop-Re-Import und spätere Roundtrip-Strategie bewerten; bis dahin bleibt der Companion read-mostly.
