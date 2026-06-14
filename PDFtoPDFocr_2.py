@@ -177,8 +177,21 @@ def ensure_tesseract(lang: str) -> bool:
             url = f"https://github.com/tesseract-ocr/tessdata_best/raw/main/{lang}.traineddata"
             r = requests.get(url, stream=True, timeout=30)
             if r.status_code == 200:
-                with open(target, "wb") as f:
-                    shutil.copyfileobj(r.raw, f)
+                # Write to a temp file first; rename atomically so a mid-stream
+                # network failure never leaves a truncated .traineddata on disk.
+                tmp_fd, tmp_name = tempfile.mkstemp(
+                    dir=tessdata_dir, suffix=".traineddata.tmp"
+                )
+                try:
+                    with os.fdopen(tmp_fd, "wb") as f:
+                        shutil.copyfileobj(r.raw, f)
+                    shutil.move(tmp_name, target)
+                except Exception:
+                    try:
+                        os.unlink(tmp_name)
+                    except OSError:
+                        pass
+                    raise
                 QMessageBox.information(None, tr("info_download_title"),
                     tr("info_lang_downloaded", lang=lang))
             else:
@@ -336,6 +349,8 @@ class OCRWorker(QThread):
                             except Exception as e:
                                 logging.warning(f"PDF operation failed: {e}")
 
+                if len(out_pdf.pages) == 0:
+                    raise ValueError("OCR produced no pages — all pages yielded empty PDF bytes")
                 dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
                 out_pdf.save(dst_path)
             finally:

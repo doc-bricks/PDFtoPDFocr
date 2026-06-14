@@ -206,3 +206,76 @@ def test_ocr_pdf_fallback_closes_src_pdf_before_unlink(tmp_path, monkeypatch):
     assert events.index("close") < events.index("unlink"), (
         f"src_pdf.close() muss vor os.unlink() kommen; Reihenfolge war: {events}"
     )
+
+
+def test_ocr_pdf_returns_false_when_all_pages_yield_empty_bytes(tmp_path, monkeypatch):
+    """Bug #4: Wenn pytesseract für alle Seiten leere Bytes liefert,
+    darf _ocr_pdf KEINE leere PDF speichern und muss False zurückgeben."""
+    from PIL import Image as PILImage
+    import pikepdf
+
+    _qapp()
+    worker = app.OCRWorker(pending_paths=[], lang="eng")
+
+    fake_image = PILImage.new("RGB", (10, 10))
+    monkeypatch.setattr("PDFtoPDFocr_2.convert_from_path", lambda *a, **kw: [fake_image])
+    # Simuliere leere Bytes für alle Seiten
+    monkeypatch.setattr(
+        "PDFtoPDFocr_2.pytesseract.image_to_pdf_or_hocr",
+        lambda *a, **kw: b"",
+    )
+
+    src = tmp_path / "empty_ocr.pdf"
+    src.write_bytes(b"%PDF-1.4\n")
+
+    result = worker._ocr_pdf(str(src), "eng")
+
+    assert result is False, "Erwartet False, wenn OCR keine Seiten erzeugt"
+    dst = tmp_path / "empty_ocr_ocred.pdf"
+    assert not dst.exists(), "Es darf keine leere Ausgabe-PDF angelegt werden"
+
+
+def test_ensure_tesseract_download_leaves_no_partial_file_on_network_error(
+    tmp_path, monkeypatch
+):
+    """Bug #5: Bei einem Netzwerkabbruch während des Downloads darf keine
+    abgeschnittene .traineddata-Datei auf der Platte verbleiben."""
+    import pikepdf
+
+    # Tesseract-Binary simulieren
+    exe_name = "tesseract.exe" if app.os.name == "nt" else "tesseract"
+    portable_dir = tmp_path / "tesseract_portable"
+    tessdata_dir = portable_dir / "tessdata"
+    tessdata_dir.mkdir(parents=True)
+    fake_exe = portable_dir / exe_name
+    fake_exe.write_text("", encoding="utf-8")
+
+    module_file = tmp_path / "PDFtoPDFocr_2.py"
+    module_file.write_text("# stub\n", encoding="utf-8")
+    monkeypatch.setattr(app, "__file__", str(module_file))
+    monkeypatch.delattr(app.sys, "_MEIPASS", raising=False)
+    monkeypatch.setattr(app.shutil, "which", lambda name: None)
+    monkeypatch.delenv("TESSDATA_PREFIX", raising=False)
+
+    # Simuliere eine Response, deren .raw.read() einen Fehler wirft
+    class BrokenRaw:
+        def read(self, amt=-1):
+            raise OSError("simulated network drop")
+
+    class FakeResponse:
+        status_code = 200
+        raw = BrokenRaw()
+
+    monkeypatch.setattr(app.requests, "get", lambda *a, **kw: FakeResponse())
+
+    # QMessageBox.critical unterdrücken
+    monkeypatch.setattr(app.QMessageBox, "critical", lambda *a, **kw: None)
+    monkeypatch.setattr(app.QMessageBox, "information", lambda *a, **kw: None)
+
+    result = app.ensure_tesseract("fra")
+
+    target = tessdata_dir / "fra.traineddata"
+    assert result is False, "ensure_tesseract muss False zurückgeben bei Netzwerkfehler"
+    assert not target.exists(), (
+        "Keine abgeschnittene .traineddata-Datei darf nach Netzwerkfehler auf der Platte liegen"
+    )
