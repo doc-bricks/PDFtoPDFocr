@@ -1,6 +1,6 @@
-import { test } from "node:test";
+import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join, dirname } from "node:path";
 
@@ -100,4 +100,46 @@ test("app.js entfernt Export-Anchor nach click() wieder aus dem DOM (Bug #8)", (
     appSrc.includes("document.body.removeChild(anchor)"),
     "exportCurrentState muss den Anchor nach click() aus dem DOM entfernen"
   );
+});
+
+describe("iOS PWA-Härtung", () => {
+  const html = readFileSync(join(ROOT, "index.html"), "utf8");
+  const css = readFileSync(join(ROOT, "style.css"), "utf8");
+  const sw = readFileSync(join(ROOT, "sw.js"), "utf8");
+
+  test("viewport enthält viewport-fit=cover (Notch/Dynamic Island)", () => {
+    assert.match(html, /viewport-fit=cover/);
+  });
+
+  test("apple-touch-icon zeigt auf apple-touch-icon-180.png", () => {
+    assert.match(html, /apple-touch-icon.*apple-touch-icon-180\.png/s);
+  });
+
+  test("apple-mobile-web-app-title ist vorhanden", () => {
+    assert.match(html, /apple-mobile-web-app-title/);
+  });
+
+  test("apple-mobile-web-app-status-bar-style ist vorhanden", () => {
+    assert.match(html, /apple-mobile-web-app-status-bar-style/);
+  });
+
+  test("KEIN apple-mobile-web-app-capable (deprecated seit iOS 11.3)", () => {
+    assert.doesNotMatch(html, /apple-mobile-web-app-capable/, "deprecated seit iOS 11.3 — darf nicht gesetzt sein");
+  });
+
+  test("apple-touch-icon-180.png existiert physisch in icons/", () => {
+    assert.ok(existsSync(join(ROOT, "icons", "apple-touch-icon-180.png")));
+  });
+
+  test("style.css enthält safe-area-inset-top", () => {
+    assert.match(css, /safe-area-inset-top/);
+  });
+
+  test("style.css enthält safe-area-inset-bottom", () => {
+    assert.match(css, /safe-area-inset-bottom/);
+  });
+
+  test("sw.js enthält apple-touch-icon-180.png in ASSETS", () => {
+    assert.match(sw, /apple-touch-icon-180\.png/);
+  });
 });

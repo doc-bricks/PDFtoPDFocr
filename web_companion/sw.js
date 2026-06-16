@@ -1,11 +1,12 @@
-const CACHE = "pdftopdfocr-web-companion-v1";
+const CACHE = "pdftopdfocr-web-companion-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
   "./library.js",
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+  "./icons/apple-touch-icon-180.png"
 ];
 
 self.addEventListener("install", event => {
