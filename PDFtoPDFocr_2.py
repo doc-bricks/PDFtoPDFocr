@@ -320,6 +320,11 @@ class OCRWorker(QThread):
             images: List[Image.Image] = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
 
             out_pdf = pikepdf.Pdf.new()
+            # FIX: pikepdf kopiert Seiten LAZY -> die Quell-PDFs (und temp-Dateien)
+            # muessen bis NACH out_pdf.save() geoeffnet bleiben. Vorher wurde src_pdf
+            # im Loop VOR dem Speichern geschlossen (und tmp geloescht) -> korrupte/
+            # fehlende OCR-Seiten moeglich. Daher sammeln, erst im finally schliessen.
+            page_sources = []  # (pikepdf.Pdf, tmp_path_or_None)
             try:
                 for img in images:
                     if img.mode != "RGB":
@@ -330,34 +335,40 @@ class OCRWorker(QThread):
                     try:
                         src_pdf = pikepdf.Pdf.open(io.BytesIO(pdf_bytes))
                         out_pdf.pages.extend(src_pdf.pages)
-                        src_pdf.close()
+                        page_sources.append((src_pdf, None))
                     except Exception as e:
                         logging.warning(f"PDF operation failed: {e}")
                         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                        src_pdf = None
-                        try:
-                            tmp.write(pdf_bytes)
-                            tmp.flush()
-                            tmp.close()
-                            src_pdf = pikepdf.Pdf.open(tmp.name)
-                            out_pdf.pages.extend(src_pdf.pages)
-                        finally:
-                            if src_pdf is not None:
-                                src_pdf.close()
-                            try:
-                                os.unlink(tmp.name)
-                            except Exception as e:
-                                logging.warning(f"PDF operation failed: {e}")
+                        tmp.write(pdf_bytes)
+                        tmp.flush()
+                        tmp.close()
+                        src_pdf = pikepdf.Pdf.open(tmp.name)
+                        out_pdf.pages.extend(src_pdf.pages)
+                        page_sources.append((src_pdf, tmp.name))
 
                 if len(out_pdf.pages) == 0:
                     raise ValueError("OCR produced no pages — all pages yielded empty PDF bytes")
                 dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
                 out_pdf.save(dst_path)
             finally:
+                # Quell-PDFs + temp-Dateien erst NACH save() schliessen/aufraeumen.
+                for _src_pdf, _tmp in page_sources:
+                    try:
+                        _src_pdf.close()
+                    except Exception:
+                        pass
+                    if _tmp:
+                        try:
+                            os.unlink(_tmp)
+                        except OSError:
+                            pass
                 out_pdf.close()
             return True
         except Exception as e:
-            print(f"OCR-Fehler bei {src_path}: {e}")
+            # logging statt print: im windowed-PyInstaller ist sys.stdout None ->
+            # print() wuerde den Worker-Thread crashen (finished_all nie emittiert,
+            # GUI haengt mit dauerhaft deaktiviertem Start-Button).
+            logging.error("OCR-Fehler bei %s: %s", src_path, e)
             return False
 
 
