@@ -82,3 +82,9 @@ Dieselben Nutzer wollen unterwegs oder auf einem zweiten Gerät Job-Stände anse
 7. P2: Echte Android-/iOS-PWA-Smokes für Import, Filter/Suche, Dateiübergabe und Offline-Start durchführen.
 8. DONE 2026-07-03: macOS-/Linux-Paket-Gate dokumentiert; bis nach Windows-Store- und PWA-Stabilität bleibt es bei Source-Smokes, keine eigene Paketlinie.
 9. P3: Optionalen Desktop-Re-Import und spätere Roundtrip-Strategie bewerten; bis dahin bleibt der Companion read-mostly.
+
+## Nachtrag 2026-07-24 — Companion-Rueckbau (Usecase-Audit, LG-Entscheid E04)
+
+ENTFERNT: `web_companion/` — "Job-Manifeste mobil vorpruefen" ohne PDF-Inhalt ist kein
+tragender Alltagsmoment, kein Aktionsnutzen. PDFtoPDFocr bleibt Desktop-only.
+Archivkopie: `C:\_Local_DEV\companion_removals_20260723\RDY_PDFtoPDFocr\`.
