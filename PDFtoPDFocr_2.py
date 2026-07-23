@@ -11,7 +11,7 @@ Missing Tesseract language packs are automatically downloaded from GitHub.
 
 import json
 import logging
-import sys, os, io, shutil, requests, tempfile
+import sys, os, io, shutil, requests, tempfile, uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List
@@ -20,9 +20,9 @@ from typing import List
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QListWidget, QListWidgetItem,
-    QFileDialog, QLabel, QComboBox, QMessageBox
+    QFileDialog, QLabel, QComboBox, QMessageBox, QMenu
 )
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QAction
 from PySide6.QtCore import Qt, QThread, Signal
 
 # OCR / PDF libs
@@ -33,11 +33,13 @@ import pikepdf
 
 # Utilities
 ICON_OK, ICON_ERR, ICON_BROOM, ICON_TRASH = "✓", "⚠", "🧹", "🗑"
-SUPPORTED_EXTS = {".pdf"}
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
+SUPPORTED_EXTS = {".pdf"} | IMAGE_EXTS
 APP_NAME = "PDFtoPDFocr"
-APP_VERSION = "1.0.4"
+APP_VERSION = "1.1.0"
 EXPORT_SCHEMA = "pdftopdfocr-job-v1"
 DEFAULT_OCR_DPI = 300
+MERGE_SUBFOLDER_NAME = "Einzeldateien"
 
 # ===== i18n =====
 
@@ -125,6 +127,16 @@ def save_ui_language(lang: str) -> bool:
     """Persistiert die UI-Sprache in der App-Konfiguration; True bei Erfolg."""
     if lang not in _UI_LANGUAGES:
         return False
+    return _update_app_config({"ui_language": lang})
+
+
+def _update_app_config(updates: dict) -> bool:
+    """Liest die App-Konfiguration, mischt `updates` ein und schreibt sie zurueck.
+
+    Gemeinsamer Persistenzmechanismus fuer UI-Sprache (U6) und Exportordner (U4):
+    beide leben in derselben config.json, damit auch unter Store-Sandboxing
+    (read-only Installationsverzeichnis) nur EIN beschreibbarer Ort noetig ist.
+    """
     data = {}
     try:
         with open(_ui_config_path(), "r", encoding="utf-8") as f:
@@ -133,7 +145,7 @@ def save_ui_language(lang: str) -> bool:
             data = loaded
     except (OSError, ValueError):
         data = {}
-    data["ui_language"] = lang
+    data.update(updates)
     try:
         _ui_config_dir().mkdir(parents=True, exist_ok=True)
         with open(_ui_config_path(), "w", encoding="utf-8") as f:
@@ -141,6 +153,22 @@ def save_ui_language(lang: str) -> bool:
         return True
     except OSError:
         return False
+
+
+def load_export_folder() -> str | None:
+    """Gespeicherter Exportordner (U4), oder None wenn nicht gesetzt."""
+    try:
+        with open(_ui_config_path(), "r", encoding="utf-8") as f:
+            data = json.load(f)
+        folder = data.get("export_folder") if isinstance(data, dict) else None
+    except (OSError, ValueError):
+        folder = None
+    return folder or None
+
+
+def save_export_folder(folder: str | None) -> bool:
+    """Persistiert den Exportordner (U4); None/"" setzt auf Standard zurueck."""
+    return _update_app_config({"export_folder": folder or ""})
 
 
 # Defaults
@@ -347,6 +375,86 @@ def write_job_export(target_path: str | Path, payload: dict) -> Path:
     return export_path
 
 
+# ===== Merge/Stapeln (Welle-1 U2/U3/U4/U5) =====
+
+def resolve_export_folder(
+    source_path: str | Path, configured_folder: str | Path | None
+) -> Path:
+    """Resolves the target folder for a merge (U4): configured export folder if it
+    exists, otherwise the folder of the source file (default per U3).
+
+    Args:
+        source_path: A file whose parent folder serves as the fallback.
+        configured_folder: User-configured export folder, or None/empty.
+
+    Returns:
+        The resolved export folder path.
+    """
+    if configured_folder:
+        candidate = Path(configured_folder)
+        if candidate.is_dir():
+            return candidate
+    return Path(source_path).parent
+
+
+def merge_ocr_outputs(
+    output_paths: list[str],
+    merged_name: str,
+    export_folder: str | Path,
+    subfolder_name: str = MERGE_SUBFOLDER_NAME,
+) -> Path:
+    """Merges already-OCRed single-file result PDFs into one collective PDF (U2).
+
+    Per U3, the individual page PDFs are moved into `export_folder/subfolder_name`
+    and the collective PDF is written at the root of `export_folder`.
+
+    Args:
+        output_paths: OCR result PDFs, in the desired page/merge order.
+        merged_name: File name for the collective PDF.
+        export_folder: Target folder for the collective PDF (see resolve_export_folder).
+        subfolder_name: Name of the subfolder that receives the individual pages.
+
+    Returns:
+        Path to the written collective PDF.
+
+    Raises:
+        ValueError: If fewer than 2 output paths are given.
+    """
+    if len(output_paths) < 2:
+        raise ValueError("merge_ocr_outputs benötigt mindestens 2 Dateien")
+
+    export_folder = Path(export_folder)
+    export_folder.mkdir(parents=True, exist_ok=True)
+    subfolder = export_folder / subfolder_name
+    subfolder.mkdir(parents=True, exist_ok=True)
+
+    merged = pikepdf.Pdf.new()
+    try:
+        for p in output_paths:
+            src_pdf = pikepdf.Pdf.open(p)
+            try:
+                merged.pages.extend(src_pdf.pages)
+            finally:
+                src_pdf.close()
+        merged_path = export_folder / merged_name
+        merged.save(merged_path)
+    finally:
+        merged.close()
+
+    # Einzelseiten erst NACH dem Speichern der Sammel-PDF verschieben, damit ein
+    # Fehlschlag beim Merge keine Dateien verwaist zurücklässt.
+    for p in output_paths:
+        src_path = Path(p)
+        if not src_path.exists():
+            continue
+        dest = subfolder / src_path.name
+        if dest.exists():
+            dest = subfolder / f"{src_path.stem}_{uuid.uuid4().hex[:8]}{src_path.suffix}"
+        shutil.move(str(src_path), str(dest))
+
+    return merged_path
+
+
 class OCRWorker(QThread):
     """Führt OCR-Verarbeitung im Hintergrund aus, sodass die GUI responsiv bleibt.
 
@@ -372,11 +480,34 @@ class OCRWorker(QThread):
             self.file_done.emit(path, success)
         self.finished_all.emit()
 
-    def _ocr_pdf(self, src_path: str, lang: str) -> bool:
-        """Führt OCR auf einer PDF-Datei aus (läuft im Worker-Thread)."""
-        try:
+    def _load_source_images(self, src_path: str) -> List[Image.Image]:
+        """Loads the page images for a source file: PDF pages via Poppler, or the
+        frame(s) of an image file directly (U1 -- multi-page TIFF yields one
+        image per frame, JPG/PNG yield a single image).
+
+        Args:
+            src_path: Path to a PDF or image (JPG/PNG/TIFF) file.
+
+        Returns:
+            List of PIL images, one per page/frame.
+        """
+        ext = os.path.splitext(src_path)[1].lower()
+        if ext not in IMAGE_EXTS:
             poppler_path = self.poppler_path or None
-            images: List[Image.Image] = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
+            return convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
+
+        images: List[Image.Image] = []
+        with Image.open(src_path) as im:
+            frame_count = getattr(im, "n_frames", 1)
+            for i in range(frame_count):
+                im.seek(i)
+                images.append(im.copy())
+        return images
+
+    def _ocr_pdf(self, src_path: str, lang: str) -> bool:
+        """Führt OCR auf einer PDF- oder Bilddatei aus (läuft im Worker-Thread)."""
+        try:
+            images: List[Image.Image] = self._load_source_images(src_path)
 
             out_pdf = pikepdf.Pdf.new()
             # FIX: pikepdf kopiert Seiten LAZY -> die Quell-PDFs (und temp-Dateien)
@@ -432,26 +563,47 @@ class OCRWorker(QThread):
 
 
 class PDFListWidget(QListWidget):
-    """QListWidget with drag-and-drop support for PDF files and folders."""
+    """QListWidget with drag-and-drop support for PDF/image files and folders.
+
+    Supports two drag-and-drop modes (U2/U5):
+    - External drop (Explorer): files/folders are added to the list. A whole
+      folder is tagged with a batch id so it can be auto-merged later (U5).
+    - Internal drag (reordering rows): row order becomes the merge/page order
+      used by "Markierte mergen" (U2 -- "Stapel-Reihenfolge = Seitenreihenfolge").
+    """
     delete_requested = Signal()
+    folder_dropped = Signal(str, str)  # batch_id, folder_path
 
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
         self.setSelectionMode(QListWidget.ExtendedSelection)
+        self.setDragEnabled(True)
+        self.setDragDropMode(QListWidget.DragDropMode.InternalMove)
+        self.setDefaultDropAction(Qt.MoveAction)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
 
     def dragEnterEvent(self, e):
-        if e.mimeData().hasUrls():
+        if e.source() is self or e.mimeData().hasUrls():
             e.acceptProposedAction()
 
     def dragMoveEvent(self, e):
-        e.acceptProposedAction()
+        if e.source() is self:
+            super().dragMoveEvent(e)
+        else:
+            e.acceptProposedAction()
 
     def dropEvent(self, e):
+        if e.source() is self and not e.mimeData().hasUrls():
+            # Interne Umsortierung: neue Zeilenreihenfolge = Merge-/Stapelreihenfolge.
+            super().dropEvent(e)
+            return
         for url in e.mimeData().urls():
             path = url.toLocalFile()
             if os.path.isdir(path):
-                self.add_folder(path)
+                batch_id = str(uuid.uuid4())
+                self.add_folder(path, batch_id=batch_id)
+                self.folder_dropped.emit(batch_id, path)
             elif os.path.isfile(path):
                 self.add_file(path)
         e.acceptProposedAction()
@@ -464,22 +616,25 @@ class PDFListWidget(QListWidget):
             return
         super().keyPressEvent(event)
 
-    def add_folder(self, folder):
+    def add_folder(self, folder, batch_id=None):
         """Adds all supported files from a folder to the list.
 
         Args:
             folder: Path to the directory to scan.
+            batch_id: If set, tags all added items as belonging to this
+                folder-drop batch (U5 automatic merge).
         """
-        for fname in os.listdir(folder):
+        for fname in sorted(os.listdir(folder)):
             full = os.path.join(folder, fname)
             if os.path.isfile(full):
-                self.add_file(full)
+                self.add_file(full, batch_id=batch_id)
 
-    def add_file(self, filepath):
+    def add_file(self, filepath, batch_id=None):
         """Adds a single file to the list if it has a supported extension and is not already listed.
 
         Args:
             filepath: Absolute path to the file to add.
+            batch_id: If set, tags the item as belonging to a folder-drop batch (U5).
         """
         if os.path.splitext(filepath)[1].lower() not in SUPPORTED_EXTS:
             return
@@ -490,6 +645,7 @@ class PDFListWidget(QListWidget):
         item.setData(Qt.UserRole, filepath)
         item.setData(Qt.UserRole + 1, 'pending')
         item.setData(Qt.UserRole + 2, "")
+        item.setData(Qt.UserRole + 3, batch_id)
         self.addItem(item)
 
 
@@ -523,6 +679,21 @@ class OCRConverterGUI(QWidget):
         self.list_widget.setAccessibleDescription(tr("a11y_file_list_description"))
         self.list_widget.setToolTip(tr("a11y_file_list_description"))
         self.layout.addWidget(self.list_widget)
+
+        # Exportordner-Einstellung (U4): konfigurierbar, Fallback = Quellordner (U3-Default)
+        self.export_folder: str | None = load_export_folder()
+        self._batch_folders: dict[str, str] = {}
+        self._merged_batches: set[str] = set()
+
+        export_layout = QHBoxLayout()
+        self.export_folder_label = QLabel("")
+        self.btn_choose_export_folder = QPushButton(tr("btn_export_folder"))
+        self.btn_reset_export_folder = QPushButton(tr("btn_export_folder_reset"))
+        export_layout.addWidget(self.export_folder_label, 1)
+        export_layout.addWidget(self.btn_choose_export_folder)
+        export_layout.addWidget(self.btn_reset_export_folder)
+        self.layout.addLayout(export_layout)
+        self._update_export_folder_label()
 
         # OCR-Spracheinstellung (Tesseract-Sprachpaket -- NICHT die UI-Sprache)
         lang_layout = QHBoxLayout()
@@ -563,6 +734,10 @@ class OCRConverterGUI(QWidget):
         self.btn_refresh.clicked.connect(self.on_refresh)
         self.btn_delete.clicked.connect(self.on_delete)
         self.list_widget.delete_requested.connect(self.on_delete)
+        self.btn_choose_export_folder.clicked.connect(self.on_choose_export_folder)
+        self.btn_reset_export_folder.clicked.connect(self.on_reset_export_folder)
+        self.list_widget.customContextMenuRequested.connect(self._show_list_context_menu)
+        self.list_widget.folder_dropped.connect(self._register_batch_folder)
 
         # Poppler-Pfad: leer = pdf2image nutzt System-Poppler
         self.poppler_path = ""
@@ -584,12 +759,160 @@ class OCRConverterGUI(QWidget):
         self.btn_export.setText(tr("btn_export_job"))
         self.btn_refresh.setText(f"{ICON_BROOM} {tr('btn_refresh')}")
         self.btn_delete.setText(f"{ICON_TRASH} {tr('btn_delete')}")
+        self.btn_choose_export_folder.setText(tr("btn_export_folder"))
+        self.btn_reset_export_folder.setText(tr("btn_export_folder_reset"))
+        self._update_export_folder_label()
 
     def open_file_dialog(self):
-        """Opens a file dialog to select PDF files and adds them to the list."""
-        files, _ = QFileDialog.getOpenFileNames(self, tr("dialog_select_files"), "", tr("filter_pdf"))
+        """Opens a file dialog to select PDF or image files and adds them to the list (U1)."""
+        files, _ = QFileDialog.getOpenFileNames(
+            self, tr("dialog_select_files"), "", tr("filter_pdf_images")
+        )
         for f in files:
             self.list_widget.add_file(f)
+
+    # ===== Exportordner-Einstellung (U4) =====
+
+    def _update_export_folder_label(self):
+        """Refreshes the label that shows the currently configured export folder."""
+        folder_text = self.export_folder or tr("label_export_folder_default")
+        self.export_folder_label.setText(tr("label_export_folder", folder=folder_text))
+
+    def on_choose_export_folder(self):
+        """Opens a folder dialog and persists the chosen export folder (U4)."""
+        folder = QFileDialog.getExistingDirectory(
+            self, tr("dialog_choose_export_folder"), self.export_folder or ""
+        )
+        if folder:
+            self.export_folder = folder
+            save_export_folder(folder)
+            self._update_export_folder_label()
+
+    def on_reset_export_folder(self):
+        """Resets the export folder to the default (source folder per file, U3/U4)."""
+        self.export_folder = None
+        save_export_folder(None)
+        self._update_export_folder_label()
+
+    # ===== Merge/Stapeln (U2/U3/U5) =====
+
+    def _show_list_context_menu(self, pos):
+        """Shows the 'Markierte mergen' context menu for selected list entries (U2)."""
+        if not self.list_widget.selectedItems():
+            return
+        menu = QMenu(self)
+        merge_action = QAction(tr("action_merge_selected"), self)
+        merge_action.triggered.connect(self.merge_selected)
+        menu.addAction(merge_action)
+        menu.exec(self.list_widget.mapToGlobal(pos))
+
+    def _selected_done_items_in_list_order(self) -> list:
+        """Returns the selected, already OCRed items in current list order.
+
+        List order reflects the drag-reordered stack order (U2), independent
+        of the order in which items were selected.
+        """
+        selected_paths = {it.data(Qt.UserRole) for it in self.list_widget.selectedItems()}
+        return [
+            self.list_widget.item(i)
+            for i in range(self.list_widget.count())
+            if self.list_widget.item(i).data(Qt.UserRole) in selected_paths
+            and self.list_widget.item(i).data(Qt.UserRole + 1) == "done"
+        ]
+
+    def merge_selected(
+        self, checked: bool = False, target_path: str | Path | None = None
+    ) -> Path | None:
+        """Merges the selected, already OCRed results into one collective PDF (U2/U3).
+
+        Args:
+            checked: Unused; matches the QAction/QPushButton `triggered`/`clicked` signature.
+            target_path: If given, skips the save dialog (used by tests and by
+                the auto-merge path is NOT routed through here, see
+                `_auto_merge_completed_batches`).
+
+        Returns:
+            Path to the written collective PDF, or None if merging was aborted
+            or not possible (fewer than 2 completed results selected).
+        """
+        del checked
+        done_items = self._selected_done_items_in_list_order()
+        if len(done_items) < 2:
+            if target_path is None:
+                QMessageBox.information(self, tr("info_export_title"), tr("info_merge_need_two"))
+            return None
+
+        output_paths = [
+            os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf" for it in done_items
+        ]
+
+        if target_path is None:
+            first_source = done_items[0].data(Qt.UserRole)
+            default_folder = resolve_export_folder(first_source, self.export_folder)
+            chosen_path, _ = QFileDialog.getSaveFileName(
+                self,
+                tr("dialog_merge_save"),
+                str(default_folder / "merged.pdf"),
+                tr("filter_pdf"),
+            )
+            if not chosen_path:
+                return None
+            target_path = chosen_path
+
+        target = Path(target_path)
+        try:
+            merged_path = merge_ocr_outputs(output_paths, target.name, target.parent)
+        except Exception as e:
+            QMessageBox.critical(self, tr("error_title"), tr("error_merge_failed", error=e))
+            return None
+
+        self.status_label.setText(tr("status_merge_saved", filename=merged_path.name))
+        self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
+        return merged_path
+
+    def _register_batch_folder(self, batch_id: str, folder_path: str):
+        """Remembers which folder a folder-drop batch originated from (U5)."""
+        self._batch_folders[batch_id] = folder_path
+
+    def _auto_merge_completed_batches(self):
+        """Automatically merges folder-drop batches once all their files are
+        processed (U5): the whole dropped folder becomes one collective PDF
+        plus a subfolder with the individual OCR results.
+        """
+        batch_items: dict[str, list] = {}
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            batch_id = item.data(Qt.UserRole + 3)
+            if batch_id:
+                batch_items.setdefault(batch_id, []).append(item)
+
+        for batch_id, items in batch_items.items():
+            if batch_id in self._merged_batches:
+                continue
+            if any(it.data(Qt.UserRole + 1) == "pending" for it in items):
+                continue  # Batch noch nicht vollstaendig verarbeitet
+            done_items = [it for it in items if it.data(Qt.UserRole + 1) == "done"]
+            if len(done_items) < 2:
+                continue
+            folder = self._batch_folders.get(batch_id)
+            if not folder:
+                continue
+            outputs = [
+                os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf" for it in done_items
+            ]
+            # U5-Default: Sammel-PDF landet IM abgelegten Ordner selbst (nicht dessen
+            # Elternordner) -- resolve_export_folder ist fuer Datei-Pfade gedacht,
+            # `folder` hier ist bereits der Zielordner.
+            configured = Path(self.export_folder) if self.export_folder else None
+            export_folder = configured if configured and configured.is_dir() else Path(folder)
+            merged_name = f"{os.path.basename(os.path.normpath(folder))}_merged.pdf"
+            try:
+                merge_ocr_outputs(outputs, merged_name, export_folder)
+                self._merged_batches.add(batch_id)
+                self.status_label.setText(tr("status_merge_saved", filename=merged_name))
+                self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
+            except Exception as e:
+                logging.warning(f"Auto-Merge fuer Batch {batch_id} fehlgeschlagen: {e}")
 
     def on_start(self):
         """Startet OCR-Verarbeitung für alle ausstehenden Dateien in einem QThread (GUI bleibt responsiv)."""
@@ -640,6 +963,7 @@ class OCRConverterGUI(QWidget):
         self.btn_start.setEnabled(True)
         self.status_label.setText(tr("status_done"))
         self.status_label.setStyleSheet("color: green; font-weight: bold;")
+        self._auto_merge_completed_batches()
 
     def on_refresh(self):
         """Clears the file list and resets the status label."""

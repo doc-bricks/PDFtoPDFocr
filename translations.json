@@ -64,8 +64,8 @@
     "en": "Job manifest saved: {filename}"
   },
   "dialog_select_files": {
-    "de": "Wähle PDF-Dateien",
-    "en": "Select PDF Files"
+    "de": "Wähle PDF- oder Bilddateien",
+    "en": "Select PDF or Image Files"
   },
   "dialog_export_job": {
     "de": "Job-Export speichern",
@@ -75,9 +75,53 @@
     "de": "PDF-Dateien (*.pdf)",
     "en": "PDF Files (*.pdf)"
   },
+  "filter_pdf_images": {
+    "de": "PDF- und Bilddateien (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)",
+    "en": "PDF and Image Files (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)"
+  },
   "filter_json": {
     "de": "JSON-Dateien (*.json)",
     "en": "JSON Files (*.json)"
+  },
+  "btn_export_folder": {
+    "de": "Exportordner …",
+    "en": "Export Folder…"
+  },
+  "btn_export_folder_reset": {
+    "de": "Standard",
+    "en": "Default"
+  },
+  "dialog_choose_export_folder": {
+    "de": "Exportordner wählen",
+    "en": "Choose export folder"
+  },
+  "label_export_folder": {
+    "de": "Exportordner: {folder}",
+    "en": "Export folder: {folder}"
+  },
+  "label_export_folder_default": {
+    "de": "Standard (Ordner der Quelldatei)",
+    "en": "Default (source file's folder)"
+  },
+  "action_merge_selected": {
+    "de": "Markierte mergen",
+    "en": "Merge selected"
+  },
+  "info_merge_need_two": {
+    "de": "Bitte mindestens 2 abgeschlossene Ergebnisse markieren.",
+    "en": "Please select at least 2 completed results."
+  },
+  "dialog_merge_save": {
+    "de": "Sammel-PDF speichern",
+    "en": "Save collective PDF"
+  },
+  "error_merge_failed": {
+    "de": "Merge fehlgeschlagen:\n{error}",
+    "en": "Merge failed:\n{error}"
+  },
+  "status_merge_saved": {
+    "de": "Sammel-PDF gespeichert: {filename}",
+    "en": "Collective PDF saved: {filename}"
   },
   "error_title": {
     "de": "Fehler",
