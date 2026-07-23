@@ -25,6 +25,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Die Desktop-Dateiliste lässt sich jetzt auch per `Entf`-Taste bereinigen; Dateiliste und Löschaktion exponieren dafür klaren Accessible Context, ohne die kompakte Oberfläche sichtbar zu vergrößern.
 - web_companion bugsweep (8 Bugs): `caches.match` ohne `{ignoreSearch: true}`, fehlendes `skipWaiting()` und `clients.claim()` im Service Worker, `escHtml` in `renderResults` (`entry.name`, `output.message`) und `buildStatCards` (`ocr_language`) fehlte, 4 Manifest-Icons (any+maskable 192/512 px) fehlten in `manifest.webmanifest`, `apple-touch-icon` fehlte, `exportCurrentState`-Anchor wurde nicht ins DOM eingehängt.
 - Gleichnamige Quelldateien aus verschiedenen Ordnern kollidieren im Job-Export und Web-Companion nicht mehr; `outputs[].input_local_path` ordnet Status und Ausgabepfade jetzt eindeutig dem jeweiligen Input zu.
+- BUG-W1: Service-Worker-`fetch` fängt jetzt Netzwerkfehler ab und liefert eine 503-Offline-Antwort statt einer ungefangenen Exception; Cache-Version auf v3 gebumpt.
+- BUG-W2: `localStorage.setItem` in `persistState()` steht jetzt in try/catch, damit `QuotaExceededError` (z. B. Safari Private Browsing) den Aufrufer nicht crasht.
+- `tests/test_platform_package_gate.py`: Der Synchronisationstest gegen `AUFGABEN.txt` (bewusst lokal/gitignored) wird jetzt per `pytest.mark.skipif` übersprungen, statt auf jedem Checkout ohne lokale Kopie fehlzuschlagen.
 
 ## [1.0.4] - 2026-05-01
 
