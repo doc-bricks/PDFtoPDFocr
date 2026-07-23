@@ -40,6 +40,10 @@ tessdata/
 tesseract_portable/
 poppler/
 _alt/
+_archive/
+
+# Backup snapshots (bugsweep pre/post, siehe web_companion/.gitignore)
+*.bak
 
 # Internal
 _internal/

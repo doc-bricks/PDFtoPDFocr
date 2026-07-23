@@ -1,7 +1,10 @@
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
+AUFGABEN_PATH = ROOT / "AUFGABEN.txt"
 
 
 def test_macos_linux_package_gate_documents_non_goal_before_store_and_pwa():
@@ -16,8 +19,15 @@ def test_macos_linux_package_gate_documents_non_goal_before_store_and_pwa():
     assert "AppImage" in text
 
 
+@pytest.mark.skipif(
+    not AUFGABEN_PATH.exists(),
+    reason=(
+        "AUFGABEN.txt ist laut .gitignore bewusst lokal/nicht versioniert; "
+        "der Sync-Check gilt nur, wenn eine lokale Kopie vorliegt."
+    ),
+)
 def test_task_and_porting_plan_are_synchronized_with_package_gate():
-    tasks = (ROOT / "AUFGABEN.txt").read_text(encoding="utf-8")
+    tasks = AUFGABEN_PATH.read_text(encoding="utf-8")
     porting = (ROOT / "PORTIERUNGSPLAN.md").read_text(encoding="utf-8")
 
     assert "[x] P3: Eigene macOS-/Linux-Desktop-Packages" in tasks
