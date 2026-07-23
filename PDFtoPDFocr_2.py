@@ -374,6 +374,7 @@ class OCRWorker(QThread):
 
 class PDFListWidget(QListWidget):
     """QListWidget with drag-and-drop support for PDF files and folders."""
+    delete_requested = Signal()
 
     def __init__(self):
         super().__init__()
@@ -395,6 +396,14 @@ class PDFListWidget(QListWidget):
             elif os.path.isfile(path):
                 self.add_file(path)
         e.acceptProposedAction()
+
+    def keyPressEvent(self, event):
+        """Supports keyboard removal for selected files without changing the compact UI."""
+        if event.key() == Qt.Key_Delete and self.selectedItems():
+            self.delete_requested.emit()
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def add_folder(self, folder):
         """Adds all supported files from a folder to the list.
@@ -436,6 +445,9 @@ class OCRConverterGUI(QWidget):
         self._ocr_worker = None  # Referenz auf laufenden QThread
 
         self.list_widget = PDFListWidget()
+        self.list_widget.setAccessibleName(tr("a11y_file_list_name"))
+        self.list_widget.setAccessibleDescription(tr("a11y_file_list_description"))
+        self.list_widget.setToolTip(tr("a11y_file_list_description"))
         self.layout.addWidget(self.list_widget)
 
         # Spracheinstellung
@@ -454,6 +466,8 @@ class OCRConverterGUI(QWidget):
         self.btn_export = QPushButton(tr("btn_export_job"))
         self.btn_refresh = QPushButton(f"{ICON_BROOM} {tr('btn_refresh')}")
         self.btn_delete = QPushButton(f"{ICON_TRASH} {tr('btn_delete')}")
+        self.btn_delete.setToolTip(tr("tooltip_delete"))
+        self.btn_delete.setAccessibleDescription(tr("a11y_delete_description"))
         for b in (
             self.btn_add_file,
             self.btn_start,
@@ -474,6 +488,7 @@ class OCRConverterGUI(QWidget):
         self.btn_export.clicked.connect(self.export_job_manifest)
         self.btn_refresh.clicked.connect(self.on_refresh)
         self.btn_delete.clicked.connect(self.on_delete)
+        self.list_widget.delete_requested.connect(self.on_delete)
 
         # Poppler-Pfad: leer = pdf2image nutzt System-Poppler
         self.poppler_path = ""
