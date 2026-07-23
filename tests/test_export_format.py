@@ -3,6 +3,7 @@ import json
 from unittest.mock import MagicMock
 
 from PySide6.QtCore import Qt
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
 import PDFtoPDFocr_2 as app
@@ -119,6 +120,34 @@ def test_export_job_manifest_collects_current_gui_status(tmp_path):
     assert data["outputs"][0]["status"] == "success"
     assert data["outputs"][0]["output_exists"] is True
     assert data["outputs"][0]["message"] == "OCR erfolgreich abgeschlossen."
+    gui.close()
+
+
+def test_file_list_delete_key_removes_selection_and_exposes_accessible_context(tmp_path):
+    _qapp()
+    first = tmp_path / "first.pdf"
+    second = tmp_path / "second.pdf"
+    first.write_bytes(b"%PDF-first\n")
+    second.write_bytes(b"%PDF-second\n")
+
+    gui = app.OCRConverterGUI()
+    gui.show()
+    gui.list_widget.add_file(str(first))
+    gui.list_widget.add_file(str(second))
+
+    assert gui.list_widget.accessibleName() == "PDF-Dateiliste"
+    assert "Entf-Taste" in gui.list_widget.accessibleDescription()
+    assert "Entf" in gui.btn_delete.toolTip()
+
+    item = gui.list_widget.item(0)
+    item.setSelected(True)
+    gui.list_widget.setCurrentItem(item)
+    gui.list_widget.setFocus()
+    QTest.keyClick(gui.list_widget, Qt.Key_Delete)
+    QApplication.processEvents()
+
+    assert gui.list_widget.count() == 1
+    assert gui.list_widget.item(0).data(Qt.UserRole) == str(second)
     gui.close()
 
 

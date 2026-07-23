@@ -379,6 +379,11 @@ class OCRWorker(QThread):
             images: List[Image.Image] = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
 
             out_pdf = pikepdf.Pdf.new()
+            # FIX: pikepdf kopiert Seiten LAZY -> die Quell-PDFs (und temp-Dateien)
+            # muessen bis NACH out_pdf.save() geoeffnet bleiben. Vorher wurde src_pdf
+            # im Loop VOR dem Speichern geschlossen (und tmp geloescht) -> korrupte/
+            # fehlende OCR-Seiten moeglich. Daher sammeln, erst im finally schliessen.
+            page_sources = []  # (pikepdf.Pdf, tmp_path_or_None)
             try:
                 for img in images:
                     if img.mode != "RGB":
@@ -389,39 +394,46 @@ class OCRWorker(QThread):
                     try:
                         src_pdf = pikepdf.Pdf.open(io.BytesIO(pdf_bytes))
                         out_pdf.pages.extend(src_pdf.pages)
-                        src_pdf.close()
+                        page_sources.append((src_pdf, None))
                     except Exception as e:
                         logging.warning(f"PDF operation failed: {e}")
                         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                        src_pdf = None
-                        try:
-                            tmp.write(pdf_bytes)
-                            tmp.flush()
-                            tmp.close()
-                            src_pdf = pikepdf.Pdf.open(tmp.name)
-                            out_pdf.pages.extend(src_pdf.pages)
-                        finally:
-                            if src_pdf is not None:
-                                src_pdf.close()
-                            try:
-                                os.unlink(tmp.name)
-                            except Exception as e:
-                                logging.warning(f"PDF operation failed: {e}")
+                        tmp.write(pdf_bytes)
+                        tmp.flush()
+                        tmp.close()
+                        src_pdf = pikepdf.Pdf.open(tmp.name)
+                        out_pdf.pages.extend(src_pdf.pages)
+                        page_sources.append((src_pdf, tmp.name))
 
                 if len(out_pdf.pages) == 0:
                     raise ValueError("OCR produced no pages — all pages yielded empty PDF bytes")
                 dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
                 out_pdf.save(dst_path)
             finally:
+                # Quell-PDFs + temp-Dateien erst NACH save() schliessen/aufraeumen.
+                for _src_pdf, _tmp in page_sources:
+                    try:
+                        _src_pdf.close()
+                    except Exception:
+                        pass
+                    if _tmp:
+                        try:
+                            os.unlink(_tmp)
+                        except OSError:
+                            pass
                 out_pdf.close()
             return True
         except Exception as e:
-            print(f"OCR-Fehler bei {src_path}: {e}")
+            # logging statt print: im windowed-PyInstaller ist sys.stdout None ->
+            # print() wuerde den Worker-Thread crashen (finished_all nie emittiert,
+            # GUI haengt mit dauerhaft deaktiviertem Start-Button).
+            logging.error("OCR-Fehler bei %s: %s", src_path, e)
             return False
 
 
 class PDFListWidget(QListWidget):
     """QListWidget with drag-and-drop support for PDF files and folders."""
+    delete_requested = Signal()
 
     def __init__(self):
         super().__init__()
@@ -443,6 +455,14 @@ class PDFListWidget(QListWidget):
             elif os.path.isfile(path):
                 self.add_file(path)
         e.acceptProposedAction()
+
+    def keyPressEvent(self, event):
+        """Supports keyboard removal for selected files without changing the compact UI."""
+        if event.key() == Qt.Key_Delete and self.selectedItems():
+            self.delete_requested.emit()
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def add_folder(self, folder):
         """Adds all supported files from a folder to the list.
@@ -499,6 +519,9 @@ class OCRConverterGUI(QWidget):
         self.layout.addLayout(ui_lang_layout)
 
         self.list_widget = PDFListWidget()
+        self.list_widget.setAccessibleName(tr("a11y_file_list_name"))
+        self.list_widget.setAccessibleDescription(tr("a11y_file_list_description"))
+        self.list_widget.setToolTip(tr("a11y_file_list_description"))
         self.layout.addWidget(self.list_widget)
 
         # OCR-Spracheinstellung (Tesseract-Sprachpaket -- NICHT die UI-Sprache)
@@ -517,6 +540,8 @@ class OCRConverterGUI(QWidget):
         self.btn_export = QPushButton(tr("btn_export_job"))
         self.btn_refresh = QPushButton(f"{ICON_BROOM} {tr('btn_refresh')}")
         self.btn_delete = QPushButton(f"{ICON_TRASH} {tr('btn_delete')}")
+        self.btn_delete.setToolTip(tr("tooltip_delete"))
+        self.btn_delete.setAccessibleDescription(tr("a11y_delete_description"))
         for b in (
             self.btn_add_file,
             self.btn_start,
@@ -537,6 +562,7 @@ class OCRConverterGUI(QWidget):
         self.btn_export.clicked.connect(self.export_job_manifest)
         self.btn_refresh.clicked.connect(self.on_refresh)
         self.btn_delete.clicked.connect(self.on_delete)
+        self.list_widget.delete_requested.connect(self.on_delete)
 
         # Poppler-Pfad: leer = pdf2image nutzt System-Poppler
         self.poppler_path = ""

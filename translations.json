@@ -31,6 +31,22 @@
     "de": "Löschen",
     "en": "Delete"
   },
+  "tooltip_delete": {
+    "de": "Ausgewählte PDF-Einträge löschen (Entf)",
+    "en": "Delete selected PDF entries (Del)"
+  },
+  "a11y_delete_description": {
+    "de": "Entfernt die aktuell markierten PDF-Einträge aus der Liste.",
+    "en": "Removes the currently selected PDF entries from the list."
+  },
+  "a11y_file_list_name": {
+    "de": "PDF-Dateiliste",
+    "en": "PDF file list"
+  },
+  "a11y_file_list_description": {
+    "de": "Hier erscheinen die ausgewählten PDF-Dateien. Dateien lassen sich per Drag-and-drop hinzufügen und per Entf-Taste wieder entfernen.",
+    "en": "Selected PDF files appear here. You can add files via drag and drop and remove them again with the Delete key."
+  },
   "status_no_files": {
     "de": "Keine neuen Dateien zum Verarbeiten.",
     "en": "No new files to process."
