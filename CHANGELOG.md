@@ -5,7 +5,38 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-24
+
+Welle-1-Usertest-Feature-Paket (U1-U7): Bild-Import, Stapeln/Mergen und
+Paket-Hygiene für den Windows-Store-Anlauf.
+
 ### Hinzugefügt / Added
+- **U1 — Bild-Import**: JPG/PNG/TIFF können jetzt direkt (ohne PDF-Umweg) per OCR
+  in ein durchsuchbares PDF umgewandelt werden. Mehrseitige TIFFs erzeugen eine
+  Seite pro Frame. Keine neuen Abhängigkeiten (Pillow + `pytesseract.image_to_pdf_or_hocr`
+  reichen), kein PyMuPDF, keine AGPL-Komponenten.
+- **U2 — Stapeln/Mergen**: Kontextmenü „Markierte mergen" auf der Dateiliste
+  fasst ausgewählte, bereits OCR-verarbeitete Ergebnisse zu einer Sammel-PDF
+  zusammen; Drag-Umsortieren innerhalb der Liste bestimmt die Stapel-/Seitenreihenfolge.
+- **U3 — Merge-Ablage**: Beim Merge wandern die einzelnen OCR-Ergebnis-PDFs in
+  einen Unterordner „Einzeldateien", die Sammel-PDF landet auf Root-Ebene des
+  Exportordners (Default: Ordner der Quelldatei).
+- **U4 — Exportordner-Einstellung**: Konfigurierbarer Exportordner mit
+  Zurücksetzen-Option; Fallback ist immer der Ordner der jeweiligen Quelldatei.
+  Persistenz teilt sich die `config.json` mit der U6-Sprachauswahl (kein
+  QSettings/Registry, bleibt Store-Sandboxing-konform).
+- **U5 — Ordner-Import als Auto-Merge**: Wird ein ganzer Ordner hineingezogen,
+  werden alle enthaltenen Bilder/PDFs als ein Batch getaggt; sobald alle
+  Dateien des Batches verarbeitet sind, entsteht automatisch eine Sammel-PDF
+  plus Unterordner mit den Einzeldateien.
+- **U7 — Paket-Hygiene**: `build_release.collect_tesseract_portable_files()`
+  schließt Tesseract-Trainingstools (`lstmtraining`, `cntraining`, `text2image`, …)
+  und `tesseract-uninstall.exe` von der Paketierung aus (Build-/Paketkonfiguration
+  betroffen, Quellordner unangetastet); reduziert unnötige WACK-relevante
+  Executables im Store-Paket. Leptonica (Tesseract-Bildverarbeitungs-Unterbau,
+  `libleptonica-6.dll`) hat jetzt einen eigenen Eintrag in
+  `THIRD_PARTY_LICENSES.txt` (per Recherche verifiziert: zlib-artige,
+  GPL-kompatible Eigenlizenz).
 - **Welle-1 U1 — sichtbarer DE/EN-Anzeigesprachschalter**: Neue Combobox „Anzeigesprache / Display language" (Deutsch/English) oben im Fenster, klar getrennt von der bestehenden OCR-Sprachauswahl. Die Oberfläche stellt sofort um (`retranslate_ui`), die Auswahl wird pro Benutzer in `%APPDATA%\PDFtoPDFocr\config.json` (XDG-Fallback) persistiert und beim Start geladen. Das vorhandene `tr()`/`translations.json`-System ist damit erstmals über ein sichtbares Bedienelement erreichbar. Regressionstests: `tests/test_language_switch.py`.
 - `Job-Export` in der Desktop-App ergänzt; die App schreibt jetzt `pdftopdfocr-job-v1.json` mit OCR-Sprache, Datei-Metadaten, Status und Ergebnis-Hinweisen ohne PDF-Inhalte.
 - `llms.txt` als maschinenlesbaren Projektkontext für Repo-Checks und LLM-Crawler ergänzt.
@@ -21,8 +52,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Portierungsstrategie ergänzt: Windows Store zuerst, Web/PWA-Companion mit `pdftopdfocr-job-v1.json`, Android/iOS über PWA-Testpfad, macOS/Linux als Source-Smoke-Ziele.
 - Exportformat und Companion-Doku beschreiben jetzt den realen Browser-Prototyp statt nur eines Platzhalters.
 - Portierungsplan auf den macOS-/Linux-Package-Gate synchronisiert; aktuelle Unterstützung bleibt Source-Smoke, keine DMG-/PKG-/AppImage-/Flatpak-/Snap-Linie.
+- `web_companion/` vollständig entfernt (kein belegter Usecase laut Audit 2026-07-23/24); die Desktop-App bleibt die primäre Plattform.
+
+### Entfernt / Removed
+- `web_companion/` (Web/PWA-Prototyp) inklusive Node-Tests -- siehe Begründung oben.
 
 ### Behoben / Fixed
+- pikepdf-Quell-PDFs (und ihre Temp-Dateien) werden jetzt erst NACH `out_pdf.save()` geschlossen/aufgeräumt, nicht mehr davor -- verhinderte korrupte/fehlende OCR-Seiten bei lazy Page-Kopien.
+- OCR-Fehler landen im Logging statt in `print()`; unter PyInstaller windowed (`sys.stdout is None`) hätte `print()` den Worker-Thread zum Absturz gebracht (GUI blieb mit dauerhaft deaktiviertem Start-Button hängen).
 - Die Desktop-Dateiliste lässt sich jetzt auch per `Entf`-Taste bereinigen; Dateiliste und Löschaktion exponieren dafür klaren Accessible Context, ohne die kompakte Oberfläche sichtbar zu vergrößern.
 - web_companion bugsweep (8 Bugs): `caches.match` ohne `{ignoreSearch: true}`, fehlendes `skipWaiting()` und `clients.claim()` im Service Worker, `escHtml` in `renderResults` (`entry.name`, `output.message`) und `buildStatCards` (`ocr_language`) fehlte, 4 Manifest-Icons (any+maskable 192/512 px) fehlten in `manifest.webmanifest`, `apple-touch-icon` fehlte, `exportCurrentState`-Anchor wurde nicht ins DOM eingehängt.
 - Gleichnamige Quelldateien aus verschiedenen Ordnern kollidieren im Job-Export und Web-Companion nicht mehr; `outputs[].input_local_path` ordnet Status und Ausgabepfade jetzt eindeutig dem jeweiligen Input zu.
