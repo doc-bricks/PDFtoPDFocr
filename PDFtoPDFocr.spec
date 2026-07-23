@@ -18,6 +18,8 @@ Prerequisites:
 
 import os
 
+import build_release
+
 block_cipher = None
 
 # Tesseract und Poppler Pfade
@@ -30,7 +32,9 @@ datas = [
 
 # Nur einbinden wenn vorhanden
 if os.path.isdir(tesseract_dir):
-    datas.append((tesseract_dir, tesseract_dir))
+    # U7 Paket-Hygiene: Trainingstools/Deinstaller ausschliessen statt den
+    # kompletten Ordner 1:1 zu spiegeln (siehe build_release.py).
+    datas.extend(build_release.collect_tesseract_portable_files(tesseract_dir))
 
 if os.path.isdir(poppler_dir):
     datas.append((poppler_dir, poppler_dir))

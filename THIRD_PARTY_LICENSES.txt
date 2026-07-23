@@ -80,6 +80,19 @@ Hinweis: Die portable Tesseract-Installation befindet sich im Unterordner
          tesseract_portable/. Die vollständige Lizenz ist unter
          tesseract_portable/doc/LICENSE zu finden.
 
+Leptonica (Bildverarbeitungs-Unterbau von Tesseract, portable Bündelung)
+-------------------------------------------------------------------------
+Lizenz: Eigene freizügige Lizenz (zlib-artige Variante, GPL-kompatibel)
+Copyright: Copyright (C) 2001 Leptonica. All rights reserved.
+URL: https://github.com/DanBloomberg/leptonica
+     http://www.leptonica.org/about-the-license.html
+Hinweis: libleptonica-6.dll wird als Laufzeitabhängigkeit von Tesseract im
+         Unterordner tesseract_portable/ mitgeliefert. Die Lizenz erlaubt
+         das Kopieren, Verändern und Weiterverbreiten (kommerziell wie
+         nicht-kommerziell) unter der Bedingung, dass die Herkunft nicht
+         falsch dargestellt wird, veränderte Versionen als solche markiert
+         werden und dieser Hinweis erhalten bleibt.
+
 ================================================================================
 
 Vollständige Lizenztexte sind über die oben angegebenen URLs abrufbar.
