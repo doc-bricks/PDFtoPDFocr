@@ -70,8 +70,8 @@ test("manifest.webmanifest hat 4 Icons (Bug #6)", () => {
 });
 
 test("manifest.webmanifest hat 2 any-Icons (Bug #6)", () => {
-  const anyIcons = manifestSrc.icons.filter(i => i.purpose === "any");
-  assert.equal(anyIcons.length, 2, "Manifest muss 2 Icons mit purpose:any haben");
+  const anyIcons = manifestSrc.icons.filter(i => !i.purpose || i.purpose === "any");
+  assert.equal(anyIcons.length, 2, "Manifest muss 2 Icons mit purpose:any oder ohne explizites purpose haben (implizit any per spec, BUG-W4 v1.2)");
 });
 
 test("manifest.webmanifest hat 2 maskable-Icons", () => {
@@ -142,4 +142,23 @@ describe("iOS PWA-Härtung", () => {
   test("sw.js enthält apple-touch-icon-180.png in ASSETS", () => {
     assert.match(sw, /apple-touch-icon-180\.png/);
   });
+});
+
+// BUG-W1 Regressionstest
+test("BUG-W1 regression: sw.js fetch hat .catch() für Offline-Fallback", () => {
+  assert.ok(
+    /fetch\(event\.request\)[\s\S]{0,100}\.catch\(/.test(swSrc),
+    "BUG-W1: sw.js fetch muss .catch() für Offline-Fallback haben"
+  );
+  assert.ok(swSrc.includes("503"), "BUG-W1: Offline-Fallback muss HTTP 503 zurückgeben");
+  const m = swSrc.match(/CACHE\s*=\s*["']pdftopdfocr-web-companion-v(\d+)["']/);
+  assert.ok(m && parseInt(m[1]) >= 3, "CACHE muss auf v3+ gebumpt sein (nach BUG-W1-Fix)");
+});
+
+// BUG-W2 Regressionstest
+test("BUG-W2 regression: app.js localStorage.setItem in try/catch (QuotaExceededError Safari)", () => {
+  assert.ok(
+    /try\s*\{[\s\S]{0,200}localStorage\.setItem/.test(appSrc),
+    "BUG-W2: localStorage.setItem in persistState() muss in try/catch eingebettet sein"
+  );
 });

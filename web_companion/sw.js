@@ -1,4 +1,4 @@
-const CACHE = "pdftopdfocr-web-companion-v2";
+const CACHE = "pdftopdfocr-web-companion-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -26,5 +26,5 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") {
     return;
   }
-  event.respondWith(caches.match(event.request, { ignoreSearch: true }).then(hit => hit || fetch(event.request)));
+  event.respondWith(caches.match(event.request, { ignoreSearch: true }).then(hit => hit || fetch(event.request).catch(() => new Response("Offline", { status: 503, headers: { "Content-Type": "text/plain" } }))));
 });

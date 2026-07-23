@@ -43,10 +43,12 @@ function persistState() {
     localStorage.removeItem(STORAGE_KEY);
     return;
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    job: state.job,
-    sourceLabel: state.sourceLabel
-  }));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      job: state.job,
+      sourceLabel: state.sourceLabel
+    }));
+  } catch { /* QuotaExceededError in Safari Private Browsing */ }
 }
 
 function restoreState() {
