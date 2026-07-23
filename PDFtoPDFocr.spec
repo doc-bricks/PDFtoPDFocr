@@ -17,7 +17,12 @@ Prerequisites:
 """
 
 import os
+import sys
 
+# SPECPATH wird von PyInstaller in den Spec-Namespace injiziert (Verzeichnis
+# dieser .spec-Datei). Ohne diesen Eintrag findet Python build_release.py
+# nicht, wenn pyinstaller aus einem anderen Arbeitsverzeichnis gestartet wird.
+sys.path.insert(0, SPECPATH)
 import build_release
 
 block_cipher = None
