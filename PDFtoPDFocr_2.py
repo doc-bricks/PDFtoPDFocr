@@ -84,6 +84,65 @@ def tr(key: str, **kwargs) -> str:
             pass
     return text
 
+
+def get_language() -> str:
+    """Gibt die aktuell aktive UI-Sprache zurück."""
+    return _LANG
+
+
+# ===== UI-Sprache: Persistenz (Welle-1 U1) =====
+
+_UI_LANGUAGES = ("de", "en")
+
+
+def _ui_config_dir() -> Path:
+    """Per-User-Konfigverzeichnis (auch bei read-only Store-Install schreibbar)."""
+    if sys.platform.startswith("win"):
+        base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    else:
+        base = os.environ.get("XDG_CONFIG_HOME") or os.path.join(
+            os.path.expanduser("~"), ".config"
+        )
+    return Path(base) / "PDFtoPDFocr"
+
+
+def _ui_config_path() -> Path:
+    return _ui_config_dir() / "config.json"
+
+
+def load_ui_language() -> str:
+    """Gespeicherte UI-Sprache ('de'/'en'), Default 'de'."""
+    try:
+        with open(_ui_config_path(), "r", encoding="utf-8") as f:
+            data = json.load(f)
+        lang = data.get("ui_language", "de") if isinstance(data, dict) else "de"
+    except (OSError, ValueError):
+        lang = "de"
+    return lang if lang in _UI_LANGUAGES else "de"
+
+
+def save_ui_language(lang: str) -> bool:
+    """Persistiert die UI-Sprache in der App-Konfiguration; True bei Erfolg."""
+    if lang not in _UI_LANGUAGES:
+        return False
+    data = {}
+    try:
+        with open(_ui_config_path(), "r", encoding="utf-8") as f:
+            loaded = json.load(f)
+        if isinstance(loaded, dict):
+            data = loaded
+    except (OSError, ValueError):
+        data = {}
+    data["ui_language"] = lang
+    try:
+        _ui_config_dir().mkdir(parents=True, exist_ok=True)
+        with open(_ui_config_path(), "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return True
+    except OSError:
+        return False
+
+
 # Defaults
 DEFAULT_TESSDATA_CANDIDATES = [
     r"C:\Program Files\Tesseract-OCR\tessdata",
@@ -419,20 +478,35 @@ class OCRConverterGUI(QWidget):
 
     def __init__(self):
         super().__init__()
+        # UI-Sprache aus persistenter Konfiguration laden, bevor Widgets gebaut werden.
+        set_language(load_ui_language())
         self.setWindowTitle(tr("window_title"))
         self.resize(640, 520)
         self.layout = QVBoxLayout(self)
         self._ocr_worker = None  # Referenz auf laufenden QThread
 
+        # UI-Sprachumschaltung (Welle-1 U1: sichtbarer DE/EN-Schalter, oben platziert)
+        ui_lang_layout = QHBoxLayout()
+        self.ui_lang_label = QLabel(tr("label_ui_lang"))
+        self.ui_lang_combo = QComboBox()
+        self.ui_lang_combo.addItem("Deutsch", "de")
+        self.ui_lang_combo.addItem("English", "en")
+        self.ui_lang_combo.setCurrentIndex(0 if get_language() == "de" else 1)
+        self.ui_lang_combo.currentIndexChanged.connect(self._on_ui_language_changed)
+        ui_lang_layout.addWidget(self.ui_lang_label)
+        ui_lang_layout.addWidget(self.ui_lang_combo)
+        ui_lang_layout.addStretch(1)
+        self.layout.addLayout(ui_lang_layout)
+
         self.list_widget = PDFListWidget()
         self.layout.addWidget(self.list_widget)
 
-        # Spracheinstellung
+        # OCR-Spracheinstellung (Tesseract-Sprachpaket -- NICHT die UI-Sprache)
         lang_layout = QHBoxLayout()
-        lang_label = QLabel(tr("label_ocr_lang"))
+        self.ocr_lang_label = QLabel(tr("label_ocr_lang"))
         self.lang_combo = QComboBox()
         self.lang_combo.addItems(["deu", "eng", "fra", "spa"])
-        lang_layout.addWidget(lang_label)
+        lang_layout.addWidget(self.ocr_lang_label)
         lang_layout.addWidget(self.lang_combo)
         self.layout.addLayout(lang_layout)
 
@@ -466,6 +540,24 @@ class OCRConverterGUI(QWidget):
 
         # Poppler-Pfad: leer = pdf2image nutzt System-Poppler
         self.poppler_path = ""
+
+    def _on_ui_language_changed(self, index: int):
+        """Wechselt die UI-Sprache, persistiert sie und stellt die Oberflaeche live um."""
+        lang = self.ui_lang_combo.itemData(index) or "de"
+        set_language(lang)
+        save_ui_language(lang)
+        self.retranslate_ui()
+
+    def retranslate_ui(self):
+        """Setzt alle sichtbaren, uebersetzten Texte in der aktuellen Sprache neu."""
+        self.setWindowTitle(tr("window_title"))
+        self.ui_lang_label.setText(tr("label_ui_lang"))
+        self.ocr_lang_label.setText(tr("label_ocr_lang"))
+        self.btn_add_file.setText(tr("btn_add_file"))
+        self.btn_start.setText(tr("btn_start"))
+        self.btn_export.setText(tr("btn_export_job"))
+        self.btn_refresh.setText(f"{ICON_BROOM} {tr('btn_refresh')}")
+        self.btn_delete.setText(f"{ICON_TRASH} {tr('btn_delete')}")
 
     def open_file_dialog(self):
         """Opens a file dialog to select PDF files and adds them to the list."""

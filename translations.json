@@ -3,6 +3,10 @@
     "de": "PDF OCR Werkzeug",
     "en": "PDF OCR Tool"
   },
+  "label_ui_lang": {
+    "de": "Anzeigesprache:",
+    "en": "Display language:"
+  },
   "label_ocr_lang": {
     "de": "OCR-Sprache:",
     "en": "OCR Language:"

@@ -6,6 +6,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Welle-1 U1 — sichtbarer DE/EN-Anzeigesprachschalter**: Neue Combobox „Anzeigesprache / Display language" (Deutsch/English) oben im Fenster, klar getrennt von der bestehenden OCR-Sprachauswahl. Die Oberfläche stellt sofort um (`retranslate_ui`), die Auswahl wird pro Benutzer in `%APPDATA%\PDFtoPDFocr\config.json` (XDG-Fallback) persistiert und beim Start geladen. Das vorhandene `tr()`/`translations.json`-System ist damit erstmals über ein sichtbares Bedienelement erreichbar. Regressionstests: `tests/test_language_switch.py`.
 - `Job-Export` in der Desktop-App ergänzt; die App schreibt jetzt `pdftopdfocr-job-v1.json` mit OCR-Sprache, Datei-Metadaten, Status und Ergebnis-Hinweisen ohne PDF-Inhalte.
 - `llms.txt` als maschinenlesbaren Projektkontext für Repo-Checks und LLM-Crawler ergänzt.
 - Regressionstests für Export-Schema, UTF-8 ohne BOM, fehlende Dateien, relative Pfade und leeren Projektstand ergänzt.
