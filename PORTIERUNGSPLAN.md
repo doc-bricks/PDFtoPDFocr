@@ -1,6 +1,6 @@
 # Portierungsplan - PDFtoPDFocr
 
-Stand: 2026-06-12
+Stand: 2026-07-03
 
 ## Kurzentscheidung
 
@@ -35,8 +35,8 @@ Dieselben Nutzer wollen unterwegs oder auf einem zweiten Gerät Job-Stände anse
 | Web/PWA | Bereits als statischer Offline-Companion umgesetzt: Manifest-Import, Demo-Modus, Filteransicht, Browser-Entwurf und JSON-Export ohne PDF-Inhalte. | P1: Companion beibehalten und per Browser-/Mobile-Smokes härten |
 | Android | Sinnvoll für Job-Vorprüfung, Kamera-/Dateiübergabe und Statusansicht; native OCR wäre hoher Runtime- und Wartungsaufwand. | P2: über PWA/Capacitor prüfen, keine native Voll-App starten |
 | iOS | Gleicher Review-Usecase wie Android, aber mit stärkerem Sandbox-/Dateizugriffslimit. | P2: Safari-PWA und später optional Capacitor/TestFlight, keine native Voll-App |
-| macOS | Fachlich plausibel für Desktop-Nutzer, aber Tesseract/Poppler-Bundling, Signierung und Notarisierung sind eigener Aufwand. | P3: Source-Smoke vorhanden; Paketierung erst nach Store/PWA-Stabilität |
-| Linux | Technisch naheliegend für Power-User mit Systempaketen. | P3: Source-Smoke vorhanden; AppImage/Flatpak nur bei belegtem Bedarf |
+| macOS | Fachlich plausibel für Desktop-Nutzer, aber Tesseract/Poppler-Bundling, Signierung und Notarisierung sind eigener Aufwand. | P3: Paket-Gate dokumentiert; Source-Smoke vorhanden; keine eigene Paketlinie vor Store/PWA-Stabilität |
+| Linux | Technisch naheliegend für Power-User mit Systempaketen. | P3: Paket-Gate dokumentiert; Source-Smoke vorhanden; AppImage/Flatpak nur bei belegtem Bedarf |
 
 ## Zielarchitektur
 
@@ -54,7 +54,7 @@ Dieselben Nutzer wollen unterwegs oder auf einem zweiten Gerät Job-Stände anse
 | Exportformat | implementiert und dokumentiert | optionalen Desktop-Re-Import eines Job-Manifests bewerten |
 | Web/PWA | Prototyp umgesetzt; Import, Filter, Demo, Browser-Entwurf, Export, Manifest und Service Worker vorhanden | Browser-Grenzen und echte Android-/iOS-PWA-Smokes dokumentieren |
 | Android/iOS | über PWA-Testpfad geplant | Import, Suche/Filter, Dateiübergabe und Offline-Start auf echten Geräten prüfen |
-| macOS/Linux | `source_platform_smoke.py` und GitHub-Actions-Matrix für Ubuntu/macOS vorhanden | CI-Ergebnisse beobachten; eigene Builds nur bei Nachfrage |
+| macOS/Linux | `source_platform_smoke.py`, GitHub-Actions-Matrix für Ubuntu/macOS und `MACOS_LINUX_PACKAGE_GATE.md` vorhanden | CI-Ergebnisse beobachten; eigene Builds nur nach Windows-Store-/PWA-Stabilität oder belegter Nachfrage |
 | Direkte Synchronisierung | nicht umgesetzt | Nicht-Ziel bis ein echter Mehrgeräte-Live-Usecase belegt ist |
 
 ## Nicht-Ziele
@@ -80,4 +80,5 @@ Dieselben Nutzer wollen unterwegs oder auf einem zweiten Gerät Job-Stände anse
 5. P0: Aktuelles Store-Screenshot-Set erstellen.
 6. P0: Reproduzierbaren EXE-/MSIX-Buildpfad und WACK/Testprotokoll für den aktuellen Stand erneuern.
 7. P2: Echte Android-/iOS-PWA-Smokes für Import, Filter/Suche, Dateiübergabe und Offline-Start durchführen.
-8. P3: Optionalen Desktop-Re-Import und spätere Roundtrip-Strategie bewerten; bis dahin bleibt der Companion read-mostly.
+8. DONE 2026-07-03: macOS-/Linux-Paket-Gate dokumentiert; bis nach Windows-Store- und PWA-Stabilität bleibt es bei Source-Smokes, keine eigene Paketlinie.
+9. P3: Optionalen Desktop-Re-Import und spätere Roundtrip-Strategie bewerten; bis dahin bleibt der Companion read-mostly.
