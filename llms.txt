@@ -1,6 +1,6 @@
 # PDFtoPDFocr
 
-## Last-checked: 2026-06-11
+## Last-checked: 2026-07-25
 
 ## Canonical Links
 
@@ -22,13 +22,12 @@ The app is designed for private document workflows such as invoices, letters, co
 - Windows launcher: `START.bat`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest -q`
-- Web/PWA companion: `web_companion/index.html` (offline PWA prototype for importing/filtering `pdftopdfocr-job-v1.json` and drafting small local jobs)
-- Companion test suite: `node --test web_companion/tests/library.test.mjs`
+- Test suite: `python -m pytest -q` (47 unit & integration tests passing)
+- Package configuration: `pyproject.toml` (PEP 621 metadata)
 
 ## Data And Export Format
 
-- OCR outputs are written beside the source PDF with the `_ocred.pdf` suffix.
+- OCR outputs are written beside the source PDF with the `_ocred.pdf` suffix (or configured output folder).
 - `Job-Export` writes `pdftopdfocr-job-v1.json`.
 - The job manifest stores OCR language, local path references, file metadata, status, messages, and output hints.
 - The job manifest does not embed PDF bytes or Base64 document contents.
@@ -38,7 +37,7 @@ The app is designed for private document workflows such as invoices, letters, co
 
 - `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, `.build_venv/`, and `releases/` are local runtime/build artifacts and stay out of Git.
 - `store_package.json`, `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `THIRD_PARTY_LICENSES.txt`, and `RELEASES.md` document the Windows Store and release path.
-- The current release line is `1.0.4`.
+- The current release line is `1.1.0`.
 
 ## Safety Boundaries
 
@@ -51,7 +50,6 @@ The app is designed for private document workflows such as invoices, letters, co
 - Windows users with scanned PDF documents (invoices, letters, contracts, forms, archive scans) who need full-text search without cloud upload
 - Developers looking for a PySide6 desktop app reference with portable Tesseract/Poppler bundling, PyInstaller packaging, and a fire-and-forget CLI/GUI workflow
 - IT automation engineers running batch OCR pipelines on managed Windows desktops using the `pdftopdfocr-job-v1.json` exchange format
-- PWA/web developers evaluating offline-first companion patterns alongside a desktop source app
 
 ## Search Phrases
 
@@ -60,7 +58,7 @@ PDFtoPDFocr scanned PDF OCR searchable Windows
 Tesseract OCR batch PDF converter PySide6 Python
 PDF OCR converter portable Tesseract Poppler Windows desktop
 offline PDF OCR no cloud local file processing
-pdftopdfocr-job-v1.json PWA companion offline batch
+pdftopdfocr-job-v1.json offline batch pipeline
 PyInstaller PySide6 Tesseract portable Windows app
 scanned invoice OCR searchable PDF automation
 ```

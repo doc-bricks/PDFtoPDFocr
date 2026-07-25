@@ -5,6 +5,17 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-25
+
+### Hinzugefügt / Added
+- **PEP 621 `pyproject.toml`**: Standardisierte Paketkonfiguration mit Metadaten (Name, Version, Lizenz, Keywords, URLs), Abhängigkeiten und Pytest-Pfadkonfiguration (`pythonpath = "."`) angelegt.
+- **Shields.io Badges**: Python-Version, Pytest-Status (47 passed), MIT-Lizenz, Windows 10/11 Plattform, Tesseract 5 OCR Engine und LLM-Ready Badges in `README.md` und `README_de.md` integriert.
+- **KI/LLM-Integrationshinweise & Architekturdiagramm**: `> [!NOTE]` Callout für KI-Agenten und offline Automatisierungsworkflows sowie Mermaid Architektur- & Datenfluss-Diagramm in `README.md` und `README_de.md` ergänzt.
+
+### Geändert / Changed
+- `llms.txt` Header auf `Last-checked: 2026-07-25` und 47 passing pytest unit/integration tests aktualisiert.
+
+
 ## [1.1.0] - 2026-07-24
 
 Welle-1-Usertest-Feature-Paket (U1-U7): Bild-Import, Stapeln/Mergen und
