@@ -5,6 +5,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Hinzugefügt / Added
+- **Windows Store Release Readiness (Option 1)**: `store_package.json` nach kanonischem Schema mit Publisher (`CN=52596601-BAB4-4F3F-B182-E8F3F273B202`) & Identity (`Geiger.PDFtoPDFocr`), `SUPPORT.md`, `WINDOWS_STORE_PREP.md`, Store-Icons (`Square44x44`, `Square150x150`, `Wide310x150`, `Square310x310`, `StoreLogo`), `scripts/check_store_readiness.py` Preflight-Script und `tests/test_store_materials.py` Test-Suite verifiziert (53/53 Pytest grün).
+
+### Behoben / Fixed
+- **Bugsweep 2026-07-25**: `OCRWorker._ocr_pdf` verarbeitet Bilder mit Alphakanal/Transparenz (`RGBA`, `LA` oder `P` mit Transparenz) vor der OCR-Übergabe jetzt sauber über ein weißes Hintergrundbild `(255, 255, 255)`. Verhindert, dass transparente Hintergründe (z.B. PNG-Diagramme) beim direkten `convert("RGB")` schwarz `(0, 0, 0)` werden und der Textkontrast für Tesseract verloren geht.
+- **pytest.ini**: `pythonpath = .` ergänzt für direkte Pytest-Testausführung ohne CLI-Flags.
+
+
 ## [1.1.0] - 2026-07-24
 
 Welle-1-Usertest-Feature-Paket (U1-U7): Bild-Import, Stapeln/Mergen und
