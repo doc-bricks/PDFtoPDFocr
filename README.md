@@ -1,7 +1,7 @@
 # PDFtoPDFocr - PDF OCR Converter
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Pytest](https://img.shields.io/badge/tests-47%20passed-brightgreen.svg)](https://github.com/doc-bricks/PDFtoPDFocr)
+[![Pytest](https://img.shields.io/badge/tests-46%20passed-brightgreen.svg)](https://github.com/doc-bricks/PDFtoPDFocr)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D6.svg)](https://github.com/doc-bricks/PDFtoPDFocr)
 [![OCR Engine](https://img.shields.io/badge/OCR-Tesseract--5-orange.svg)](https://github.com/tesseract-ocr/tesseract)
