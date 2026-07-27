@@ -1,34 +1,38 @@
+[English](README.md) | [Deutsch](README_de.md)
+
 # PDFtoPDFocr - PDF OCR Converter
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Pytest](https://img.shields.io/badge/tests-46%20passed-brightgreen.svg)](https://github.com/doc-bricks/PDFtoPDFocr)
-[![Lizenz: MIT](https://img.shields.io/badge/lizenz-MIT-green.svg)](LICENSE)
-[![Plattform](https://img.shields.io/badge/plattform-Windows%2010%2F11-0078D6.svg)](https://github.com/doc-bricks/PDFtoPDFocr)
-[![OCR Engine](https://img.shields.io/badge/OCR-Tesseract--5-orange.svg)](https://github.com/tesseract-ocr/tesseract)
-[![LLM-Ready](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
+[![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Pytest](https://img.shields.io/badge/pytest-51%20bestanden-brightgreen.svg)](tests/)
+[![LLM-Bereit](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
+[![Ökosystem](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
+[![Dachorganisation](https://img.shields.io/badge/Dachorganisation-open--bricks-blue.svg)](https://github.com/open-bricks)
 
-Wandelt gescannte PDF-Dateien und Bilder in durchsuchbare PDFs um: per OCR (Texterkennung) mit Tesseract. Batch-Verarbeitung, auswählbare OCR-Sprachen, automatischer Sprachpaket-Download, Direkt-Bildimport, Auto-Merge und portable Tesseract/Poppler-Integration.
+Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um: per OCR (Texterkennung) mit Tesseract. Batch-Verarbeitung, auswählbare OCR-Sprache, automatischer Sprachpaket-Download und portable Tesseract-Integration.
 
 Maschinenlesbarer Projektkontext: [`llms.txt`](llms.txt) | [English Documentation](README.md)
 
 > [!NOTE]
-> **Für KI-Agenten & Automatisierungsworkflows**: Maschinenlesbare Projektkontexte und Funktionsspezifikationen stehen in [`llms.txt`](llms.txt) bereit. PDFtoPDFocr unterstützt Batch-OCR, auswählbare Sprachpakete und strukturierte lokale Job-Manifest-Exporte (`pdftopdfocr-job-v1.json`) für offline Dokumenten-Pipelines.
+> **KI & LLM-Integration:** Dieses Repository enthält eine strukturierte [`llms.txt`](llms.txt)-Datei mit maschinenlesbarem Kontext, Architektur-Details, CLI/GUI-Schnittstellen und Test-Einstiegspunkten für autonome KI-Agenten.
+
+> [!TIP]
+> **Datenschutz & Lokale Verarbeitung:** PDF-Dateien werden zu 100% lokal auf Ihrem System verarbeitet. Dokumente werden niemals auf externe Server oder Cloud-APIs hochgeladen.
 
 ![PDFtoPDFocr Hauptfenster](README/screenshots/main.png)
 
 ## Systemarchitektur & Datenfluss
 
 ```mermaid
-flowchart TD
-    A[Input Scanned PDF / Images] --> B[PDFtoPDFocr GUI / Batch Engine]
-    B --> C{Document Rasterization}
-    C -->|pdf2image + Poppler| D[Page Image Frames]
-    C -->|Pillow / Image Import| D
-    D --> E[Tesseract OCR Engine]
-    E -->|pytesseract + tessdata| F[Searchable Text Layer / HOCR]
-    F --> G[pikepdf PDF Assembler]
-    G --> H[Output Searchable PDF `_ocred.pdf`]
-    B --> I[Job Manifest Export `pdftopdfocr-job-v1.json`]
+graph TD
+    A[Gescannte PDF-Datei / Batch] --> B[PySide6 Desktop GUI]
+    B --> C[pdf2image / Poppler Rasterizer]
+    C --> D[pytesseract / Portable Tesseract Engine]
+    D --> E[pikepdf / PDF Assembler]
+    E --> F[Durchsuchbare Ausgabe _ocred.pdf]
+    B --> G[Job Exporter]
+    G --> H[pdftopdfocr-job-v1.json Manifest]
+    H --> I[Web/PWA Companion Vorschau]
 ```
 
 ## Features

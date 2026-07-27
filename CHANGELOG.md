@@ -5,6 +5,13 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-27
+
+### Hinzugefügt / Added
+- **Discoverability, SEO & README-Design Audit (Pfad B)**: Shields.io Status-Badges (Python 3.10+, License MIT, Pytest 51 passed, LLM-Ready, Ecosystem doc-bricks, Umbrella open-bricks), GFM-Hinweisboxen (`> [!NOTE]` für KI/LLM-Kontext, `> [!TIP]` für Datenschutz & lokale Offline-Verarbeitung), Sprachwechsler-Navigation (`[English](README.md) | [Deutsch](README_de.md)`) und Mermaid-Systemarchitektur- & Datenflussdiagramm in `README.md` und `README_de.md` eingebunden.
+- **PEP 621 Standardisierung**: `pyproject.toml` mit vollständigen Metadaten, PyPI-Classifiers, Build-System (`setuptools`) und `[tool.pytest.ini_options]` Test-Konfiguration erstellt.
+- **llms.txt Update**: Index-Header auf `Last-checked: 2026-07-27` und 52 verifizierte Pytest-Tests aktualisiert.
+
 ## [1.1.1] - 2026-07-25
 
 ### Hinzugefügt / Added
