@@ -5,6 +5,10 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Korrigiert / Fixed
+- **TASKPLAN 1376 — Git-Konsolidierung**: Die durch Commit `98bd6b8` versehentlich wieder eingeführte Verzeichnisstruktur `web_companion/` erneut entfernt und damit den dokumentierten E04-Entscheid für eine Desktop-only-Anwendung wiederhergestellt.
+- **TASKPLAN 1377 — Plattform-Paket-Gate**: Den vorhandenen `skipif`-Schutz für die bewusst nicht versionierte `AUFGABEN.txt` bestätigt; Zieltest (`2 passed`), Gesamtsuite (`47 passed`) und Source-Platform-Smoke sind grün.
+
 ## [1.1.1] - 2026-07-27
 
 ### Hinzugefügt / Added
