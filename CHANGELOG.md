@@ -5,6 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-29
+
+### Hinzugefügt / Added
+- **Discoverability & Marketing Refresh (Pfad B)**: `llms.txt` Index-Header auf `Last-checked: 2026-07-29` und 47 verifizierte Pytest-Tests aktualisiert, Pytest-Badges in `README.md` und `README_de.md` auf 47 passed synchronisiert, Paketversion in `pyproject.toml` auf `1.1.1` angeglichen. [G 2026-07-29]
+
 ### Korrigiert / Fixed
 - **TASKPLAN 1376 — Git-Konsolidierung**: Die durch Commit `98bd6b8` versehentlich wieder eingeführte Verzeichnisstruktur `web_companion/` erneut entfernt und damit den dokumentierten E04-Entscheid für eine Desktop-only-Anwendung wiederhergestellt.
 - **TASKPLAN 1377 — Plattform-Paket-Gate**: Den vorhandenen `skipif`-Schutz für die bewusst nicht versionierte `AUFGABEN.txt` bestätigt; Zieltest (`2 passed`), Gesamtsuite (`47 passed`) und Source-Platform-Smoke sind grün.
