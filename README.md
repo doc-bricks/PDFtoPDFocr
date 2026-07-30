@@ -1,3 +1,5 @@
+<img src="assets/banner.png" width="100%" alt="Pdftopdfocr banner">
+
 [English](README.md) | [Deutsch](README_de.md)
 
 # PDFtoPDFocr - PDF OCR Converter
