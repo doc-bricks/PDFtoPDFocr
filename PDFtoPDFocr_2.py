@@ -517,7 +517,13 @@ class OCRWorker(QThread):
             page_sources = []  # (pikepdf.Pdf, tmp_path_or_None)
             try:
                 for img in images:
-                    if img.mode != "RGB":
+                    if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+                        bg = Image.new("RGB", img.size, (255, 255, 255))
+                        if img.mode != "RGBA":
+                            img = img.convert("RGBA")
+                        bg.paste(img, mask=img.split()[3])
+                        img = bg
+                    elif img.mode != "RGB":
                         img = img.convert("RGB")
                     pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, lang=lang, extension='pdf')
                     if not pdf_bytes:

@@ -34,5 +34,13 @@ def test_bs2_ocr_error_uses_logging_not_print():
     assert 'logging.error("OCR-Fehler bei %s: %s"' in _SRC
 
 
+def test_bs3_rgba_transparency_blending():
+    """Bilder mit Alphakanal werden über einen weißen Hintergrund compositet statt schwarz zu werden."""
+    assert 'img.mode in ("RGBA", "LA")' in _SRC
+    assert 'Image.new("RGB", img.size, (255, 255, 255))' in _SRC
+    assert 'bg.paste(img, mask=img.split()[3])' in _SRC
+
+
 def test_bs_syntax_valid():
     py_compile.compile(str(_SRC_PATH), doraise=True)
+
