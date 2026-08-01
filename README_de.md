@@ -95,11 +95,11 @@ Die Ausgabe landet in `dist/PDFtoPDFocr/`. Falls vorhanden, werden `tesseract_po
 
 ## Portierung / Plattformstrategie
 
-Die aktuelle Portierungsentscheidung steht in `PORTIERUNGSPLAN.md`: Windows Store bleibt der erste Release-Kanal, weil die App lokale Batch-OCR mit Tesseract, Poppler und PySide6 bündelt. Android, iOS und Web sollen nicht als sofortige native Clones entstehen, sondern über einen Web/PWA-Companion mit dem Austauschformat `pdftopdfocr-job-v1.json` vorbereitet werden.
+Die aktuelle Portierungsentscheidung steht in `PORTIERUNGSPLAN.md`: PDFtoPDFocr bleibt eine Desktop-first-OCR-App. Windows Store ist der wichtigste Release-Pfad, weil die App lokale Batch-OCR mit Tesseract, Poppler und PySide6 bündelt.
 
-Der Companion-Prototyp in `web_companion/` kann dieses Manifest jetzt offline importieren, filtern und als Browser-Entwurf für kleine Vorab-Jobs erneut exportieren. So lassen sich mobile PWA-Smokes und Ergebnisprüfungen vorbereiten, ohne PDF-Inhalte in den Browser hochzuladen.
+Der frühere Web/PWA-Companion wurde nach einem Usecase-Audit entfernt. Android, iOS, Web, native Mobile-Apps und App-eigene Synchronisierung sind keine aktiven Produktlinien, solange kein neuer konkreter Nutzer-Usecase dokumentiert ist.
 
-macOS und Linux bleiben zunächst Source- und Smoke-Test-Ziele aus derselben Desktop-Codebasis. Eine eigene Desktop-Paketierung folgt erst, wenn Windows Store und PWA-Linie stabil sind.
+macOS und Linux bleiben zunächst Source- und Smoke-Test-Ziele aus derselben Desktop-Codebasis. Eine eigene Desktop-Paketierung folgt erst, wenn der Windows-Store-Pfad aktuell ist oder echte macOS-/Linux-Nachfrage dokumentiert wurde.
 
 ## Lizenz
 
