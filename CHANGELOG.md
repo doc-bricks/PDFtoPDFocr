@@ -5,6 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-08-04
+
+### Geändert / Changed
+- **Technische Hygiene & Maintenance Check (Pfad A)**: `pythonpath = ["."]` in `pyproject.toml` (`[tool.pytest.ini_options]`) und `pytest.ini` für Standalone-Testausführung ergänzt, Paketversion auf `1.1.2` synchronisiert, `llms.txt` Last-checked Zeitstempel auf `2026-08-04` aktualisiert. [G 2026-08-04]
+
 ## [1.1.2] - 2026-07-29
 
 ### Hinzugefügt / Added

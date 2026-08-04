@@ -1,6 +1,6 @@
 # PDFtoPDFocr
 
-## Last-checked: 2026-07-29
+## Last-checked: 2026-08-04
 
 ## Canonical Links
 
@@ -37,7 +37,7 @@ The app is designed for private document workflows such as invoices, letters, co
 
 - `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, `.build_venv/`, and `releases/` are local runtime/build artifacts and stay out of Git.
 - `store_package.json`, `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `THIRD_PARTY_LICENSES.txt`, and `RELEASES.md` document the Windows Store and release path.
-- The current release line is `1.1.0`.
+- The current release line is `1.1.2`.
 
 ## Safety Boundaries
 

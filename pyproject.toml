@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PDFtoPDFocr"
-version = "1.1.1"
+version = "1.1.2"
 description = "Local-first Windows desktop tool for converting scanned PDF files into searchable PDFs using Tesseract OCR."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -40,6 +40,7 @@ Repository = "https://github.com/doc-bricks/PDFtoPDFocr.git"
 Changelog = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/CHANGELOG.md"
 
 [tool.pytest.ini_options]
+pythonpath = ["."]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-ra -q"
