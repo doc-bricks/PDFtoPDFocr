@@ -47,8 +47,25 @@
 
 ---
 
+### Befund 4: macOS/Linux Package-Gate-Verifikation — GELÖST
+
+- **Task:** 1378, Package-Gate-Checks und `source_platform_smoke.py` für
+  Nicht-Windows-Plattformen.
+- **Lokaler Nachweis:** `python -m pytest -q` meldet `47 passed`; der sechsstufige
+  `python source_platform_smoke.py` besteht mit `QT_QPA_PLATFORM=offscreen`.
+- **Remote-Nachweis:** GitHub-Actions-Run
+  `30909177856` auf HEAD `f3477e2` ist für `ubuntu-latest` und `macos-latest`
+  erfolgreich; beide Jobs installieren die Abhängigkeiten und führen den
+  Source-Smoke aus.
+- **Entscheidung:** Das Gate bleibt geschlossen. Es wurden keine nativen
+  macOS-/Linux-Paketartefakte erzeugt oder als Release behauptet. Ein optionaler
+  generischer `pip wheel .`-Probe scheitert erwartbar an der flachen App-Struktur
+  (`assets`, `README`, `store_assets`) und ist kein unterstützter Releasepfad;
+  die Desktop-Ausgabe bleibt PyInstaller vorbehalten.
+
 ## Abschluss des TASKSOLVER-Bündels
 
 - Task 1376: Git-Staging konsolidiert, Remote-Divergenz aufgelöst und Companion-Regression korrigiert.
 - Task 1377: Plattform-Paket-Gate empirisch verifiziert.
+- Task 1378: macOS-/Linux-Source-Gate am aktuellen HEAD erneut verifiziert.
 - Offene Blocker: keine.

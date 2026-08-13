@@ -1,6 +1,6 @@
 # macOS/Linux Package Gate - PDFtoPDFocr
 
-Stand: 2026-07-03
+Stand: 2026-08-13 (Verifikation)
 
 ## Entscheidung
 
@@ -32,6 +32,31 @@ Wenn das Gate später geöffnet wird, muss der erste Paket-Slice klein bleiben:
 - Linux: AppImage, Flatpak, Snap oder Tarball bewusst wählen; keine parallelen Paketformate im ersten Lauf.
 - Für beide Plattformen: `source_platform_smoke.py` vorher grün, Paket-Smoke auf frischem Profil, SHA256SUMS, README/RELEASES-Doku und klare Nicht-Unterstützung nativer Mobile-OCR.
 
+## Verifikation 2026-08-13
+
+Der geschlossene Package-Gate-Entscheid wurde gegen den aktuellen Clone und den
+aktuellen Remote-HEAD `f3477e2` read-back-geprüft:
+
+- `python -m pytest -q`: **47 passed**.
+- `python source_platform_smoke.py` (Windows-Host, `QT_QPA_PLATFORM=offscreen`):
+  alle sechs Checks bestanden; dieser Lauf ist ausdrücklich kein Ersatz für
+  die Nicht-Windows-Matrix.
+- GitHub Actions Run
+  [30909177856](https://github.com/doc-bricks/PDFtoPDFocr/actions/runs/30909177856):
+  `Smoke (ubuntu-latest)` und `Smoke (macos-latest)` erfolgreich. Der Linux-Job
+  installierte die Qt-Systembibliotheken; beide Jobs installierten die Python-
+  Abhängigkeiten und beendeten `source_platform_smoke.py` erfolgreich.
+- Es wurden keine DMG-, PKG-, AppImage-, Flatpak-, Snap-, Deb- oder RPM-Artefakte
+  erzeugt. Die Gate-Grenze bleibt damit unverändert: Source-/CI-Smoke, keine
+  native Paketveröffentlichung.
+- Ein zusätzlicher generischer `python -m pip wheel --no-deps .`-Probe ist kein
+  unterstützter Releasepfad: Setuptools verweigert die flache App-Struktur wegen
+  der Top-Level-Verzeichnisse `assets`, `README` und `store_assets`. Das Projekt
+  baut seine Desktop-Ausgabe über PyInstaller; aus dem fehlgeschlagenen Probe-
+  Lauf wird ausdrücklich kein Wheel- oder PyPI-Versprechen abgeleitet.
+
 ## Aktueller Status
 
-Status 2026-07-03: geschlossenes Gate. Source-Smokes sind die Grenze der aktuellen macOS-/Linux-Unterstützung; eigene Pakete bleiben nach Windows-Store- und PWA-Stabilisierung zu bewerten.
+Status 2026-08-13: geschlossenes Gate. Source-Smokes sind die Grenze der
+aktuellen macOS-/Linux-Unterstützung; eigene Pakete bleiben nach Windows-Store-
+und PWA-Stabilisierung zu bewerten.

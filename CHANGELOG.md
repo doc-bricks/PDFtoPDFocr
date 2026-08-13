@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+- **TASKPLAN 1378 — macOS/Linux Package-Gate erneut verifiziert:** 47 Tests und
+  der sechsstufige Source-Smoke sind lokal grün. GitHub-Actions-Run
+  `30909177856` bestätigt den Smoke auf `ubuntu-latest` und `macos-latest` am
+  aktuellen HEAD `f3477e2`; das Gate bleibt geschlossen und erzeugt keine
+  native DMG-/PKG-/AppImage-/Flatpak-/Snap-/Deb-/RPM-Linie.
+
 ## [1.1.2] - 2026-08-04
 
 ### Geändert / Changed
