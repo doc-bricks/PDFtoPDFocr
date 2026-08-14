@@ -5,11 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
-- **TASKPLAN 1378 — macOS/Linux Package-Gate erneut verifiziert:** 47 Tests und
-  der sechsstufige Source-Smoke sind lokal grün. GitHub-Actions-Run
-  `30909177856` bestätigt den Smoke auf `ubuntu-latest` und `macos-latest` am
-  aktuellen HEAD `f3477e2`; das Gate bleibt geschlossen und erzeugt keine
-  native DMG-/PKG-/AppImage-/Flatpak-/Snap-/Deb-/RPM-Linie.
+## [1.1.3] - 2026-08-14
+
+### Behoben / Fixed
+- **Bug-Regression BS-3 (pikepdf Lazy Page Lifecycle in `merge_ocr_outputs`)**: In `merge_ocr_outputs` wurden geöffnete Quell-PDF-Instanzen (`src_pdf`) bisher innerhalb der Schleife vor `merged.save()` geschlossen. Da `pikepdf` Seiteninhalte lazy referenziert, führte das vorzeitige Schließen zu potenziellen Stream- und Deskriptor-Fehlern beim Speichern der Sammel-PDF. Geöffnete Quell-PDFs werden nun bis nach dem Speichern offengehalten und sauber im äußeren `finally`-Block geschlossen. [G 2026-08-14]
+- **Testabdeckung**: Regressionstests `test_bs3_merge_ocr_outputs_sources_kept_open_until_save` und `test_bs3_merge_ocr_outputs_functional_execution` in `tests/test_bug_regressions.py` ergänzt; Pytest-Suite auf 49/49 passed aktualisiert. [G 2026-08-14]
 
 ## [1.1.2] - 2026-08-04
 

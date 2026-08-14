@@ -36,7 +36,7 @@ ICON_OK, ICON_ERR, ICON_BROOM, ICON_TRASH = "✓", "⚠", "🧹", "🗑"
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
 SUPPORTED_EXTS = {".pdf"} | IMAGE_EXTS
 APP_NAME = "PDFtoPDFocr"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.3"
 EXPORT_SCHEMA = "pdftopdfocr-job-v1"
 DEFAULT_OCR_DPI = 300
 MERGE_SUBFOLDER_NAME = "Einzeldateien"
@@ -429,16 +429,20 @@ def merge_ocr_outputs(
     subfolder.mkdir(parents=True, exist_ok=True)
 
     merged = pikepdf.Pdf.new()
+    opened_sources: list[pikepdf.Pdf] = []
     try:
         for p in output_paths:
             src_pdf = pikepdf.Pdf.open(p)
-            try:
-                merged.pages.extend(src_pdf.pages)
-            finally:
-                src_pdf.close()
+            opened_sources.append(src_pdf)
+            merged.pages.extend(src_pdf.pages)
         merged_path = export_folder / merged_name
         merged.save(merged_path)
     finally:
+        for src_pdf in opened_sources:
+            try:
+                src_pdf.close()
+            except Exception:
+                pass
         merged.close()
 
     # Einzelseiten erst NACH dem Speichern der Sammel-PDF verschieben, damit ein

@@ -1,6 +1,6 @@
 # PDFtoPDFocr
 
-## Last-checked: 2026-08-04
+## Last-checked: 2026-08-14
 
 ## Canonical Links
 
@@ -22,7 +22,7 @@ The app is designed for private document workflows such as invoices, letters, co
 - Windows launcher: `START.bat`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (47 verified tests: 47 passed) [2026-07-29]
+- Test suite: `python -m pytest` (49 verified tests: 49 passed) [2026-08-14]
 - Package configuration: `pyproject.toml` (PEP 621 metadata)
 
 ## Data And Export Format
