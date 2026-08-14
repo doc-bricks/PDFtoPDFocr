@@ -128,7 +128,7 @@ def main():
     if exe_path.exists():
         size_mb = exe_path.stat().st_size / (1024 * 1024)
         total_mb = sum(f.stat().st_size for f in (DIST_DIR / "PDFtoPDFocr").rglob("*") if f.is_file()) / (1024 * 1024)
-        print(f"\n  Build erfolgreich!")
+        print("\n  Build erfolgreich!")
         print(f"  EXE: {exe_path} ({size_mb:.1f} MB)")
         print(f"  Gesamt: {total_mb:.1f} MB")
     else:

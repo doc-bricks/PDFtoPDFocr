@@ -22,7 +22,7 @@ The app is designed for private document workflows such as invoices, letters, co
 - Windows launcher: `START.bat`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (49 verified tests: 49 passed) [2026-08-14]
+- Test suite: `python -m pytest` (54 verified tests: 54 passed) [2026-08-14]
 - Package configuration: `pyproject.toml` (PEP 621 metadata)
 
 ## Data And Export Format
@@ -37,7 +37,7 @@ The app is designed for private document workflows such as invoices, letters, co
 
 - `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, `.build_venv/`, and `releases/` are local runtime/build artifacts and stay out of Git.
 - `store_package.json`, `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `THIRD_PARTY_LICENSES.txt`, and `RELEASES.md` document the Windows Store and release path.
-- The current release line is `1.1.2`.
+- The current release line is `1.1.3`.
 
 ## Safety Boundaries
 

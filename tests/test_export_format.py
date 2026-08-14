@@ -241,7 +241,6 @@ def test_ocr_pdf_returns_false_when_all_pages_yield_empty_bytes(tmp_path, monkey
     """Bug #4: Wenn pytesseract für alle Seiten leere Bytes liefert,
     darf _ocr_pdf KEINE leere PDF speichern und muss False zurückgeben."""
     from PIL import Image as PILImage
-    import pikepdf
 
     _qapp()
     worker = app.OCRWorker(pending_paths=[], lang="eng")
@@ -269,7 +268,6 @@ def test_ensure_tesseract_download_leaves_no_partial_file_on_network_error(
 ):
     """Bug #5: Bei einem Netzwerkabbruch während des Downloads darf keine
     abgeschnittene .traineddata-Datei auf der Platte verbleiben."""
-    import pikepdf
 
     # Tesseract-Binary simulieren
     exe_name = "tesseract.exe" if app.os.name == "nt" else "tesseract"

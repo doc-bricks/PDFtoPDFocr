@@ -7,9 +7,15 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [1.1.3] - 2026-08-14
 
+### Hinzugefügt / Added
+- **App-Icon-Modernisierung & Asset-Set**: Master-App-Icon (512x512 PNG, RGB/RGBA) mit modernem PDF/OCR-Scanner-Motiv generiert und unter `assets/icon.png` sowie `PDFtoPDFocr.png` abgelegt. Multi-Resolution Windows-ICO-Dateien (`PDFtoPDFocr.ico`, `assets/app_icon.ico`, `assets/icon.ico`) mit allen Standardauflösungen (256x256, 128x128, 64x64, 48x48, 32x32, 24x24, 16x16) und `assets/favicon.ico` erzeugt. Standard-Kachel- und Store-Icons unter `assets/icons/` (`icon_44x44.png`, `icon_50x50.png`, `icon_150x150.png`, `icon_310x150.png`, `icon_310x310.png`) und `store_assets/` synchronisiert.
+- **Runtime-Icon-Anbindung**: `get_project_root()`, `get_app_icon_path()` und `get_app_icon()` in `PDFtoPDFocr_2.py` implementiert; `OCRConverterGUI` und `QApplication` binden das Anwendungs-Icon verlässlich ein.
+- **PyInstaller-Spec & Build**: `PDFtoPDFocr.spec` bindet `assets/` über `datas` ein und wählt prioritär `PDFtoPDFocr.ico`; `build_exe.bat` auf `.SOFTWARE`-Standard mit isoliertem Build-Root `C:\_Local_DEV\BUILDS\PDFtoPDFocr\1.1.3` modernisiert.
+- **Asset-Testsuite**: Neue Testsuite `tests/test_app_assets.py` mit 5 Tests für Icon-Integrität, Formate, Auflösungen und GUI-Laufzeitbindung implementiert (54/54 passed, 100% grün).
+
 ### Behoben / Fixed
 - **Bug-Regression BS-3 (pikepdf Lazy Page Lifecycle in `merge_ocr_outputs`)**: In `merge_ocr_outputs` wurden geöffnete Quell-PDF-Instanzen (`src_pdf`) bisher innerhalb der Schleife vor `merged.save()` geschlossen. Da `pikepdf` Seiteninhalte lazy referenziert, führte das vorzeitige Schließen zu potenziellen Stream- und Deskriptor-Fehlern beim Speichern der Sammel-PDF. Geöffnete Quell-PDFs werden nun bis nach dem Speichern offengehalten und sauber im äußeren `finally`-Block geschlossen. [G 2026-08-14]
-- **Testabdeckung**: Regressionstests `test_bs3_merge_ocr_outputs_sources_kept_open_until_save` und `test_bs3_merge_ocr_outputs_functional_execution` in `tests/test_bug_regressions.py` ergänzt; Pytest-Suite auf 49/49 passed aktualisiert. [G 2026-08-14]
+- **Testabdeckung**: Regressionstests `test_bs3_merge_ocr_outputs_sources_kept_open_until_save` und `test_bs3_merge_ocr_outputs_functional_execution` in `tests/test_bug_regressions.py` ergänzt; Pytest-Suite auf 54/54 passed aktualisiert. [G 2026-08-14]
 
 ## [1.1.2] - 2026-08-04
 

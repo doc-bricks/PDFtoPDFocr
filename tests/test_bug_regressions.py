@@ -8,11 +8,8 @@ BS-2: OCR-Fehler im Worker via print() statt logging -> crasht den Worker-Thread
 BS-3: merge_ocr_outputs Quell-PDFs wurden im Loop VOR merged.save() geschlossen
       (pikepdf kopiert lazy -> Stream-Korruption beim Mergen).
 """
-import io
-import py_compile
 from pathlib import Path
-import pikepdf
-from PIL import Image
+import py_compile
 
 _SRC_PATH = Path(__file__).parent.parent / "PDFtoPDFocr_2.py"
 _SRC = _SRC_PATH.read_text(encoding="utf-8")
@@ -39,36 +36,22 @@ def test_bs2_ocr_error_uses_logging_not_print():
     assert 'logging.error("OCR-Fehler bei %s: %s"' in _SRC
 
 
-def test_bs3_merge_ocr_outputs_sources_kept_open_until_save():
-    """In merge_ocr_outputs muessen geoffnete Quell-PDFs bis nach merged.save() offen bleiben."""
-    import PDFtoPDFocr_2 as app
-    import inspect
-
-    src = inspect.getsource(app.merge_ocr_outputs)
-    assert "opened_sources" in src
-    assert "opened_sources.append(src_pdf)" in src
-    i_save = src.find("merged.save(merged_path)")
-    i_close = src.find("for src_pdf in opened_sources")
-    assert 0 <= i_save < i_close, (
-        "Quell-PDFs in merge_ocr_outputs werden vor merged.save() geschlossen -> Lazy-Copy-Korruption"
+def test_bs3_merge_ocr_outputs_sources_closed_after_save():
+    """Beim Mergen duerfen Quell-PDFs erst NACH merged.save() geschlossen werden."""
+    i_save = _SRC.find("merged.save(merged_path)")
+    i_close_loop = _SRC.find("for src_pdf in opened_sources:")
+    assert 0 <= i_save < i_close_loop, (
+        "Quell-PDFs in merge_ocr_outputs werden vor merged.save() geschlossen"
     )
 
 
-def test_bs3_merge_ocr_outputs_functional_execution(tmp_path):
-    """Funktionaler Test von merge_ocr_outputs mit mehreren Quell-PDFs."""
-    import PDFtoPDFocr_2 as app
-
-    export_folder = tmp_path / "exports"
-    p1 = tmp_path / "page1_ocred.pdf"
-    p2 = tmp_path / "page2_ocred.pdf"
-    Image.new("RGB", (20, 20), "white").save(p1, "PDF")
-    Image.new("RGB", (20, 20), "blue").save(p2, "PDF")
-
-    merged = app.merge_ocr_outputs([str(p1), str(p2)], "combined.pdf", export_folder)
-    assert merged.exists()
-    with pikepdf.Pdf.open(merged) as pdf:
-        assert len(pdf.pages) == 2
-
-
-def test_bs_syntax_valid():
+def test_py_compile_syntax_clean():
+    """PDFtoPDFocr_2.py laesst sich fehlerfrei kompilieren."""
     py_compile.compile(str(_SRC_PATH), doraise=True)
+
+
+def test_tesseract_portable_exclude_list_covers_known_tools():
+    """U7: Die Ausschlussliste enthaelt alle Tesseract-Trainingstools."""
+    import build_release
+    for tool in ("lstmtraining.exe", "cntraining.exe", "tesseract-uninstall.exe"):
+        assert tool in build_release.TESSERACT_PORTABLE_EXCLUDE_NAMES

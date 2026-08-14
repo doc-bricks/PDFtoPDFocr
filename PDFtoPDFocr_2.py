@@ -9,21 +9,36 @@ Uses pdf2image + pytesseract + pikepdf (no PyMuPDF required).
 Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
+import io
 import json
 import logging
-import sys, os, io, shutil, requests, tempfile, uuid
-from datetime import datetime, timezone
+import os
 from pathlib import Path
+import shutil
+import sys
+import tempfile
 from typing import List
+import uuid
+from datetime import datetime, timezone
+import requests
 
 # PySide6
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QListWidget, QListWidgetItem,
-    QFileDialog, QLabel, QComboBox, QMessageBox, QMenu
-)
-from PySide6.QtGui import QColor, QAction
 from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QAction, QColor, QIcon
+from PySide6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QListWidget,
+    QListWidgetItem,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 # OCR / PDF libs
 import pytesseract
@@ -40,6 +55,41 @@ APP_VERSION = "1.1.3"
 EXPORT_SCHEMA = "pdftopdfocr-job-v1"
 DEFAULT_OCR_DPI = 300
 MERGE_SUBFOLDER_NAME = "Einzeldateien"
+
+
+def get_project_root() -> Path:
+    """Liefert das Root-Verzeichnis des Projekts bzw. das PyInstaller-Bundle-Verzeichnis."""
+    if getattr(sys, "_MEIPASS", None):
+        return Path(sys._MEIPASS)
+    return Path(__file__).resolve().parent
+
+
+def get_app_icon_path() -> Path:
+    """Liefert den Pfad zum Standard-App-Icon (bevorzugt assets/icon.png oder PDFtoPDFocr.ico)."""
+    root = get_project_root()
+    candidates = [
+        Path(sys.executable).with_name("PDFtoPDFocr.ico") if getattr(sys, "frozen", False) else None,
+        Path(sys.executable).with_name("icon.png") if getattr(sys, "frozen", False) else None,
+        root / "assets" / "icon.png",
+        root / "assets" / "app_icon.ico",
+        root / "assets" / "icon.ico",
+        root / "PDFtoPDFocr.ico",
+        root / "PDFtoPDFocr.png",
+        root / "ICO.ico",
+    ]
+    for candidate in candidates:
+        if candidate and candidate.exists():
+            return candidate
+    return root / "PDFtoPDFocr.ico"
+
+
+def get_app_icon() -> QIcon:
+    """Erzeugt ein QIcon aus den vorhandenen App-Icon-Pfaden."""
+    icon_path = get_app_icon_path()
+    if icon_path.exists():
+        return QIcon(str(icon_path))
+    return QIcon()
+
 
 # ===== i18n =====
 
@@ -662,6 +712,11 @@ class OCRConverterGUI(QWidget):
         set_language(load_ui_language())
         self.setWindowTitle(tr("window_title"))
         self.resize(640, 520)
+
+        app_icon = get_app_icon()
+        if not app_icon.isNull():
+            self.setWindowIcon(app_icon)
+
         self.layout = QVBoxLayout(self)
         self._ocr_worker = None  # Referenz auf laufenden QThread
 
@@ -1036,6 +1091,9 @@ class OCRConverterGUI(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app_icon = get_app_icon()
+    if not app_icon.isNull():
+        app.setWindowIcon(app_icon)
     gui = OCRConverterGUI()
     gui.show()
     sys.exit(app.exec())

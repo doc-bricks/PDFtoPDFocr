@@ -33,6 +33,7 @@ poppler_dir = 'poppler'
 
 datas = [
     ('translations.json', '.'),
+    ('assets', 'assets'),
 ]
 
 # Nur einbinden wenn vorhanden
@@ -44,7 +45,11 @@ if os.path.isdir(tesseract_dir):
 if os.path.isdir(poppler_dir):
     datas.append((poppler_dir, poppler_dir))
 
-if os.path.exists('ICO.ico'):
+if os.path.exists('PDFtoPDFocr.ico'):
+    icon_path = 'PDFtoPDFocr.ico'
+elif os.path.exists('assets/icon.ico'):
+    icon_path = 'assets/icon.ico'
+elif os.path.exists('ICO.ico'):
     icon_path = 'ICO.ico'
 elif os.path.exists('store_assets/icon.ico'):
     icon_path = 'store_assets/icon.ico'
