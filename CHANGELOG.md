@@ -5,6 +5,9 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Geändert / Changed
+- **Technische Hygiene & Maintenance Check (Pfad A)**: `[tool.ruff]` und `[tool.ruff.lint]` Konfiguration in `pyproject.toml` integriert (`target-version = "py310"`, `line-length = 120`, `E501`/`E402`/`E722`/`E741`/`F841` ignore, `ruff check` 100% sauber), `llms.txt` Last-checked Zeitstempel auf `2026-08-16` aktualisiert, Testsuite (54/54 Pytest Tests passed) verifiziert. [G 2026-08-16]
+
 ## [1.1.3] - 2026-08-14
 
 ### Hinzugefügt / Added
