@@ -5,6 +5,18 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed
+- **`build_exe.bat`: ungültiges `--specpath`-Flag entfernt** — PyInstaller lehnt diese Option
+  ab, sobald ein bestehendes `.spec` übergeben wird ("option(s) not allowed: --specpath");
+  der Build brach dadurch sofort ab. Fund + Fix im Rahmen der Windows-Store-Welle-1-Vorbereitung
+  (T-20260816-296785081). Frischer Build verifiziert: EXE startet ohne Absturz, Pytest 53/1 grün.
+
+### Hinzugefügt / Added
+- **Windows-Store-Screenshot-Generator** (`scripts/generate_store_screenshots.py`): erzeugt die
+  4 in `releases/windowsstore/SCREENSHOT_PLAN.md` geforderten Screenshots reproduzierbar aus
+  neutralen Demo-Daten, mit demselben Tofu-/Font-Rendering-Selbsttest wie in ProSync/PromptBoard/
+  Klangpult (bricht ab statt ein defektes Kästchen-Screenshot-Set stillschweigend zu erzeugen).
+
 ### Geändert / Changed
 - **Technische Hygiene & Maintenance Check (Pfad A)**: `[tool.ruff]` und `[tool.ruff.lint]` Konfiguration in `pyproject.toml` integriert (`target-version = "py310"`, `line-length = 120`, `E501`/`E402`/`E722`/`E741`/`F841` ignore, `ruff check` 100% sauber), `llms.txt` Last-checked Zeitstempel auf `2026-08-16` aktualisiert, Testsuite (54/54 Pytest Tests passed) verifiziert. [G 2026-08-16]
 
