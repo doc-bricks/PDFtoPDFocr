@@ -26,10 +26,12 @@ if errorlevel 1 (
 if not exist "%BUILD_ROOT%" mkdir "%BUILD_ROOT%"
 if not exist "%DIST_DIR%" mkdir "%DIST_DIR%"
 
+REM --specpath ist NICHT erlaubt, wenn PyInstaller mit einem bestehenden .spec
+REM aufgerufen wird (nur workpath/distpath/noconfirm/clean gelten dann; Fund
+REM 2026-08-18, T-20260816-296785081: "option(s) not allowed: --specpath").
 python -m PyInstaller --noconfirm --clean ^
     --workpath "%BUILD_ROOT%\build" ^
     --distpath "%BUILD_ROOT%\dist" ^
-    --specpath "%BUILD_ROOT%" ^
     "%SPEC_FILE%"
 
 if errorlevel 1 (
