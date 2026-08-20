@@ -12,6 +12,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   (T-20260816-296785081). Frischer Build verifiziert: EXE startet ohne Absturz, Pytest 53/1 grün.
 
 ### Hinzugefügt / Added
+- **Discoverability, README-Design & Marketing (Pfad B)**: Badges in `README.md` & `README_de.md` um Testsuite (60 Passed, 100% grün), Version (`1.1.3`), Python (`>=3.10`), UI-Engine (`PySide6 | Qt`), Plattform (`Windows 10/11 | Linux | macOS`), Datenschutz (`100% Offline / Zero-Egress`), Sicherheit (`Local-First`), `doc-bricks` Ecosystem, `open-bricks` Umbrella und `llms.txt` Discovery synchronisiert.
+- **Interaktive Mermaid-Diagramme**: (1) Systemarchitektur- und Komponenten-Workflow-Diagramm (Dokumenten-Input -> Poppler-Rasterizer -> Tesseract-Engine -> pikepdf-Assembler -> Durchsuchbare Ausgabe & Job-Manifest); (2) Lokaler Datenfluss- & Datenschutz-Isolations-Sequenzdiagramm mit 100% Offline- und Zero-Egress-Garantien in beiden Sprachfassungen integriert.
+- **Zweisprachige Sicherheitsrichtlinie (`SECURITY.md`)**: Vollständige deutsch-englische Sicherheitsdokumentation mit Local-First & Zero-Egress Invarianten, kontrolliertem Netzwerkzugriff (ausschließlich bedarfsgerechte Tesseract-Sprachpakete), Originaldateischutz (verlustfreie Ausgabe via `_ocred.pdf`), Manifest-Isolation, Non-Elevation (Standard-Benutzerkontext) und privater Schwachstellenmeldung (`security@ellmos.ai` & GitHub Advisories) implementiert.
+- **Geschwisterwerkzeuge-Matrix**: Umfassende Ökosystem-Tabelle über `doc-bricks` (DokuReader, MediaBrain, UniversalDocsGrabber, UniversalInvoiceMail, UniversalMailCleaner, CleanMarkdown, LitZentrum, MailProcessor), `file-bricks` (ProFiler, ExplorerPro), `dev-bricks` (DevCenter, CodeBox) und `open-bricks` in beiden README-Versionen eingebunden.
+- **Metadaten- & Paritätstestsuite**: Neue automatisierte Testsuite `tests/test_metadata.py` für Manifest-, Badges-, Links-, Sicherheits- und `llms.txt`-Parität implementiert (6/6 Tests passed, Gesamtsuite 60/60 passed).
+- **llms.txt & Schnelleinstieg**: `llms.txt` Last-checked Zeitstempel auf `2026-08-21` und 60 Tests aktualisiert; Schnelleinstieg-Tabelle in `README.md` und `README_de.md` ergänzt. [G 2026-08-21]
 - **Windows-Store-Screenshot-Generator** (`scripts/generate_store_screenshots.py`): erzeugt die
   4 in `releases/windowsstore/SCREENSHOT_PLAN.md` geforderten Screenshots reproduzierbar aus
   neutralen Demo-Daten, mit demselben Tofu-/Font-Rendering-Selbsttest wie in ProSync/PromptBoard/
