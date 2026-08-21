@@ -42,7 +42,7 @@ from PySide6.QtWidgets import (
 
 # OCR / PDF libs
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageOps
 from pdf2image import convert_from_path
 import pikepdf
 
@@ -309,7 +309,12 @@ def ensure_tesseract(lang: str) -> bool:
     os.environ["TESSDATA_PREFIX"] = tessdata_dir
     target = os.path.join(tessdata_dir, f"{lang}.traineddata")
 
-    if not os.path.exists(target):
+    if not os.path.exists(target) or os.path.getsize(target) == 0:
+        if os.path.exists(target) and os.path.getsize(target) == 0:
+            try:
+                os.unlink(target)
+            except OSError:
+                pass
         try:
             url = f"https://github.com/tesseract-ocr/tessdata_best/raw/main/{lang}.traineddata"
             r = requests.get(url, stream=True, timeout=30)
@@ -321,7 +326,12 @@ def ensure_tesseract(lang: str) -> bool:
                 )
                 try:
                     with os.fdopen(tmp_fd, "wb") as f:
-                        shutil.copyfileobj(r.raw, f)
+                        if hasattr(r, "iter_content") and callable(r.iter_content):
+                            for chunk in r.iter_content(chunk_size=65536):
+                                if chunk:
+                                    f.write(chunk)
+                        elif hasattr(r, "raw") and r.raw is not None:
+                            shutil.copyfileobj(r.raw, f)
                     shutil.move(tmp_name, target)
                 except Exception:
                     try:
@@ -509,6 +519,33 @@ def merge_ocr_outputs(
     return merged_path
 
 
+def normalize_image_for_ocr(img: Image.Image) -> Image.Image:
+    """Normalisiert ein PIL-Bild für die OCR-Verarbeitung:
+    1. Korrigiert die EXIF-Orientierung (z.B. bei Smartphone-Fotos / Scans).
+    2. Behandelt Transparenz / Alpha-Kanäle sauber (Compositing auf weißem Grund
+       statt Pillow-Standardumwandlung nach Schwarz, wodurch schwarzer Text unlesbar wird).
+    3. Konvertiert das Bild verlässlich in den RGB-Farbraum.
+    """
+    try:
+        transposed = ImageOps.exif_transpose(img)
+        if transposed is not None:
+            img = transposed
+    except Exception:
+        pass
+
+    if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in getattr(img, "info", {})):
+        try:
+            img_rgba = img.convert("RGBA")
+            background = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255))
+            composite = Image.alpha_composite(background, img_rgba)
+            return composite.convert("RGB")
+        except Exception:
+            return img.convert("RGB")
+    elif img.mode != "RGB":
+        return img.convert("RGB")
+    return img
+
+
 class OCRWorker(QThread):
     """Führt OCR-Verarbeitung im Hintergrund aus, sodass die GUI responsiv bleibt.
 
@@ -571,8 +608,7 @@ class OCRWorker(QThread):
             page_sources = []  # (pikepdf.Pdf, tmp_path_or_None)
             try:
                 for img in images:
-                    if img.mode != "RGB":
-                        img = img.convert("RGB")
+                    img = normalize_image_for_ocr(img)
                     pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, lang=lang, extension='pdf')
                     if not pdf_bytes:
                         continue

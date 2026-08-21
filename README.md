@@ -11,7 +11,7 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](#requirements)
 [![Privacy](https://img.shields.io/badge/privacy-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#privacy--network-access)
 [![Security](https://img.shields.io/badge/security-Local--First-blue.svg)](SECURITY.md)
-[![Pytest](https://img.shields.io/badge/pytest-60%20passed-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-63%20passed-brightgreen.svg)](tests/)
 [![LLM-Ready](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ecosystem](https://img.shields.io/badge/Ecosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Umbrella](https://img.shields.io/badge/Umbrella-open--bricks-blue.svg)](https://github.com/open-bricks)

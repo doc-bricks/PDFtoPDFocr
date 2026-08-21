@@ -6,6 +6,8 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Behoben / Fixed
+- **Bugsweep BS-4: Bild-Normalisierung mit Alpha-Compositing & EXIF-Orientierung (`PDFtoPDFocr_2.py`)** — Bilder mit Transparenz/Alpha-Kanal (`RGBA`, `LA`, transientes `P`) wurden bei der direkten Pillow-Konvertierung nach RGB mit einem soliden schwarzen Hintergrund gefüllt, was schwarzen Text auf transparentem Grund vollständig unlesbar machte. Die neue Funktion `normalize_image_for_ocr()` führt ein sauberes Alpha-Compositing auf weißem Grund durch, korrigiert die EXIF-Orientierung bei Smartphone- und Scanner-Fotos via `ImageOps.exif_transpose()` und verhindert OCR-Erkennungsfehler auf transparenten Dokumenten.
+- **Bugsweep BS-5: Tesseract-Download- & Dateigrößen-Validierung (`PDFtoPDFocr_2.py`)** — `ensure_tesseract()` behandelt 0-Byte-Stubs und unvollständige `.traineddata`-Dateien durch explizite Dateigrößenvalidierung (`os.path.getsize(target) == 0`) und lädt beschädigte oder leere Sprachpakete automatisch neu herunter.
 - **`build_exe.bat`: ungültiges `--specpath`-Flag entfernt** — PyInstaller lehnt diese Option
   ab, sobald ein bestehendes `.spec` übergeben wird ("option(s) not allowed: --specpath");
   der Build brach dadurch sofort ab. Fund + Fix im Rahmen der Windows-Store-Welle-1-Vorbereitung
