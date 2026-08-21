@@ -5,6 +5,13 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Hinzugefügt / Added
+- **Icon-, EXE- & START.bat Health & Build-Standardisierung**:
+  - **Startdatei (`START.bat`)**: Vollständig modernisiert mit UTF-8-Codepage (`chcp 65001`), automatischer Priorisierung vorkompilierter Binaries (`dist\PDFtoPDFocr\PDFtoPDFocr.exe` -> `dist\PDFtoPDFocr.exe` -> `PDFtoPDFocr.exe`) und transparentem Python-Interpreter-Fallback (`py -3` / `python PDFtoPDFocr_2.py`).
+  - **PyInstaller-Spec (`PDFtoPDFocr.spec`)**: Auf `upx=False` umgestellt (Vermeidung von UPX-Antivirus-Fehlalarmen und Verlangsamung beim Kaltstart), Icon-Dateien (`PDFtoPDFocr.ico`, `ICO.ico`) in `datas` gebündelt und 8 nicht benötigte schwere Pakete (`altair`, `cv2`, `pandas`, `plotly`, `pyarrow`, `scipy`, `soundfile`, `sympy`) via `build_exclude_scanner.py` zuverlässig ausgeschlossen.
+  - **Build & Verifikation**: `build_exe.bat` mit lokalem Build-Root ausgeführt; Binärdatei `dist\PDFtoPDFocr\PDFtoPDFocr.exe` (3.83 MB, SHA256 `38519389CCF64330A67578E4B7DC568BC10B410317979EB1BC3FDA177D5FA833`) erfolgreich erzeugt; Direktstart und `START.bat`-Start jeweils mit laufendem Prozess verifiziert.
+  - **Dokumentation (`ICON_EXE_VERKNUEPFUNG.md`)**: Umfassende deutschsprachige Anleitung zur Verknüpfung von `.ico`-Assets mit `.exe`-Binaries über PyInstaller, PE-Ressourcen-Header, Qt/PySide6-Laufzeit-Handler, Windows-Desktopverknüpfungen und Icon-Cache-Reset erstellt. [G 2026-08-21]
+
 ### Behoben / Fixed
 - **Bugsweep BS-4: Bild-Normalisierung mit Alpha-Compositing & EXIF-Orientierung (`PDFtoPDFocr_2.py`)** — Bilder mit Transparenz/Alpha-Kanal (`RGBA`, `LA`, transientes `P`) wurden bei der direkten Pillow-Konvertierung nach RGB mit einem soliden schwarzen Hintergrund gefüllt, was schwarzen Text auf transparentem Grund vollständig unlesbar machte. Die neue Funktion `normalize_image_for_ocr()` führt ein sauberes Alpha-Compositing auf weißem Grund durch, korrigiert die EXIF-Orientierung bei Smartphone- und Scanner-Fotos via `ImageOps.exif_transpose()` und verhindert OCR-Erkennungsfehler auf transparenten Dokumenten.
 - **Bugsweep BS-5: Tesseract-Download- & Dateigrößen-Validierung (`PDFtoPDFocr_2.py`)** — `ensure_tesseract()` behandelt 0-Byte-Stubs und unvollständige `.traineddata`-Dateien durch explizite Dateigrößenvalidierung (`os.path.getsize(target) == 0`) und lädt beschädigte oder leere Sprachpakete automatisch neu herunter.

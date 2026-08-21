@@ -34,6 +34,8 @@ poppler_dir = 'poppler'
 datas = [
     ('translations.json', '.'),
     ('assets', 'assets'),
+    ('PDFtoPDFocr.ico', '.'),
+    ('ICO.ico', '.'),
 ]
 
 # Nur einbinden wenn vorhanden
@@ -73,8 +75,9 @@ a = Analysis(
     excludes=[
         # GUI-Frameworks, die nicht benötigt werden
         'tkinter', 'PyQt5', 'PyQt6',
-        # Wissenschaftliche Pakete
+        # Wissenschaftliche & schwere Pakete
         'matplotlib', 'numpy', 'pandas', 'scipy', 'sklearn',
+        'altair', 'plotly', 'pyarrow', 'soundfile', 'sympy',
         # Andere nicht benötigte Pakete
         'cv2', 'docx', 'openpyxl', 'xlrd',
         'IPython', 'jupyter', 'notebook',
@@ -113,7 +116,7 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=False,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
@@ -129,7 +132,7 @@ coll = COLLECT(
     a.zipfiles,
     a.datas,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
     name='PDFtoPDFocr',
 )
