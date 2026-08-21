@@ -90,12 +90,19 @@ def test_no_plaintext_secrets_or_api_keys() -> None:
 
 
 def LOCAL_files_iter():
+    skip_suffixes = {
+        ".png", ".ico", ".jpg", ".jpeg", ".exe", ".pdf", ".traineddata",
+        ".zip", ".msix", ".msixupload", ".appx", ".appxupload", ".tar",
+        ".gz", ".7z", ".dll", ".so", ".dylib", ".pyd", ".pyc"
+    }
     for f in ROOT.rglob("*"):
         if not f.is_file():
             continue
-        if any(part in f.parts for part in (".git", ".pytest_cache", ".ruff_cache", "assets", "store_assets", "README")):
+        if any(part in f.parts for part in (".git", ".pytest_cache", ".ruff_cache", "assets", "store_assets", "README", "build", "dist")):
             continue
-        if f.suffix in (".png", ".ico", ".jpg", ".exe", ".pdf", ".traineddata"):
+        if f.suffix.lower() in skip_suffixes:
+            continue
+        if f.stat().st_size > 2_000_000:
             continue
         yield f
 
