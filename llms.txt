@@ -24,9 +24,9 @@ The app is designed for private document workflows such as invoices, letters, co
 - Windows launcher: `START.bat`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (63 verified tests: 63 passed) [2026-08-21]
+- Test suite: `python -m pytest` (68 verified tests: 68 passed) [2026-08-21]
 - Package configuration: `pyproject.toml` (PEP 621 metadata)
-- Key test files: `tests/test_metadata.py`, `tests/test_tesseract_config.py`, `tests/test_export_format.py`, `tests/test_bug_regressions.py`, `tests/test_app_assets.py`
+- Key test files: `tests/test_security_license_contract.py`, `tests/test_metadata.py`, `tests/test_tesseract_config.py`, `tests/test_export_format.py`, `tests/test_bug_regressions.py`, `tests/test_app_assets.py`
 
 ## Data And Export Format
 

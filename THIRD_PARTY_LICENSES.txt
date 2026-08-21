@@ -1,6 +1,6 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
-Stand: 2026-05-15
+Stand: 2026-08-21
 
 Dieses Dokument listet alle Drittanbieter-Bibliotheken auf,
 die von PDFtoPDFocr verwendet werden.
@@ -70,6 +70,37 @@ Lizenz: Apache License 2.0
 Copyright: Kenneth Reitz and contributors
 URL: https://pypi.org/project/requests/
      https://requests.readthedocs.io/
+
+urllib3 (Abhängigkeit von requests)
+------------------------------------
+Lizenz: MIT
+Copyright: Andrey Petrov and contributors
+URL: https://pypi.org/project/urllib3/
+     https://urllib3.readthedocs.io/
+
+certifi (Abhängigkeit von requests)
+------------------------------------
+Lizenz: Mozilla Public License 2.0 (MPL 2.0)
+Copyright: Kenneth Reitz and contributors
+URL: https://pypi.org/project/certifi/
+
+charset-normalizer (Abhängigkeit von requests)
+-----------------------------------------------
+Lizenz: MIT
+Copyright: Ahmed TAHRI
+URL: https://pypi.org/project/charset-normalizer/
+
+idna (Abhängigkeit von requests)
+---------------------------------
+Lizenz: BSD-3-Clause
+Copyright: Kim Davies and contributors
+URL: https://pypi.org/project/idna/
+
+packaging (Abhängigkeit von pikepdf/pytesseract)
+-------------------------------------------------
+Lizenz: Apache License 2.0 / BSD 2-Clause
+Copyright: Donald Stufft and individual contributors
+URL: https://pypi.org/project/packaging/
 
 Tesseract OCR (portable Bündelung)
 ------------------------------------

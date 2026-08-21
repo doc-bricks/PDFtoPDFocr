@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -64,6 +64,14 @@ client_secret*.json
 token.json
 *.pem
 *.key
+LOCK*.txt
+
+# Sync & Conflict Artifacts
+*-WORKSTATION-LG*
+*-ASUS-GEI*
+*.conflict
+*.sync-conflict-*
+
 # ---- Interne Steuerungsdateien ----
 DECISIONS.md
 PORTIERUNGSPLAN.md
