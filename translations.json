@@ -170,5 +170,77 @@
   "error_katarakt_load_failed": {
     "de": "Katarakt konnte nicht geladen werden:\n{error}",
     "en": "Katarakt could not be loaded:\n{error}"
+  },
+  "tooltip_ui_lang": {
+    "de": "Wählen Sie die Sprache der Benutzeroberfläche (Deutsch / Englisch)",
+    "en": "Select the user interface language (German / English)"
+  },
+  "a11y_ui_lang_description": {
+    "de": "Stellt die Sprache der Benutzeroberfläche um und speichert die Auswahl dauerhaft.",
+    "en": "Switches the user interface language and saves the selection permanently."
+  },
+  "tooltip_ocr_lang": {
+    "de": "Wählen Sie die OCR-Erkennungssprache für Tesseract (z. B. deu für Deutsch, eng für Englisch)",
+    "en": "Select the OCR recognition language for Tesseract (e.g. deu for German, eng for English)"
+  },
+  "a11y_ocr_lang_description": {
+    "de": "Legt das Tesseract-Sprachpaket für die optische Texterkennung fest.",
+    "en": "Sets the Tesseract language pack for optical character recognition."
+  },
+  "tooltip_add_file": {
+    "de": "Dateien zur Liste hinzufügen (Strg+O)",
+    "en": "Add files to the list (Ctrl+O)"
+  },
+  "a11y_add_file_description": {
+    "de": "Öffnet einen Dateidialog zur Auswahl von PDF- oder Bilddateien.",
+    "en": "Opens a file dialog to select PDF or image files."
+  },
+  "tooltip_start": {
+    "de": "OCR-Verarbeitung für alle ausstehenden Dateien starten (Strg+Eingabetaste)",
+    "en": "Start OCR processing for all pending files (Ctrl+Enter)"
+  },
+  "a11y_start_description": {
+    "de": "Startet die Texterkennung für alle unvollendeten Dateien in der Liste.",
+    "en": "Starts optical character recognition for all pending files in the list."
+  },
+  "tooltip_export_job": {
+    "de": "Aktuellen Job- und Verarbeitungsstatus als JSON exportieren (Strg+E)",
+    "en": "Export current job and processing status as JSON (Ctrl+E)"
+  },
+  "a11y_export_job_description": {
+    "de": "Speichert den aktuellen Auftragsstatus in einer standardisierten JSON-Manifestdatei.",
+    "en": "Saves the current job status to a standardized JSON manifest file."
+  },
+  "tooltip_refresh": {
+    "de": "Dateiliste und Status leeren (F5)",
+    "en": "Clear file list and status (F5)"
+  },
+  "a11y_refresh_description": {
+    "de": "Leert die gesamte Dateiliste und setzt die Statusanzeige zurück.",
+    "en": "Clears the complete file list and resets the status display."
+  },
+  "tooltip_export_folder": {
+    "de": "Zielordner für OCR-Ergebnisse und Sammel-PDFs auswählen (Strg+Umschalt+O)",
+    "en": "Choose target folder for OCR results and collective PDFs (Ctrl+Shift+O)"
+  },
+  "a11y_export_folder_description": {
+    "de": "Wählt ein individuelles Zielverzeichnis für ausgegebene OCR-Dateien.",
+    "en": "Selects a custom destination directory for output OCR files."
+  },
+  "tooltip_export_folder_reset": {
+    "de": "Auf Quellordner als Standard-Zielverzeichnis zurücksetzen",
+    "en": "Reset to source folder as default target directory"
+  },
+  "a11y_export_folder_reset_description": {
+    "de": "Setzt das Zielverzeichnis auf den Ursprungsordner jeder Quelldatei zurück.",
+    "en": "Resets the destination directory to each source file's original folder."
+  },
+  "a11y_status_label_name": {
+    "de": "Verarbeitungsstatus",
+    "en": "Processing status"
+  },
+  "a11y_export_folder_label_name": {
+    "de": "Exportordner-Anzeige",
+    "en": "Export folder display"
   }
 }

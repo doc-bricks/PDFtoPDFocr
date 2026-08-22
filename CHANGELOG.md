@@ -6,6 +6,13 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 ## [Unreleased]
 
 ### Hinzugefügt / Added
+- **Software UX & Accessibility (A11y) Review (Pfad A/Governance)**:
+  - **Screenreader- und Barrierefreiheitsmetadaten (`PDFtoPDFocr_2.py`, `translations.json`)**: Vollständige `AccessibleName`- und `AccessibleDescription`-Attribute für alle interaktiven Widgets (`ui_lang_combo`, `lang_combo`, `list_widget`, `btn_add_file`, `btn_start`, `btn_export`, `btn_refresh`, `btn_delete`, `btn_choose_export_folder`, `btn_reset_export_folder`, `status_label`, `export_folder_label`) implementiert.
+  - **Umfassendes Tooltip-System**: Kontextsensitive, informative Tooltips für alle Bedienelemente in Deutsch und Englisch mit Tastaturkürzel-Hinweisen.
+  - **Tastatur-Ergonomie & Shortcuts**: Globale Tastaturkürzel für Primäraktionen (`Strg+O` für Dateiauswahl, `Strg+Eingabetaste` für OCR-Start, `Strg+E` für Job-Export, `F5` für Liste leeren, `Strg+Umschalt+O` für Zielordnerauswahl); Unterstützung für `Entf` und `Rückschritt` (Backspace) in der Dateiliste (`PDFListWidget`).
+  - **Kontraststarke Statusrückmeldung**: WCAG AA konforme Farbgebung (`#0b6e4f` / `#b45309`) für Erfolgs- und Fehleranzeigen; dateiindividuelle Hover-Tooltips mit dynamischem Verarbeitungsstatus.
+  - **Dynamische Lokalisierung**: `retranslate_ui()` aktualisiert bei Sprachumschaltung (DE <-> EN) alle Texte, barrierefreien Beschreibungen und Tooltips live und lückenlos.
+  - **Automatisierte Testsuite (`tests/test_ui_accessibility.py`)**: 6 neue Regressionstests für A11y-Namen, Tooltips, Tastenkombinationen, Backspace/Del-Handling, dynamische Umschaltung und WCAG-Farbkontraste hinzugefügt (Gesamtsuite auf 74 Tests erweitert, 74/74 passed). [G 2026-08-23]
 - **Icon-, EXE- & START.bat Health & Build-Standardisierung**:
   - **Startdatei (`START.bat`)**: Vollständig modernisiert mit UTF-8-Codepage (`chcp 65001`), automatischer Priorisierung vorkompilierter Binaries (`dist\PDFtoPDFocr\PDFtoPDFocr.exe` -> `dist\PDFtoPDFocr.exe` -> `PDFtoPDFocr.exe`) und transparentem Python-Interpreter-Fallback (`py -3` / `python PDFtoPDFocr_2.py`).
   - **PyInstaller-Spec (`PDFtoPDFocr.spec`)**: Auf `upx=False` umgestellt (Vermeidung von UPX-Antivirus-Fehlalarmen und Verlangsamung beim Kaltstart), Icon-Dateien (`PDFtoPDFocr.ico`, `ICO.ico`) in `datas` gebündelt und 8 nicht benötigte schwere Pakete (`altair`, `cv2`, `pandas`, `plotly`, `pyarrow`, `scipy`, `soundfile`, `sympy`) via `build_exclude_scanner.py` zuverlässig ausgeschlossen.

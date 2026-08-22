@@ -11,12 +11,12 @@
 [![Plattform](https://img.shields.io/badge/plattform-Windows%2010%2F11%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](#voraussetzungen)
 [![Datenschutz](https://img.shields.io/badge/datenschutz-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#datenschutz--netzwerkzugriff)
 [![Sicherheit](https://img.shields.io/badge/sicherheit-Local--First-blue.svg)](SECURITY.md)
-[![Pytest](https://img.shields.io/badge/pytest-68%20bestanden-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-74%20bestanden-brightgreen.svg)](tests/)
 [![LLM-Bereit](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ökosystem](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Dachorganisation](https://img.shields.io/badge/Dachorganisation-open--bricks-blue.svg)](https://github.com/open-bricks)
 
-Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um: per OCR (optische Zeichenerkennung) mit Tesseract. Batch-Verarbeitung, auswählbare OCR-Sprache, automatischer Sprachpaket-Download, verlustfreier Erhalt der Originaldateien und portable Tesseract/Poppler-Integration.
+Wandelt gescannte PDF-Dateien in durchsuchbare PDFs um: per OCR (optische Zeichenerkennung) mit Tesseract. Batch-Verarbeitung, auswählbare OCR-Sprache, automatischer Sprachpaket-Download, verlustfreier Erhalt der Originaldateien, barrierefreie Benutzeroberfläche und portable Tesseract/Poppler-Integration.
 
 Maschinenlesbarer Projektkontext: [`llms.txt`](llms.txt) | [English Documentation](README.md) | [Sicherheitsrichtlinie](SECURITY.md)
 
@@ -81,11 +81,11 @@ sequenceDiagram
 | Aufgabe | Schnittstelle / Befehl | Ausgabe / Ergebnis |
 |---|---|---|
 | **Desktop-App starten** | `python PDFtoPDFocr_2.py` oder `START.bat` | PySide6 Desktop-GUI mit Drag & Drop Warteschlange |
-| **Gescannte PDFs umwandeln** | Dateien hinzufügen, Sprache wählen, "Start" | Verlustfreie `*_ocred.pdf` mit Volltext-Suchlayer |
+| **Gescannte PDFs umwandeln** | Dateien hinzufügen, Sprache wählen, "Start" (`Strg+Eingabetaste`) | Verlustfreie `*_ocred.pdf` mit Volltext-Suchlayer |
 | **Direkte Bild-OCR** | JPG, PNG oder mehrseitige TIFF-Dateien hineinziehen | Zusammengefügtes durchsuchbares PDF-Dokument |
 | **In Sammel-PDF vereinen** | "Auto-Merge" in Menüleiste aktivieren | Konsolidierte mehrseitige durchsuchbare Sammel-PDF |
-| **Job-Manifest exportieren** | Klick auf "Job-Export" | Portables `pdftopdfocr-job-v1.json` Manifest |
-| **Testsuite ausführen** | `python -m pytest` | 60 verifizierte Unit-, Regressions- und Metadaten-Tests |
+| **Job-Manifest exportieren** | Klick auf "Job-Export" (`Strg+E`) | Portables `pdftopdfocr-job-v1.json` Manifest |
+| **Testsuite ausführen** | `python -m pytest` | 74 verifizierte Unit-, Regressions-, Barrierefreiheits- und Metadaten-Tests |
 | **Portablen Build erzeugen** | `python build_release.py --clean` | Eigenständige ausführbare Datei in `dist/PDFtoPDFocr/` |
 
 ## Features
@@ -98,7 +98,19 @@ sequenceDiagram
 - **Portable Tesseract & Poppler** – Tesseract OCR ist integriert; keine globale Systeminstallation nötig.
 - **Originaldatei erhalten** – Ergebnisse werden als neue Datei mit Suffix `_ocred.pdf` oder im konfigurierten Ausgabeverzeichnis gespeichert; Originale bleiben unberührt.
 - **Job-Manifest-Export** – Über `Job-Export` ein portables `pdftopdfocr-job-v1.json` mit Einstellungen, Ausführungsstatus und Dateimetadaten speichern.
-- **Farbcodierte Fortschrittsanzeige** – Übersichtliche Statusanzeige pro Datei mit barrierefreien Steuerelementen und reaktionsschnellem Worker-Thread.
+- **Vollständige Barrierefreiheit (A11y) & Ergonomie** – Screenreader-fähige Namen (`AccessibleName`) und Beschreibungen (`AccessibleDescription`) auf allen Steuerelementen, kontextsensitive Tooltips in aktiver Sprache und vollständige Tastaturkürzel (`Strg+O`, `Strg+Eingabetaste`, `Strg+E`, `F5`, `Strg+Umschalt+O`, `Entf`/`Rückschritt`).
+- **Kontraststarke Statusanzeige** – WCAG-konforme Farbgebung (`#0b6e4f` / `#b45309`) und dateiindividuelle Hover-Tooltips mit aktuellem Verarbeitungsstatus.
+
+## Barrierefreiheit & Tastaturkürzel
+
+| Aktion | Tastaturkürzel | Beschreibung |
+|---|---|---|
+| **Dateien hinzufügen** | `Strg+O` | Öffnet den Dateiauswahldialog |
+| **OCR starten** | `Strg+Eingabetaste` | Startet die Stapelverarbeitung |
+| **Job-Manifest exportieren** | `Strg+E` | Exportiert den Auftragsstatus als JSON-Manifest |
+| **Liste leeren / Reset** | `F5` | Setzt Dateiliste und Statusanzeige zurück |
+| **Ausgabeordner wählen** | `Strg+Umschalt+O` | Wählt ein individuelles Zielverzeichnis |
+| **Eintrag entfernen** | `Entf` oder `Rückschritt` | Entfernt ausgewählte Datei aus der Liste |
 
 ## Voraussetzungen
 
@@ -135,13 +147,14 @@ python -m pytest
 ```
 
 Die Test-Suite deckt folgende Kernbereiche ab:
+- **UI-Barrierefreiheit & Tastaturkürzel** (`tests/test_ui_accessibility.py`)
 - **Tesseract-Konfiguration** (`tests/test_tesseract_config.py`)
 - **Job-Export-Format & Manifest-Schema** (`tests/test_export_format.py`)
 - **Sprachumschaltung & Multi-Language-Support** (`tests/test_language_switch.py`)
 - **Bug-Regressionen & Ressourcen-Lifecycle** (`tests/test_bug_regressions.py`)
 - **App-Icons & Visuelle Asset-Prüfung** (`tests/test_app_assets.py`)
 - **Plattform-Paketierung & Release-Build-Validierung** (`tests/test_build_release.py`, `tests/test_platform_package_gate.py`)
-- **Metadaten-, Sicherheits- & Paritäts-Governance** (`tests/test_metadata.py`)
+- **Metadaten-, Sicherheits- & Paritäts-Governance** (`tests/test_metadata.py`, `tests/test_security_license_contract.py`)
 
 ## Geschwisterwerkzeuge & Ökosystem
 

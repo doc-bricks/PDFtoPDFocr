@@ -11,12 +11,12 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](#requirements)
 [![Privacy](https://img.shields.io/badge/privacy-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#privacy--network-access)
 [![Security](https://img.shields.io/badge/security-Local--First-blue.svg)](SECURITY.md)
-[![Pytest](https://img.shields.io/badge/pytest-68%20passed-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-74%20passed-brightgreen.svg)](tests/)
 [![LLM-Ready](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ecosystem](https://img.shields.io/badge/Ecosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Umbrella](https://img.shields.io/badge/Umbrella-open--bricks-blue.svg)](https://github.com/open-bricks)
 
-Converts scanned PDF files into searchable PDFs using OCR (optical character recognition) with Tesseract. Batch processing, selectable OCR language, automatic language pack download, non-destructive original file preservation, and portable Tesseract/Poppler integration.
+Converts scanned PDF files into searchable PDFs using OCR (optical character recognition) with Tesseract. Batch processing, selectable OCR language, automatic language pack download, non-destructive original file preservation, accessible UI ergonomics, and portable Tesseract/Poppler integration.
 
 Machine-readable project context: [`llms.txt`](llms.txt) | [Deutsche Dokumentation](README_de.md) | [Security Policy](SECURITY.md)
 
@@ -76,16 +76,16 @@ sequenceDiagram
     Note over User,FS: 100% Local-First / Zero-Egress Operation (No Cloud Upload)
 ```
 
-## Quick Start & Core Workflows
+## Quick Start / Interface Overview
 
 | Task | Interface / Command | Output / Result |
 |---|---|---|
 | **Launch Desktop App** | `python PDFtoPDFocr_2.py` or `START.bat` | PySide6 Desktop GUI with drag & drop file queue |
-| **Convert Scanned PDFs** | Add files, select language, click "Start" | Non-destructive `*_ocred.pdf` with full-text search layer |
+| **Convert Scanned PDFs** | Add files, select language, click "Start" (`Ctrl+Return`) | Non-destructive `*_ocred.pdf` with full-text search layer |
 | **Direct Image OCR** | Drop JPG, PNG, or multi-frame TIFF images | Assembled searchable PDF document |
 | **Merge into Single PDF** | Enable "Auto-Merge" in toolbar | Consolidated multi-document searchable PDF |
-| **Export Job Manifest** | Click "Job-Export" | Portable `pdftopdfocr-job-v1.json` manifest |
-| **Run Verification Suite** | `python -m pytest` | 60 verified unit, regression, and metadata tests |
+| **Export Job Manifest** | Click "Job-Export" (`Ctrl+E`) | Portable `pdftopdfocr-job-v1.json` manifest |
+| **Run Verification Suite** | `python -m pytest` | 74 verified unit, regression, accessibility, and metadata tests |
 | **Portable Build** | `python build_release.py --clean` | Self-contained executable in `dist/PDFtoPDFocr/` |
 
 ## Features
@@ -98,7 +98,19 @@ sequenceDiagram
 - **Portable Tesseract & Poppler** — Tesseract OCR is bundled locally; no global system installation required.
 - **Original File Preserved** — Results are saved with the `_ocred.pdf` suffix or in a configured output folder; source files remain untouched.
 - **Job Manifest Export** — Save portable `pdftopdfocr-job-v1.json` manifests containing job settings, execution status, and file metadata.
-- **Color-Coded Progress** — Clear progress indication per file with accessible UI controls and responsive worker threads.
+- **Full Accessibility (A11y) & Ergonomics** — Screen-reader accessible names and descriptions across all controls, informative tooltips in active language, and complete keyboard shortcuts (`Ctrl+O`, `Ctrl+Return`, `Ctrl+E`, `F5`, `Ctrl+Shift+O`, `Del`/`Backspace`).
+- **High-Contrast Progress** — WCAG-compliant color coding (`#0b6e4f` / `#b45309`) and per-item hover tooltips with real-time status.
+
+## Accessibility & Keyboard Shortcuts
+
+| Action | Shortcut | Description |
+|---|---|---|
+| **Add Files** | `Ctrl+O` | Open file selector dialog |
+| **Start OCR** | `Ctrl+Return` | Start batch OCR processing |
+| **Export Job Manifest** | `Ctrl+E` | Export job state as JSON manifest |
+| **Clear List & Reset** | `F5` | Reset file list and status display |
+| **Select Output Folder** | `Ctrl+Shift+O` | Choose custom output directory |
+| **Remove Selected File** | `Del` or `Backspace` | Remove selected item from queue |
 
 ## Requirements
 
@@ -135,13 +147,14 @@ python -m pytest
 ```
 
 The test suite covers:
+- **UI Accessibility & Shortcuts** (`tests/test_ui_accessibility.py`)
 - **Tesseract Configuration** (`tests/test_tesseract_config.py`)
 - **Job Export Format & Manifest Schema** (`tests/test_export_format.py`)
 - **Language Switching & Multi-Language Support** (`tests/test_language_switch.py`)
 - **Bug Regressions & Resource Lifecycle** (`tests/test_bug_regressions.py`)
 - **App Icons & Visual Asset Verification** (`tests/test_app_assets.py`)
 - **Platform Packaging & Release Validation** (`tests/test_build_release.py`, `tests/test_platform_package_gate.py`)
-- **Metadata, Security & Parity Governance** (`tests/test_metadata.py`)
+- **Metadata, Security & Parity Governance** (`tests/test_metadata.py`, `tests/test_security_license_contract.py`)
 
 ## Sibling Tools & Ecosystem
 

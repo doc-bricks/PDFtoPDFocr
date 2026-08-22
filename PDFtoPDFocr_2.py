@@ -699,8 +699,8 @@ class PDFListWidget(QListWidget):
         e.acceptProposedAction()
 
     def keyPressEvent(self, event):
-        """Supports keyboard removal for selected files without changing the compact UI."""
-        if event.key() == Qt.Key_Delete and self.selectedItems():
+        """Supports keyboard removal for selected files (Del and Backspace keys) without changing the compact UI."""
+        if event.key() in (Qt.Key_Delete, Qt.Key_Backspace) and self.selectedItems():
             self.delete_requested.emit()
             event.accept()
             return
@@ -736,6 +736,7 @@ class PDFListWidget(QListWidget):
         item.setData(Qt.UserRole + 1, 'pending')
         item.setData(Qt.UserRole + 2, "")
         item.setData(Qt.UserRole + 3, batch_id)
+        item.setToolTip(filepath)
         self.addItem(item)
 
 
@@ -770,9 +771,6 @@ class OCRConverterGUI(QWidget):
         self.layout.addLayout(ui_lang_layout)
 
         self.list_widget = PDFListWidget()
-        self.list_widget.setAccessibleName(tr("a11y_file_list_name"))
-        self.list_widget.setAccessibleDescription(tr("a11y_file_list_description"))
-        self.list_widget.setToolTip(tr("a11y_file_list_description"))
         self.layout.addWidget(self.list_widget)
 
         # Exportordner-Einstellung (U4): konfigurierbar, Fallback = Quellordner (U3-Default)
@@ -783,12 +781,12 @@ class OCRConverterGUI(QWidget):
         export_layout = QHBoxLayout()
         self.export_folder_label = QLabel("")
         self.btn_choose_export_folder = QPushButton(tr("btn_export_folder"))
+        self.btn_choose_export_folder.setShortcut("Ctrl+Shift+O")
         self.btn_reset_export_folder = QPushButton(tr("btn_export_folder_reset"))
         export_layout.addWidget(self.export_folder_label, 1)
         export_layout.addWidget(self.btn_choose_export_folder)
         export_layout.addWidget(self.btn_reset_export_folder)
         self.layout.addLayout(export_layout)
-        self._update_export_folder_label()
 
         # OCR-Spracheinstellung (Tesseract-Sprachpaket -- NICHT die UI-Sprache)
         lang_layout = QHBoxLayout()
@@ -802,12 +800,14 @@ class OCRConverterGUI(QWidget):
         # Buttons
         btn_layout = QHBoxLayout()
         self.btn_add_file = QPushButton(tr("btn_add_file"))
+        self.btn_add_file.setShortcut("Ctrl+O")
         self.btn_start = QPushButton(tr("btn_start"))
+        self.btn_start.setShortcut("Ctrl+Return")
         self.btn_export = QPushButton(tr("btn_export_job"))
+        self.btn_export.setShortcut("Ctrl+E")
         self.btn_refresh = QPushButton(f"{ICON_BROOM} {tr('btn_refresh')}")
+        self.btn_refresh.setShortcut("F5")
         self.btn_delete = QPushButton(f"{ICON_TRASH} {tr('btn_delete')}")
-        self.btn_delete.setToolTip(tr("tooltip_delete"))
-        self.btn_delete.setAccessibleDescription(tr("a11y_delete_description"))
         for b in (
             self.btn_add_file,
             self.btn_start,
@@ -834,6 +834,9 @@ class OCRConverterGUI(QWidget):
         self.list_widget.customContextMenuRequested.connect(self._show_list_context_menu)
         self.list_widget.folder_dropped.connect(self._register_batch_folder)
 
+        # Retranslate initialisieren (setzt alle Texte, A11y-Attribute und Tooltips)
+        self.retranslate_ui()
+
         # Poppler-Pfad: leer = pdf2image nutzt System-Poppler
         self.poppler_path = ""
 
@@ -845,17 +848,59 @@ class OCRConverterGUI(QWidget):
         self.retranslate_ui()
 
     def retranslate_ui(self):
-        """Setzt alle sichtbaren, uebersetzten Texte in der aktuellen Sprache neu."""
+        """Setzt alle sichtbaren, uebersetzten Texte, Barrierefreiheits-Metadaten und Tooltips in der aktuellen Sprache neu."""
         self.setWindowTitle(tr("window_title"))
         self.ui_lang_label.setText(tr("label_ui_lang"))
+        self.ui_lang_combo.setAccessibleName(tr("label_ui_lang"))
+        self.ui_lang_combo.setAccessibleDescription(tr("a11y_ui_lang_description"))
+        self.ui_lang_combo.setToolTip(tr("tooltip_ui_lang"))
+
         self.ocr_lang_label.setText(tr("label_ocr_lang"))
+        self.lang_combo.setAccessibleName(tr("label_ocr_lang"))
+        self.lang_combo.setAccessibleDescription(tr("a11y_ocr_lang_description"))
+        self.lang_combo.setToolTip(tr("tooltip_ocr_lang"))
+
+        self.list_widget.setAccessibleName(tr("a11y_file_list_name"))
+        self.list_widget.setAccessibleDescription(tr("a11y_file_list_description"))
+        self.list_widget.setToolTip(tr("a11y_file_list_description"))
+
         self.btn_add_file.setText(tr("btn_add_file"))
+        self.btn_add_file.setAccessibleName(tr("btn_add_file"))
+        self.btn_add_file.setAccessibleDescription(tr("a11y_add_file_description"))
+        self.btn_add_file.setToolTip(tr("tooltip_add_file"))
+
         self.btn_start.setText(tr("btn_start"))
+        self.btn_start.setAccessibleName(tr("btn_start"))
+        self.btn_start.setAccessibleDescription(tr("a11y_start_description"))
+        self.btn_start.setToolTip(tr("tooltip_start"))
+
         self.btn_export.setText(tr("btn_export_job"))
+        self.btn_export.setAccessibleName(tr("btn_export_job"))
+        self.btn_export.setAccessibleDescription(tr("a11y_export_job_description"))
+        self.btn_export.setToolTip(tr("tooltip_export_job"))
+
         self.btn_refresh.setText(f"{ICON_BROOM} {tr('btn_refresh')}")
+        self.btn_refresh.setAccessibleName(tr("btn_refresh"))
+        self.btn_refresh.setAccessibleDescription(tr("a11y_refresh_description"))
+        self.btn_refresh.setToolTip(tr("tooltip_refresh"))
+
         self.btn_delete.setText(f"{ICON_TRASH} {tr('btn_delete')}")
+        self.btn_delete.setAccessibleName(tr("btn_delete"))
+        self.btn_delete.setAccessibleDescription(tr("a11y_delete_description"))
+        self.btn_delete.setToolTip(tr("tooltip_delete"))
+
         self.btn_choose_export_folder.setText(tr("btn_export_folder"))
+        self.btn_choose_export_folder.setAccessibleName(tr("btn_export_folder"))
+        self.btn_choose_export_folder.setAccessibleDescription(tr("a11y_export_folder_description"))
+        self.btn_choose_export_folder.setToolTip(tr("tooltip_export_folder"))
+
         self.btn_reset_export_folder.setText(tr("btn_export_folder_reset"))
+        self.btn_reset_export_folder.setAccessibleName(tr("btn_export_folder_reset"))
+        self.btn_reset_export_folder.setAccessibleDescription(tr("a11y_export_folder_reset_description"))
+        self.btn_reset_export_folder.setToolTip(tr("tooltip_export_folder_reset"))
+
+        self.status_label.setAccessibleName(tr("a11y_status_label_name"))
+        self.export_folder_label.setAccessibleName(tr("a11y_export_folder_label_name"))
         self._update_export_folder_label()
 
     def open_file_dialog(self):
@@ -1037,27 +1082,31 @@ class OCRConverterGUI(QWidget):
         self.status_label.setStyleSheet("")
 
     def _on_file_done(self, path: str, success: bool):
-        """Ergebnis einer einzelnen Datei anzeigen."""
+        """Ergebnis einer einzelnen Datei anzeigen mit barrierefreiem Farbkontrast und Tooltip."""
         for i in range(self.list_widget.count()):
             item = self.list_widget.item(i)
             if item.data(Qt.UserRole) == path:
                 if success:
+                    status_text = tr("message_ocr_success")
                     item.setText(f"{ICON_OK} {os.path.basename(path)}")
-                    item.setForeground(QColor('green'))
+                    item.setForeground(QColor('#0b6e4f'))
                     item.setData(Qt.UserRole + 1, 'done')
-                    item.setData(Qt.UserRole + 2, tr("message_ocr_success"))
+                    item.setData(Qt.UserRole + 2, status_text)
+                    item.setToolTip(f"{path}\n{status_text}")
                 else:
+                    status_text = tr("message_ocr_failed")
                     item.setText(f"{ICON_ERR} {os.path.basename(path)}")
-                    item.setForeground(QColor('orange'))
+                    item.setForeground(QColor('#b45309'))
                     item.setData(Qt.UserRole + 1, 'error')
-                    item.setData(Qt.UserRole + 2, tr("message_ocr_failed"))
+                    item.setData(Qt.UserRole + 2, status_text)
+                    item.setToolTip(f"{path}\n{status_text}")
                 break
 
     def _on_ocr_finished(self):
         """Alle Dateien verarbeitet."""
         self.btn_start.setEnabled(True)
         self.status_label.setText(tr("status_done"))
-        self.status_label.setStyleSheet("color: green; font-weight: bold;")
+        self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
         self._auto_merge_completed_batches()
 
     def on_refresh(self):
