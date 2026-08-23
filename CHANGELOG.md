@@ -3,6 +3,32 @@
 Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [1.0.5] - 2026-08-23
+
+### Fixed
+- **Doppelklick auf eine PDF öffnete die App nicht.** Zwei unabhängige Ursachen, beide behoben:
+  - Das Store-Paket deklarierte keine Dateizuordnung (`uap:FileTypeAssociation` fehlte im
+    `AppxManifest.xml`), die App erschien deshalb nicht einmal unter „Öffnen mit".
+  - Die Anwendung wertete übergebene Dateipfade nicht aus. Windows reicht den Pfad als
+    Kommandozeilenargument durch — ohne Auswertung startet die App zwar, zeigt die Datei
+    aber nicht an. Der Manifest-Eintrag allein hätte also nicht genügt.
+- Neu: `OCRConverterGUI.add_paths_from_arguments()` nimmt beim Start übergebene Dateien und
+  Ordner auf (Doppelklick, „Öffnen mit", Ablegen auf dem Programmsymbol). Nicht unterstützte
+  Endungen und Duplikate filtert die bestehende Prüfung weiterhin heraus.
+
+### Added
+- Ausführungsalias `pdftopdfocr.exe` (Start per Namen in der Konsole).
+- Sprachen `de-DE` und `en-US` im Paket hinterlegt (`languages` in `store_package.json`).
+- 8 Tests in `tests/test_cli_file_arguments.py`, darunter einer, der prüft, dass der
+  Einstiegspunkt die Argumente auch tatsächlich durchreicht.
+
+### Changed
+- Paketversion `1.0.4.0` → `1.0.5.0`; `MaxVersionTested` `10.0.19041.0` → `10.0.22621.0`.
+- Manifest wird aus `store_package.json` erzeugt (store-packager 2.2.0).
+
+### Store
+- Eingereicht am 2026-08-23, Submission `1152921505701721467`, Status `Certification`.
+
 ## [Unreleased]
 
 ### Hinzugefügt / Added

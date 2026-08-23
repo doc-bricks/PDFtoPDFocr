@@ -903,6 +903,48 @@ class OCRConverterGUI(QWidget):
         self.export_folder_label.setAccessibleName(tr("a11y_export_folder_label_name"))
         self._update_export_folder_label()
 
+    def add_paths_from_arguments(self, paths):
+        """Nimmt beim Start uebergebene Dateipfade in die Liste auf.
+
+        Windows uebergibt den Dateipfad als Kommandozeilenargument, wenn eine
+        Datei per Doppelklick, ueber "Oeffnen mit" oder per Ablegen auf dem
+        Programmsymbol geoeffnet wird. Ohne diese Auswertung startet die
+        Anwendung zwar, zeigt die Datei aber nicht an - die Dateizuordnung im
+        AppxManifest allein genuegt also nicht.
+
+        Verzeichnisse werden flach aufgeloest. Nicht unterstuetzte Endungen und
+        Duplikate filtert add_file bereits selbst heraus.
+
+        Args:
+            paths: Liste von Pfaden, ueblicherweise sys.argv[1:].
+
+        Returns:
+            Anzahl der tatsaechlich aufgenommenen Dateien.
+        """
+        added = 0
+        for raw in paths or []:
+            if not raw or str(raw).startswith("-"):
+                continue
+            try:
+                path = os.path.abspath(os.path.expanduser(str(raw)))
+            except (OSError, ValueError):
+                continue
+            candidates = []
+            if os.path.isdir(path):
+                try:
+                    candidates = [os.path.join(path, e) for e in sorted(os.listdir(path))]
+                except OSError:
+                    continue
+            elif os.path.isfile(path):
+                candidates = [path]
+            for candidate in candidates:
+                if not os.path.isfile(candidate):
+                    continue
+                before = self.list_widget.count()
+                self.list_widget.add_file(candidate)
+                added += self.list_widget.count() - before
+        return added
+
     def open_file_dialog(self):
         """Opens a file dialog to select PDF or image files and adds them to the list (U1)."""
         files, _ = QFileDialog.getOpenFileNames(
@@ -1181,4 +1223,8 @@ if __name__ == "__main__":
         app.setWindowIcon(app_icon)
     gui = OCRConverterGUI()
     gui.show()
+    # Beim Start uebergebene Dateien aufnehmen (Doppelklick, "Oeffnen mit",
+    # Ablegen auf dem Programmsymbol). app.arguments() ist gegenueber sys.argv
+    # vorzuziehen, weil Qt eigene Schalter bereits entfernt hat.
+    gui.add_paths_from_arguments(app.arguments()[1:])
     sys.exit(app.exec())
