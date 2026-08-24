@@ -26,7 +26,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/version-1.1.3-blue.svg" in readme_en
     assert "badge/python-3.10%2B-blue.svg" in readme_en
     assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_en
-    assert "badge/pytest-74%20passed-brightgreen.svg" in readme_en
+    assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_en
+    assert "badge/pytest-91%20passed-brightgreen.svg" in readme_en
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
     assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
     assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
@@ -36,7 +37,8 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/version-1.1.3-blue.svg" in readme_de
     assert "badge/python-3.10%2B-blue.svg" in readme_de
     assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_de
-    assert "badge/pytest-74%20bestanden-brightgreen.svg" in readme_de
+    assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_de
+    assert "badge/pytest-91%20bestanden-brightgreen.svg" in readme_de
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
     assert "doc--bricks-orange.svg" in readme_de
     assert "open--bricks-blue.svg" in readme_de
@@ -60,11 +62,12 @@ def test_readme_badges_and_links_parity() -> None:
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert "Last-checked: 2026-08-23" in llms
+    assert "Last-checked: 2026-08-24" in llms
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
-    assert "74 verified tests" in llms or "74 passed" in llms
+    assert "91 verified tests" in llms or "91 passed" in llms
     assert "test_metadata.py" in llms
+    assert "test_i18n.py" in llms
     assert "test_ui_accessibility.py" in llms
 
 
@@ -88,5 +91,5 @@ def test_store_package_parity() -> None:
 
 def test_changelog_parity() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert "2026-08-23" in changelog
-    assert "Accessibility" in changelog or "Barrierefreiheit" in changelog
+    assert "2026-08-24" in changelog
+    assert "Internationalisierung" in changelog or "i18n" in changelog.lower()

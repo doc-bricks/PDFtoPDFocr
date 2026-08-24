@@ -91,48 +91,102 @@ def get_app_icon() -> QIcon:
     return QIcon()
 
 
-# ===== i18n =====
+# ===== i18n (P-006 / Tier-2 Standard: DE, EN, ES, ZH, JA, RU) =====
+
+SUPPORTED_LANGUAGES = ("de", "en", "es", "zh", "ja", "ru")
+DEFAULT_LANGUAGE = "de"
+_UI_LANGUAGES = SUPPORTED_LANGUAGES
+
+LANGUAGE_NAMES = {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "zh": "简体中文",
+    "ja": "日本語",
+    "ru": "Русский",
+}
+
+
+def detect_system_language() -> str:
+    """Erkennt die Systemsprache (Windows UI Language oder Locale) mit Fallback 'de'."""
+    try:
+        if sys.platform.startswith("win"):
+            import ctypes
+
+            lang_id = ctypes.windll.kernel32.GetUserDefaultUILanguage() & 0xFF
+            lang_map = {
+                0x07: "de",  # German
+                0x09: "en",  # English
+                0x0A: "es",  # Spanish
+                0x04: "zh",  # Chinese
+                0x11: "ja",  # Japanese
+                0x19: "ru",  # Russian
+            }
+            if lang_id in lang_map:
+                return lang_map[lang_id]
+            return "en"
+    except Exception:
+        pass
+    try:
+        import locale
+
+        loc = (locale.getdefaultlocale()[0] or "").lower()
+        for code in ("de", "es", "zh", "ja", "ru", "en"):
+            if loc.startswith(code):
+                return code
+    except Exception:
+        pass
+    return "de"
+
 
 def _load_translations() -> dict:
-    """Lädt translations.json aus dem Skript-Verzeichnis."""
+    """Lädt translations.json aus dem Skript- oder Bundle-Verzeichnis."""
     try:
-        base = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
         path = os.path.join(base, "translations.json")
         with open(path, "r", encoding="utf-8") as f:
             import json
+
             return json.load(f)
     except Exception:
         return {}
+
 
 _TRANSLATIONS = _load_translations()
 _LANG = "de"  # Standard: Deutsch; wechselbar via set_language()
 
 
 def set_language(lang: str) -> None:
-    """Setzt die aktive Sprache (z.B. 'de' oder 'en')."""
+    """Setzt die aktive UI-Sprache (z.B. 'de', 'en', 'es', 'zh', 'ja', 'ru')."""
     global _LANG
-    _LANG = lang
+    if lang in SUPPORTED_LANGUAGES:
+        _LANG = lang
 
 
 def tr(key: str, **kwargs) -> str:
     """Gibt den übersetzten String für key in der aktuellen Sprache zurück.
 
-    Falls kein Eintrag vorhanden ist, wird key als Fallback zurückgegeben.
+    Falls kein Eintrag für die Zielsprache vorhanden ist, greift die
+    4-stufige Fallback-Kette: _LANG -> en -> de -> key.
     Unterstützt Platzhalter via str.format(**kwargs).
 
     Args:
         key: Schlüssel aus translations.json.
-        **kwargs: Optionale Platzhalter-Werte (z.B. lang="deu").
+        **kwargs: Optionale Platzhalter-Werte (z.B. filename="test.pdf").
 
     Returns:
         Übersetzter String.
     """
     entry = _TRANSLATIONS.get(key, {})
-    text = entry.get(_LANG, entry.get("de", key))
+    if isinstance(entry, dict):
+        text = entry.get(_LANG) or entry.get("en") or entry.get("de") or key
+    else:
+        text = str(entry) if entry else key
+
     if kwargs:
         try:
             text = text.format(**kwargs)
-        except KeyError:
+        except (KeyError, ValueError, IndexError):
             pass
     return text
 
@@ -143,8 +197,6 @@ def get_language() -> str:
 
 
 # ===== UI-Sprache: Persistenz (Welle-1 U1) =====
-
-_UI_LANGUAGES = ("de", "en")
 
 
 def _ui_config_dir() -> Path:
@@ -163,7 +215,7 @@ def _ui_config_path() -> Path:
 
 
 def load_ui_language() -> str:
-    """Gespeicherte UI-Sprache ('de'/'en'), Default 'de'."""
+    """Gespeicherte UI-Sprache ('de', 'en', 'es', 'zh', 'ja', 'ru'), Default 'de'."""
     try:
         with open(_ui_config_path(), "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -757,13 +809,15 @@ class OCRConverterGUI(QWidget):
         self.layout = QVBoxLayout(self)
         self._ocr_worker = None  # Referenz auf laufenden QThread
 
-        # UI-Sprachumschaltung (Welle-1 U1: sichtbarer DE/EN-Schalter, oben platziert)
+        # UI-Sprachumschaltung (6 Sprachen gemäß P-006 / Tier-2-Mehrsprachigkeit)
         ui_lang_layout = QHBoxLayout()
         self.ui_lang_label = QLabel(tr("label_ui_lang"))
         self.ui_lang_combo = QComboBox()
-        self.ui_lang_combo.addItem("Deutsch", "de")
-        self.ui_lang_combo.addItem("English", "en")
-        self.ui_lang_combo.setCurrentIndex(0 if get_language() == "de" else 1)
+        for code in _UI_LANGUAGES:
+            self.ui_lang_combo.addItem(LANGUAGE_NAMES.get(code, code), code)
+        cur_lang = get_language()
+        cur_idx = _UI_LANGUAGES.index(cur_lang) if cur_lang in _UI_LANGUAGES else 0
+        self.ui_lang_combo.setCurrentIndex(cur_idx)
         self.ui_lang_combo.currentIndexChanged.connect(self._on_ui_language_changed)
         ui_lang_layout.addWidget(self.ui_lang_label)
         ui_lang_layout.addWidget(self.ui_lang_combo)
@@ -843,9 +897,10 @@ class OCRConverterGUI(QWidget):
     def _on_ui_language_changed(self, index: int):
         """Wechselt die UI-Sprache, persistiert sie und stellt die Oberflaeche live um."""
         lang = self.ui_lang_combo.itemData(index) or "de"
-        set_language(lang)
-        save_ui_language(lang)
-        self.retranslate_ui()
+        if lang in _UI_LANGUAGES:
+            set_language(lang)
+            save_ui_language(lang)
+            self.retranslate_ui()
 
     def retranslate_ui(self):
         """Setzt alle sichtbaren, uebersetzten Texte, Barrierefreiheits-Metadaten und Tooltips in der aktuellen Sprache neu."""

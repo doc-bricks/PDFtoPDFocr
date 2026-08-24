@@ -1,246 +1,490 @@
 {
   "window_title": {
     "de": "PDF OCR Werkzeug",
-    "en": "PDF OCR Tool"
+    "en": "PDF OCR Tool",
+    "es": "Herramienta OCR para PDF",
+    "zh": "PDF OCR 工具",
+    "ja": "PDF OCR ツール",
+    "ru": "Инструмент PDF OCR"
   },
   "label_ui_lang": {
     "de": "Anzeigesprache:",
-    "en": "Display language:"
+    "en": "Display language:",
+    "es": "Idioma de interfaz:",
+    "zh": "显示语言：",
+    "ja": "表示言語：",
+    "ru": "Язык интерфейса:"
   },
   "label_ocr_lang": {
     "de": "OCR-Sprache:",
-    "en": "OCR Language:"
+    "en": "OCR Language:",
+    "es": "Idioma de OCR:",
+    "zh": "OCR 识别语言：",
+    "ja": "OCR 言語：",
+    "ru": "Язык OCR:"
   },
   "btn_add_file": {
     "de": "Datei hinzufügen",
-    "en": "Add File"
+    "en": "Add File",
+    "es": "Añadir archivo",
+    "zh": "添加文件",
+    "ja": "ファイルを追加",
+    "ru": "Добавить файл"
   },
   "btn_start": {
     "de": "Start",
-    "en": "Start"
+    "en": "Start",
+    "es": "Iniciar",
+    "zh": "开始",
+    "ja": "開始",
+    "ru": "Старт"
   },
   "btn_export_job": {
     "de": "Job-Export",
-    "en": "Export Job"
+    "en": "Export Job",
+    "es": "Exportar trabajo",
+    "zh": "导出任务",
+    "ja": "ジョブのエクスポート",
+    "ru": "Экспорт задания"
   },
   "btn_refresh": {
     "de": "Aktualisieren",
-    "en": "Refresh"
+    "en": "Refresh",
+    "es": "Actualizar",
+    "zh": "刷新",
+    "ja": "更新",
+    "ru": "Обновить"
   },
   "btn_delete": {
     "de": "Löschen",
-    "en": "Delete"
+    "en": "Delete",
+    "es": "Eliminar",
+    "zh": "删除",
+    "ja": "削除",
+    "ru": "Удалить"
   },
   "tooltip_delete": {
     "de": "Ausgewählte PDF-Einträge löschen (Entf)",
-    "en": "Delete selected PDF entries (Del)"
+    "en": "Delete selected PDF entries (Del)",
+    "es": "Eliminar entradas PDF seleccionadas (Supr)",
+    "zh": "删除选中的 PDF 条目（Delete）",
+    "ja": "選択した PDF エントリを削除（Delete）",
+    "ru": "Удалить выбранные записи PDF (Del)"
   },
   "a11y_delete_description": {
     "de": "Entfernt die aktuell markierten PDF-Einträge aus der Liste.",
-    "en": "Removes the currently selected PDF entries from the list."
+    "en": "Removes the currently selected PDF entries from the list.",
+    "es": "Elimina las entradas PDF seleccionadas de la lista.",
+    "zh": "从列表中移除当前选定的 PDF 条目。",
+    "ja": "リストから現在選択されている PDF エントリを削除します。",
+    "ru": "Удаляет выбранные записи PDF из списка."
   },
   "a11y_file_list_name": {
     "de": "PDF-Dateiliste",
-    "en": "PDF file list"
+    "en": "PDF file list",
+    "es": "Lista de archivos PDF",
+    "zh": "PDF 文件列表",
+    "ja": "PDF ファイルリスト",
+    "ru": "Список файлов PDF"
   },
   "a11y_file_list_description": {
     "de": "Hier erscheinen die ausgewählten PDF-Dateien. Dateien lassen sich per Drag-and-drop hinzufügen und per Entf-Taste wieder entfernen.",
-    "en": "Selected PDF files appear here. You can add files via drag and drop and remove them again with the Delete key."
+    "en": "Selected PDF files appear here. You can add files via drag and drop and remove them again with the Delete key.",
+    "es": "Los archivos PDF seleccionados aparecen aquí. Puede añadir archivos mediante arrastrar y soltar y eliminarlos con la tecla Supr.",
+    "zh": "选定的 PDF 文件将显示在此处。您可以通过拖放添加文件，并使用 Delete 键将其移除。",
+    "ja": "選択した PDF ファイルがここに表示されます。ドラッグ＆ドロップでファイルを追加し、Delete キーで削除できます。",
+    "ru": "Выбранные файлы PDF отображаются здесь. Вы можете добавлять файлы перетаскиванием и удалять их клавишей Del."
   },
   "status_no_files": {
     "de": "Keine neuen Dateien zum Verarbeiten.",
-    "en": "No new files to process."
+    "en": "No new files to process.",
+    "es": "No hay archivos nuevos para procesar.",
+    "zh": "没有要处理的新文件。",
+    "ja": "処理する新しいファイルがありません。",
+    "ru": "Нет новых файлов для обработки."
   },
   "status_done": {
     "de": "Prozess abgeschlossen!",
-    "en": "Process completed!"
+    "en": "Process completed!",
+    "es": "¡Proceso completado!",
+    "zh": "处理已完成！",
+    "ja": "処理が完了しました！",
+    "ru": "Процесс завершён!"
   },
   "status_processing": {
     "de": "Verarbeite: {filename} ...",
-    "en": "Processing: {filename} ..."
+    "en": "Processing: {filename} ...",
+    "es": "Procesando: {filename} ...",
+    "zh": "正在处理：{filename} ...",
+    "ja": "処理中: {filename} ...",
+    "ru": "Обработка: {filename} ..."
   },
   "status_export_saved": {
     "de": "Job-Manifest gespeichert: {filename}",
-    "en": "Job manifest saved: {filename}"
+    "en": "Job manifest saved: {filename}",
+    "es": "Manifiesto de trabajo guardado: {filename}",
+    "zh": "任务清单已保存：{filename}",
+    "ja": "ジョブマニフェストが保存されました: {filename}",
+    "ru": "Манифест задания сохранён: {filename}"
   },
   "dialog_select_files": {
     "de": "Wähle PDF- oder Bilddateien",
-    "en": "Select PDF or Image Files"
+    "en": "Select PDF or Image Files",
+    "es": "Seleccionar archivos PDF o imágenes",
+    "zh": "选择 PDF 或图像文件",
+    "ja": "PDF または画像ファイルを選択",
+    "ru": "Выберите файлы PDF или изображений"
   },
   "dialog_export_job": {
     "de": "Job-Export speichern",
-    "en": "Save Job Export"
+    "en": "Save Job Export",
+    "es": "Guardar exportación de trabajo",
+    "zh": "保存任务导出",
+    "ja": "ジョブエクスポートを保存",
+    "ru": "Сохранить экспорт задания"
   },
   "filter_pdf": {
     "de": "PDF-Dateien (*.pdf)",
-    "en": "PDF Files (*.pdf)"
+    "en": "PDF Files (*.pdf)",
+    "es": "Archivos PDF (*.pdf)",
+    "zh": "PDF 文件 (*.pdf)",
+    "ja": "PDF ファイル (*.pdf)",
+    "ru": "Файлы PDF (*.pdf)"
   },
   "filter_pdf_images": {
     "de": "PDF- und Bilddateien (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)",
-    "en": "PDF and Image Files (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)"
+    "en": "PDF and Image Files (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)",
+    "es": "Archivos PDF e imágenes (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)",
+    "zh": "PDF 和图像文件 (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)",
+    "ja": "PDF および画像ファイル (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)",
+    "ru": "Файлы PDF и изображений (*.pdf *.jpg *.jpeg *.png *.tif *.tiff)"
   },
   "filter_json": {
     "de": "JSON-Dateien (*.json)",
-    "en": "JSON Files (*.json)"
+    "en": "JSON Files (*.json)",
+    "es": "Archivos JSON (*.json)",
+    "zh": "JSON 文件 (*.json)",
+    "ja": "JSON ファイル (*.json)",
+    "ru": "Файлы JSON (*.json)"
   },
   "btn_export_folder": {
     "de": "Exportordner …",
-    "en": "Export Folder…"
+    "en": "Export Folder…",
+    "es": "Carpeta de exportación…",
+    "zh": "导出文件夹…",
+    "ja": "エクスポートフォルダー…",
+    "ru": "Папка экспорта…"
   },
   "btn_export_folder_reset": {
     "de": "Standard",
-    "en": "Default"
+    "en": "Default",
+    "es": "Predeterminado",
+    "zh": "默认",
+    "ja": "デフォルト",
+    "ru": "По умолчанию"
   },
   "dialog_choose_export_folder": {
     "de": "Exportordner wählen",
-    "en": "Choose export folder"
+    "en": "Choose export folder",
+    "es": "Elegir carpeta de exportación",
+    "zh": "选择导出文件夹",
+    "ja": "エクスポートフォルダーを選択",
+    "ru": "Выбрать папку для экспорта"
   },
   "label_export_folder": {
     "de": "Exportordner: {folder}",
-    "en": "Export folder: {folder}"
+    "en": "Export folder: {folder}",
+    "es": "Carpeta de exportación: {folder}",
+    "zh": "导出文件夹：{folder}",
+    "ja": "エクスポートフォルダー: {folder}",
+    "ru": "Папка экспорта: {folder}"
   },
   "label_export_folder_default": {
     "de": "Standard (Ordner der Quelldatei)",
-    "en": "Default (source file's folder)"
+    "en": "Default (source file's folder)",
+    "es": "Predeterminado (carpeta del archivo de origen)",
+    "zh": "默认（源文件所在文件夹）",
+    "ja": "デフォルト（元のファイルのフォルダー）",
+    "ru": "По умолчанию (папка исходного файла)"
   },
   "action_merge_selected": {
     "de": "Markierte mergen",
-    "en": "Merge selected"
+    "en": "Merge selected",
+    "es": "Combinar seleccionados",
+    "zh": "合并所选项",
+    "ja": "選択項目を結合",
+    "ru": "Объединить выбранные"
   },
   "info_merge_need_two": {
     "de": "Bitte mindestens 2 abgeschlossene Ergebnisse markieren.",
-    "en": "Please select at least 2 completed results."
+    "en": "Please select at least 2 completed results.",
+    "es": "Por favor, seleccione al menos 2 resultados completados.",
+    "zh": "请至少选择 2 个已完成的结果。",
+    "ja": "完了した結果を少なくとも2つ選択してください。",
+    "ru": "Пожалуйста, выберите как минимум 2 завершённых результата."
   },
   "dialog_merge_save": {
     "de": "Sammel-PDF speichern",
-    "en": "Save collective PDF"
+    "en": "Save collective PDF",
+    "es": "Guardar PDF combinado",
+    "zh": "保存合并后的 PDF",
+    "ja": "結合 PDF を保存",
+    "ru": "Сохранить объединённый PDF"
   },
   "error_merge_failed": {
     "de": "Merge fehlgeschlagen:\n{error}",
-    "en": "Merge failed:\n{error}"
+    "en": "Merge failed:\n{error}",
+    "es": "Error al combinar:\n{error}",
+    "zh": "合并失败：\n{error}",
+    "ja": "結合に失敗しました:\n{error}",
+    "ru": "Ошибка объединения:\n{error}"
   },
   "status_merge_saved": {
     "de": "Sammel-PDF gespeichert: {filename}",
-    "en": "Collective PDF saved: {filename}"
+    "en": "Collective PDF saved: {filename}",
+    "es": "PDF combinado guardado: {filename}",
+    "zh": "合并后的 PDF 已保存：{filename}",
+    "ja": "結合 PDF が保存されました: {filename}",
+    "ru": "Объединённый PDF сохранён: {filename}"
   },
   "error_title": {
     "de": "Fehler",
-    "en": "Error"
+    "en": "Error",
+    "es": "Error",
+    "zh": "错误",
+    "ja": "エラー",
+    "ru": "Ошибка"
   },
   "info_download_title": {
     "de": "Download",
-    "en": "Download"
+    "en": "Download",
+    "es": "Descarga",
+    "zh": "下载",
+    "ja": "ダウンロード",
+    "ru": "Загрузка"
   },
   "info_export_title": {
     "de": "Job-Export",
-    "en": "Job Export"
+    "en": "Job Export",
+    "es": "Exportación de trabajo",
+    "zh": "任务导出",
+    "ja": "ジョブエクスポート",
+    "ru": "Экспорт задания"
   },
   "info_export_saved": {
     "de": "Job-Manifest '{filename}' wurde gespeichert.",
-    "en": "Job manifest '{filename}' was saved."
+    "en": "Job manifest '{filename}' was saved.",
+    "es": "El manifiesto de trabajo '{filename}' ha sido guardado.",
+    "zh": "任务清单 '{filename}' 已保存。",
+    "ja": "ジョブマニフェスト '{filename}' が保存されました。",
+    "ru": "Манифест задания '{filename}' сохранён."
   },
   "error_tesseract_not_found": {
     "de": "Tesseract OCR wurde nicht gefunden.\nBitte installieren: https://tesseract-ocr.github.io/tessdoc/Installation.html",
-    "en": "Tesseract OCR was not found.\nPlease install it: https://tesseract-ocr.github.io/tessdoc/Installation.html"
+    "en": "Tesseract OCR was not found.\nPlease install it: https://tesseract-ocr.github.io/tessdoc/Installation.html",
+    "es": "No se encontró Tesseract OCR.\nPor favor, instálelo: https://tesseract-ocr.github.io/tessdoc/Installation.html",
+    "zh": "未找到 Tesseract OCR。\n请安装：https://tesseract-ocr.github.io/tessdoc/Installation.html",
+    "ja": "Tesseract OCR が見つかりませんでした。\nインストールしてください: https://tesseract-ocr.github.io/tessdoc/Installation.html",
+    "ru": "Tesseract OCR не найден.\nПожалуйста, установите: https://tesseract-ocr.github.io/tessdoc/Installation.html"
   },
   "info_lang_downloaded": {
     "de": "Sprachpaket '{lang}' wurde automatisch heruntergeladen.",
-    "en": "Language pack '{lang}' was downloaded automatically."
+    "en": "Language pack '{lang}' was downloaded automatically.",
+    "es": "El paquete de idioma '{lang}' se descargó automáticamente.",
+    "zh": "语言包 '{lang}' 已自动下载。",
+    "ja": "言語パック '{lang}' が自動的にダウンロードされました。",
+    "ru": "Языковой пакет '{lang}' был загружен автоматически."
   },
   "error_lang_download_failed": {
     "de": "Download von {lang}.traineddata fehlgeschlagen (HTTP {status}).",
-    "en": "Download of {lang}.traineddata failed (HTTP {status})."
+    "en": "Download of {lang}.traineddata failed (HTTP {status}).",
+    "es": "Error al descargar {lang}.traineddata (HTTP {status}).",
+    "zh": "下载 {lang}.traineddata 失败 (HTTP {status})。",
+    "ja": "{lang}.traineddata のダウンロードに失敗しました (HTTP {status})。",
+    "ru": "Ошибка загрузки {lang}.traineddata (HTTP {status})."
   },
   "error_lang_load_failed": {
     "de": "Sprachpaket '{lang}' konnte nicht geladen werden:\n{error}",
-    "en": "Language pack '{lang}' could not be loaded:\n{error}"
+    "en": "Language pack '{lang}' could not be loaded:\n{error}",
+    "es": "No se pudo cargar el paquete de idioma '{lang}':\n{error}",
+    "zh": "无法加载语言包 '{lang}'：\n{error}",
+    "ja": "言語パック '{lang}' を読み込めませんでした:\n{error}",
+    "ru": "Не удалось загрузить языковой пакет '{lang}':\n{error}"
   },
   "message_ocr_success": {
     "de": "OCR erfolgreich abgeschlossen.",
-    "en": "OCR completed successfully."
+    "en": "OCR completed successfully.",
+    "es": "OCR completado con éxito.",
+    "zh": "OCR 识别成功完成。",
+    "ja": "OCR が正常に完了しました。",
+    "ru": "OCR успешно завершено."
   },
   "message_ocr_failed": {
     "de": "OCR fehlgeschlagen.",
-    "en": "OCR failed."
+    "en": "OCR failed.",
+    "es": "OCR fallido.",
+    "zh": "OCR 识别失败。",
+    "ja": "OCR が失敗しました。",
+    "ru": "Ошибка OCR."
   },
   "error_katarakt_download_failed": {
     "de": "Katarakt-Download fehlgeschlagen (HTTP {status}).",
-    "en": "Katarakt download failed (HTTP {status})."
+    "en": "Katarakt download failed (HTTP {status}).",
+    "es": "Error al descargar Katarakt (HTTP {status}).",
+    "zh": "Katarakt 下载失败 (HTTP {status})。",
+    "ja": "Katarakt のダウンロードに失敗しました (HTTP {status})。",
+    "ru": "Ошибка загрузки Katarakt (HTTP {status})."
   },
   "error_katarakt_load_failed": {
     "de": "Katarakt konnte nicht geladen werden:\n{error}",
-    "en": "Katarakt could not be loaded:\n{error}"
+    "en": "Katarakt could not be loaded:\n{error}",
+    "es": "No se pudo cargar Katarakt:\n{error}",
+    "zh": "无法加载 Katarakt：\n{error}",
+    "ja": "Katarakt を読み込めませんでした:\n{error}",
+    "ru": "Не удалось загрузить Katarakt:\n{error}"
   },
   "tooltip_ui_lang": {
-    "de": "Wählen Sie die Sprache der Benutzeroberfläche (Deutsch / Englisch)",
-    "en": "Select the user interface language (German / English)"
+    "de": "Wählen Sie die Sprache der Benutzeroberfläche (Deutsch / Englisch / Spanisch / Chinesisch / Japanisch / Russisch)",
+    "en": "Select the user interface language (German / English / Spanish / Chinese / Japanese / Russian)",
+    "es": "Seleccione el idioma de la interfaz de usuario (Alemán / Inglés / Español / Chino / Japonés / Ruso)",
+    "zh": "选择用户界面语言（德语 / 英语 / 西班牙语 / 中文 / 日语 / 俄语）",
+    "ja": "ユーザーインターフェースの言語を選択（ドイツ語 / 英語 / スペイン語 / 中国語 / 日本語 / ロシア語）",
+    "ru": "Выберите язык интерфейса (немецкий / английский / испанский / китайский / японский / русский)"
   },
   "a11y_ui_lang_description": {
     "de": "Stellt die Sprache der Benutzeroberfläche um und speichert die Auswahl dauerhaft.",
-    "en": "Switches the user interface language and saves the selection permanently."
+    "en": "Switches the user interface language and saves the selection permanently.",
+    "es": "Cambia el idioma de la interfaz de usuario y guarda la selección permanentemente.",
+    "zh": "切换用户界面语言并永久保存选择。",
+    "ja": "ユーザーインターフェースの言語を切り替え、選択を永続的に保存します。",
+    "ru": "Переключает язык интерфейса и сохраняет выбор."
   },
   "tooltip_ocr_lang": {
     "de": "Wählen Sie die OCR-Erkennungssprache für Tesseract (z. B. deu für Deutsch, eng für Englisch)",
-    "en": "Select the OCR recognition language for Tesseract (e.g. deu for German, eng for English)"
+    "en": "Select the OCR recognition language for Tesseract (e.g. deu for German, eng for English)",
+    "es": "Seleccione el idioma de reconocimiento OCR para Tesseract (p. ej. deu para alemán, eng para inglés)",
+    "zh": "选择 Tesseract 的 OCR 识别语言（例如 deu 代表德语，eng 代表英语）",
+    "ja": "Tesseract の OCR 認識言語を選択（例: ドイツ語は deu、英語は eng）",
+    "ru": "Выберите язык распознавания OCR для Tesseract (например, deu для немецкого, eng для английского)"
   },
   "a11y_ocr_lang_description": {
     "de": "Legt das Tesseract-Sprachpaket für die optische Texterkennung fest.",
-    "en": "Sets the Tesseract language pack for optical character recognition."
+    "en": "Sets the Tesseract language pack for optical character recognition.",
+    "es": "Establece el paquete de idioma de Tesseract para el reconocimiento óptico de caracteres.",
+    "zh": "设置用于光学字符识别的 Tesseract 语言包。",
+    "ja": "光学文字認識用の Tesseract 言語パックを設定します。",
+    "ru": "Устанавливает языковой пакет Tesseract для оптического распознавания текста."
   },
   "tooltip_add_file": {
     "de": "Dateien zur Liste hinzufügen (Strg+O)",
-    "en": "Add files to the list (Ctrl+O)"
+    "en": "Add files to the list (Ctrl+O)",
+    "es": "Añadir archivos a la lista (Ctrl+O)",
+    "zh": "添加文件到列表（Ctrl+O）",
+    "ja": "ファイルをリストに追加（Ctrl+O）",
+    "ru": "Добавить файлы в список (Ctrl+O)"
   },
   "a11y_add_file_description": {
     "de": "Öffnet einen Dateidialog zur Auswahl von PDF- oder Bilddateien.",
-    "en": "Opens a file dialog to select PDF or image files."
+    "en": "Opens a file dialog to select PDF or image files.",
+    "es": "Abre un cuadro de diálogo para seleccionar archivos PDF o imágenes.",
+    "zh": "打开文件对话框以选择 PDF 或图像文件。",
+    "ja": "PDF または画像ファイルを選択するファイルダイアログを開きます。",
+    "ru": "Открывает диалоговое окно для выбора файлов PDF или изображений."
   },
   "tooltip_start": {
     "de": "OCR-Verarbeitung für alle ausstehenden Dateien starten (Strg+Eingabetaste)",
-    "en": "Start OCR processing for all pending files (Ctrl+Enter)"
+    "en": "Start OCR processing for all pending files (Ctrl+Enter)",
+    "es": "Iniciar procesamiento OCR para todos los archivos pendientes (Ctrl+Entrar)",
+    "zh": "开始处理所有待处理文件的 OCR（Ctrl+Enter）",
+    "ja": "すべての保留中ファイルの OCR 処理を開始（Ctrl+Enter）",
+    "ru": "Запустить обработку OCR для всех ожидающих файлов (Ctrl+Enter)"
   },
   "a11y_start_description": {
     "de": "Startet die Texterkennung für alle unvollendeten Dateien in der Liste.",
-    "en": "Starts optical character recognition for all pending files in the list."
+    "en": "Starts optical character recognition for all pending files in the list.",
+    "es": "Inicia el reconocimiento óptico de caracteres para todos los archivos pendientes de la lista.",
+    "zh": "为列表中所有未完成的文件启动光学字符识别。",
+    "ja": "リスト内のすべての未完了ファイルに対して光学文字認識を開始します。",
+    "ru": "Запускает оптическое распознавание текста для всех ожидающих файлов в списке."
   },
   "tooltip_export_job": {
     "de": "Aktuellen Job- und Verarbeitungsstatus als JSON exportieren (Strg+E)",
-    "en": "Export current job and processing status as JSON (Ctrl+E)"
+    "en": "Export current job and processing status as JSON (Ctrl+E)",
+    "es": "Exportar el estado actual del trabajo y procesamiento como JSON (Ctrl+E)",
+    "zh": "将当前任务和处理状态导出为 JSON（Ctrl+E）",
+    "ja": "現在のジョブおよび処理状態を JSON としてエクスポート（Ctrl+E）",
+    "ru": "Экспортировать текущее состояние задания и обработки в JSON (Ctrl+E)"
   },
   "a11y_export_job_description": {
     "de": "Speichert den aktuellen Auftragsstatus in einer standardisierten JSON-Manifestdatei.",
-    "en": "Saves the current job status to a standardized JSON manifest file."
+    "en": "Saves the current job status to a standardized JSON manifest file.",
+    "es": "Guarda el estado actual del trabajo en un archivo de manifiesto JSON estandarizado.",
+    "zh": "将当前任务状态保存到标准化的 JSON 清单文件中。",
+    "ja": "現在のジョブ状態を標準化された JSON マニフェストファイルに保存します。",
+    "ru": "Сохраняет текущий статус задания в стандартизированный файл манифеста JSON."
   },
   "tooltip_refresh": {
     "de": "Dateiliste und Status leeren (F5)",
-    "en": "Clear file list and status (F5)"
+    "en": "Clear file list and status (F5)",
+    "es": "Limpiar lista de archivos y estado (F5)",
+    "zh": "清空文件列表和状态（F5）",
+    "ja": "ファイルリストと状態をクリア（F5）",
+    "ru": "Очистить список файлов и состояние (F5)"
   },
   "a11y_refresh_description": {
     "de": "Leert die gesamte Dateiliste und setzt die Statusanzeige zurück.",
-    "en": "Clears the complete file list and resets the status display."
+    "en": "Clears the complete file list and resets the status display.",
+    "es": "Borra toda la lista de archivos y restablece la visualización del estado.",
+    "zh": "清空整个文件列表并重置状态显示。",
+    "ja": "ファイルリスト全体をクリアし、ステータス表示をリセットします。",
+    "ru": "Очищает весь список файлов и сбрасывает индикатор состояния."
   },
   "tooltip_export_folder": {
     "de": "Zielordner für OCR-Ergebnisse und Sammel-PDFs auswählen (Strg+Umschalt+O)",
-    "en": "Choose target folder for OCR results and collective PDFs (Ctrl+Shift+O)"
+    "en": "Choose target folder for OCR results and collective PDFs (Ctrl+Shift+O)",
+    "es": "Elegir carpeta de destino para resultados OCR y PDF combinados (Ctrl+Shift+O)",
+    "zh": "选择 OCR 结果和合并 PDF 的目标文件夹（Ctrl+Shift+O）",
+    "ja": "OCR 結果および結合 PDF の出力先フォルダーを選択（Ctrl+Shift+O）",
+    "ru": "Выбрать целевую папку для результатов OCR и объединённых PDF (Ctrl+Shift+O)"
   },
   "a11y_export_folder_description": {
     "de": "Wählt ein individuelles Zielverzeichnis für ausgegebene OCR-Dateien.",
-    "en": "Selects a custom destination directory for output OCR files."
+    "en": "Selects a custom destination directory for output OCR files.",
+    "es": "Selecciona un directorio de destino personalizado para los archivos OCR de salida.",
+    "zh": "选择输出 OCR 文件的自定义目标目录。",
+    "ja": "出力 OCR ファイル用のカスタム宛先ディレクトリを選択します。",
+    "ru": "Выбирает пользовательский каталог для выходных файлов OCR."
   },
   "tooltip_export_folder_reset": {
     "de": "Auf Quellordner als Standard-Zielverzeichnis zurücksetzen",
-    "en": "Reset to source folder as default target directory"
+    "en": "Reset to source folder as default target directory",
+    "es": "Restablecer a la carpeta de origen como directorio de destino predeterminado",
+    "zh": "重置为源文件夹作为默认目标目录",
+    "ja": "ソースフォルダーをデフォルトの宛先ディレクトリとしてリセット",
+    "ru": "Сбросить на исходную папку как целевой каталог по умолчанию"
   },
   "a11y_export_folder_reset_description": {
     "de": "Setzt das Zielverzeichnis auf den Ursprungsordner jeder Quelldatei zurück.",
-    "en": "Resets the destination directory to each source file's original folder."
+    "en": "Resets the destination directory to each source file's original folder.",
+    "es": "Restablece el directorio de destino a la carpeta original de cada archivo de origen.",
+    "zh": "将目标目录重置为每个源文件的原始文件夹。",
+    "ja": "宛先ディレクトリを各ソースファイルの元のフォルダーにリセットします。",
+    "ru": "Сбрасывает целевой каталог на исходную папку каждого файла."
   },
   "a11y_status_label_name": {
     "de": "Verarbeitungsstatus",
-    "en": "Processing status"
+    "en": "Processing status",
+    "es": "Estado de procesamiento",
+    "zh": "处理状态",
+    "ja": "処理状態",
+    "ru": "Статус обработки"
   },
   "a11y_export_folder_label_name": {
     "de": "Exportordner-Anzeige",
-    "en": "Export folder display"
+    "en": "Export folder display",
+    "es": "Visualización de carpeta de exportación",
+    "zh": "导出文件夹显示",
+    "ja": "エクスポートフォルダー表示",
+    "ru": "Отображение папки экспорта"
   }
 }

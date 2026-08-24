@@ -20,14 +20,14 @@ PDFtoPDFocr_2 = pytest.importorskip("PDFtoPDFocr_2")
 
 
 @pytest.fixture(scope="module")
-def app():
+def qapp():
     from PySide6.QtWidgets import QApplication
     inst = QApplication.instance() or QApplication([])
     yield inst
 
 
 @pytest.fixture
-def gui(app):
+def gui(qapp):
     g = PDFtoPDFocr_2.OCRConverterGUI()
     yield g
     g.close()
