@@ -585,7 +585,8 @@ def normalize_image_for_ocr(img: Image.Image) -> Image.Image:
     except Exception:
         pass
 
-    if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in getattr(img, "info", {})):
+    has_alpha = "A" in img.getbands() or "transparency" in getattr(img, "info", {})
+    if has_alpha:
         try:
             img_rgba = img.convert("RGBA")
             background = Image.new("RGBA", img_rgba.size, (255, 255, 255, 255))

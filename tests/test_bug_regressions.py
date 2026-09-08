@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Regressionstests Bugsweep 2026-06-23 (Desktop, /bugsweep-Loop Run 5/15).
+"""Regressionstests Bugsweep.
 
 BS-1: pikepdf-Quell-PDFs wurden im Loop VOR out_pdf.save() geschlossen
       (pikepdf kopiert lazy -> korrupte/fehlende OCR-Seiten).
@@ -7,6 +7,9 @@ BS-2: OCR-Fehler im Worker via print() statt logging -> crasht den Worker-Thread
       im windowed-PyInstaller (sys.stdout None).
 BS-3: merge_ocr_outputs Quell-PDFs wurden im Loop VOR merged.save() geschlossen
       (pikepdf kopiert lazy -> Stream-Korruption beim Mergen).
+BS-4: Transparente RGBA-/LA-/P-Bilder werden auf weißem Hintergrund composited.
+BS-5: 0-Byte .traineddata-Dateien werden erkannt und neu heruntergeladen.
+BS-6: normalize_image_for_ocr behandelt alle Alpha- & Transparenz-Modi (PA sowie tRNS).
 """
 from pathlib import Path
 import py_compile
@@ -120,4 +123,31 @@ def test_bs5_ensure_tesseract_handles_zero_byte_traineddata(tmp_path, monkeypatc
     assert corrupted_target.exists()
     assert corrupted_target.stat().st_size > 0
     assert corrupted_target.read_bytes() == b"VALID_TRAINEDDATA_CONTENT"
+
+
+def test_bs6_normalize_image_for_ocr_pa_and_indexed_transparency():
+    """BS-6: PA-Modus (Palette+Alpha) und Indexed-Transparency (L/RGB mit tRNS)
+    müssen auf weißem Hintergrund composited werden, statt schwarz eingefärbt zu werden.
+    """
+    from PIL import Image
+    import PDFtoPDFocr_2 as app
+
+    # 1. PA-Modus (Palette mit Alphakanal)
+    pa = Image.new("PA", (10, 10), (0, 0))  # transparenter Hintergrund
+    pa.putpixel((5, 5), (0, 255))           # opaker Pixel
+    norm_pa = app.normalize_image_for_ocr(pa)
+    assert norm_pa.mode == "RGB"
+    assert norm_pa.getpixel((0, 0)) == (255, 255, 255), (
+        f"PA transparenter Hintergrund muss weiß sein, war aber {norm_pa.getpixel((0, 0))}"
+    )
+
+    # 2. L-Modus mit tRNS Transparenz-Metadaten
+    l_img = Image.new("L", (10, 10), 0)
+    l_img.info["transparency"] = 0
+    norm_l = app.normalize_image_for_ocr(l_img)
+    assert norm_l.mode == "RGB"
+    assert norm_l.getpixel((0, 0)) == (255, 255, 255), (
+        f"L mit Transparenz muss weiß sein, war aber {norm_l.getpixel((0, 0))}"
+    )
+
 
