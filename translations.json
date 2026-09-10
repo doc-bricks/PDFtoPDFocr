@@ -95,6 +95,14 @@
     "ja": "選択した PDF ファイルがここに表示されます。ドラッグ＆ドロップでファイルを追加し、Delete キーで削除できます。",
     "ru": "Выбранные файлы PDF отображаются здесь. Вы можете добавлять файлы перетаскиванием и удалять их клавишей Del."
   },
+  "status_ready": {
+    "de": "Bereit. Dateien hierher ziehen oder 'Datei hinzufügen' wählen.",
+    "en": "Ready. Drag files here or select 'Add File'.",
+    "es": "Listo. Arrastre archivos aquí o seleccione 'Añadir archivo'.",
+    "zh": "就绪。将文件拖至此处或选择“添加文件”。",
+    "ja": "準備完了。ここにファイルをドラッグするか、「ファイルを追加」を選択してください。",
+    "ru": "Готово. Перетащите файлы сюда или выберите «Добавить файл»."
+  },
   "status_no_files": {
     "de": "Keine neuen Dateien zum Verarbeiten.",
     "en": "No new files to process.",
@@ -206,6 +214,22 @@
     "zh": "默认（源文件所在文件夹）",
     "ja": "デフォルト（元のファイルのフォルダー）",
     "ru": "По умолчанию (папка исходного файла)"
+  },
+  "action_open_file": {
+    "de": "Datei öffnen",
+    "en": "Open file",
+    "es": "Abrir archivo",
+    "zh": "打开文件",
+    "ja": "ファイルを開く",
+    "ru": "Открыть файл"
+  },
+  "action_open_folder": {
+    "de": "Im Ordner anzeigen",
+    "en": "Show in folder",
+    "es": "Mostrar en la carpeta",
+    "zh": "在文件夹中显示",
+    "ja": "フォルダーで表示",
+    "ru": "Показать в папке"
   },
   "action_merge_selected": {
     "de": "Markierte mergen",

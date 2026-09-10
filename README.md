@@ -12,7 +12,7 @@
 [![Privacy](https://img.shields.io/badge/privacy-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#privacy--network-access)
 [![Security](https://img.shields.io/badge/security-Local--First-blue.svg)](SECURITY.md)
 [![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#features)
-[![Pytest](https://img.shields.io/badge/pytest-91%20passed-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-103%20passed-brightgreen.svg)](tests/)
 [![LLM-Ready](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ecosystem](https://img.shields.io/badge/Ecosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Umbrella](https://img.shields.io/badge/Umbrella-open--bricks-blue.svg)](https://github.com/open-bricks)
@@ -86,7 +86,7 @@ sequenceDiagram
 | **Direct Image OCR** | Drop JPG, PNG, or multi-frame TIFF images | Assembled searchable PDF document |
 | **Merge into Single PDF** | Enable "Auto-Merge" in toolbar | Consolidated multi-document searchable PDF |
 | **Export Job Manifest** | Click "Job-Export" (`Ctrl+E`) | Portable `pdftopdfocr-job-v1.json` manifest |
-| **Run Verification Suite** | `python -m pytest` | 74 verified unit, regression, accessibility, and metadata tests |
+| **Run Verification Suite** | `python -m pytest` | 103 verified unit, regression, accessibility, and metadata tests |
 | **Portable Build** | `python build_release.py --clean` | Self-contained executable in `dist/PDFtoPDFocr/` |
 
 ## Features

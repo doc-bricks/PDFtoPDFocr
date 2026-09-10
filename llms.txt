@@ -1,6 +1,6 @@
 # PDFtoPDFocr
 
-## Last-checked: 2026-08-24
+## Last-checked: 2026-09-10
 
 ## Canonical Links
 
@@ -26,7 +26,7 @@ The app is designed for private document workflows such as invoices, letters, co
 - Translation Auditor & Scanner: `python manage_translations.py --check`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (91 verified tests: 91 passed) [2026-08-24]
+- Test suite: `python -m pytest` (103 verified tests: 103 passed) [2026-09-10]
 - Package configuration: `pyproject.toml` (PEP 621 metadata)
 - Key test files: `tests/test_i18n.py`, `tests/test_ui_accessibility.py`, `tests/test_security_license_contract.py`, `tests/test_metadata.py`, `tests/test_tesseract_config.py`, `tests/test_export_format.py`, `tests/test_bug_regressions.py`, `tests/test_app_assets.py`, `tests/test_cli_file_arguments.py`
 

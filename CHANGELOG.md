@@ -37,6 +37,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
   - Verhindert Duplikate bei abweichenden Pfadtrennern (`/` vs. `\`, z. B. bei Drag-and-Drop / `QFileDialog` vs. CLI-Startargumenten), relativen Pfaden und Windows-Dateisystem-Case.
 
 ### Hinzugefügt / Added
+- **Software UX & Accessibility: Kontextmenü, Doppelklick-Aktion & Status-Guidance (`PDFtoPDFocr_2.py`, `translations.json`, `tests/test_ui_accessibility.py`)**:
+  - **Barrierefreies Kontextmenü (`_create_list_context_menu`, `_show_list_context_menu`)**: Rechtsklick auf Listeneinträge öffnet ein vollständiges Aktionsmenü mit "Datei öffnen", "Im Ordner anzeigen", "Markierte mergen" (`Strg+M`) und "Löschen" (`Entf`).
+  - **Direkte Doppelklick-Aktion (`_on_item_double_clicked`)**: Doppelklick auf einen Listeneintrag öffnet unmittelbar das erzeugte OCR-Ergebnis (`_ocred.pdf`) oder die Quelldatei im Standardbetrachter.
+  - **Sofortige Status-Orientierung (`status_label`)**: Initialer App-Start und Listen-Bereinigung (`on_refresh`) zeigen direkt verständliche Benutzerhinweise ("Bereit. Dateien hierher ziehen oder 'Datei hinzufügen' wählen.") in allen 6 unterstützten Sprachen.
+  - **Lokalisierungserweiterung (`translations.json`)**: Neue Schlüssel `status_ready`, `action_open_file` und `action_open_folder` in allen 6 Sprachen (DE, EN, ES, ZH, JA, RU) hinterlegt.
+  - **Erweiterte Testabdeckung (`tests/test_ui_accessibility.py`)**: 3 neue automatisierte A11y-Tests für Status-Guidance, Doppelklick-Verhalten und Kontextmenü-Aktionen (Gesamtsuite auf 103 Tests erweitert, 103/103 passed, 100% grün). [G 2026-09-10]
 - **Software Internationalisierung & 6-Sprachen-Standard (P-006 / Tier-2-Mehrsprachigkeit)**:
   - **Vollständiger 6-Sprachen-Katalog (`translations.json`)**: Sämtliche 61 Lokalisierungsschlüssel für Benutzeroberfläche, Tooltips, Fehlermeldungen, Dialoge und Barrierefreiheitsattribute (A11y) vollständig und authentisch für Deutsch (`de`), Englisch (`en`), Spanisch (`es`), vereinfachtes Chinesisch (`zh`), Japanisch (`ja`) und Russisch (`ru`) übersetzt (100% Vollständigkeit, 0 fehlende Schlüssel).
   - **4-Stufen-Fallback-Kette & Translator-Modul (`translator.py`)**: `TranslationManager` mit robuster Kaskade (`aktive Sprache -> Englisch -> Deutsch -> Schlüsselname`) und Platzhalter-Formatierung (`{filename}`, `{error}`, `{lang}`, `{status}`, `{folder}`) implementiert; automatische Systemsprachenerkennung via `detect_system_language()`.

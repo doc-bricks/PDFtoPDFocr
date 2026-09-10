@@ -91,6 +91,8 @@ def test_ui_keyboard_shortcuts():
         assert gui.btn_start.shortcut().toString() in ("Ctrl+Return", "Ctrl+Enter", "Strg+Eingabetaste")
         assert gui.btn_export.shortcut().toString() in ("Ctrl+E", "Strg+E")
         assert gui.btn_refresh.shortcut().toString() == "F5"
+        assert gui.btn_delete.shortcut().toString() in ("Del", "Delete", "Entf")
+        assert gui.action_merge.shortcut().toString() in ("Ctrl+M", "Strg+M")
         assert gui.btn_choose_export_folder.shortcut().toString() in ("Ctrl+Shift+O", "Strg+Umschalt+O")
     finally:
         gui.close()
@@ -192,5 +194,88 @@ def test_file_done_accessible_contrast_and_tooltips(tmp_path):
         assert item_err.data(Qt.UserRole + 1) == "error"
         assert "fehlgeschlagen" in item_err.toolTip()
         assert item_err.foreground().color().name() == "#b45309"
+    finally:
+        gui.close()
+
+
+def test_initial_and_refresh_status_guidance():
+    """Initial launch and list refresh provide clear accessible status guidance."""
+    _qapp()
+    app.set_language("de")
+    gui = app.OCRConverterGUI()
+    try:
+        assert gui.status_label.text() == "Bereit. Dateien hierher ziehen oder 'Datei hinzufügen' wählen."
+        # Retranslate updates guidance
+        app.set_language("en")
+        gui.retranslate_ui()
+        assert gui.status_label.text() == "Ready. Drag files here or select 'Add File'."
+        # Refresh restores ready guidance
+        gui.status_label.setText("Temporary status")
+        gui.on_refresh()
+        assert gui.status_label.text() == "Ready. Drag files here or select 'Add File'."
+    finally:
+        gui.close()
+        app.set_language("de")
+
+
+def test_list_item_double_click_opens_target(tmp_path, monkeypatch):
+    """Double-clicking a list item opens the OCR result if present, else source."""
+    _qapp()
+    gui = app.OCRConverterGUI()
+    opened_paths = []
+    monkeypatch.setattr(app, "open_file_path", lambda p: opened_paths.append(str(p)) or True)
+
+    try:
+        src_file = tmp_path / "doc.pdf"
+        src_file.write_bytes(b"%PDF-doc\n")
+        gui.list_widget.add_file(str(src_file))
+        item = gui.list_widget.item(0)
+
+        # Before OCR: double click opens source file
+        gui._on_item_double_clicked(item)
+        assert len(opened_paths) == 1
+        assert opened_paths[-1] == str(src_file)
+
+        # After OCR: double click opens _ocred.pdf
+        ocred_file = tmp_path / "doc_ocred.pdf"
+        ocred_file.write_bytes(b"%PDF-ocred\n")
+        gui._on_item_double_clicked(item)
+        assert len(opened_paths) == 2
+        assert opened_paths[-1] == str(ocred_file)
+    finally:
+        gui.close()
+
+
+def test_context_menu_actions_and_shortcuts(tmp_path):
+    """Context menu provides Open File, Open Folder, Merge (Ctrl+M), and Delete (Del)."""
+    _qapp()
+    app.set_language("de")
+    gui = app.OCRConverterGUI()
+    try:
+        f1 = tmp_path / "page1.pdf"
+        f2 = tmp_path / "page2.pdf"
+        f1.write_bytes(b"%PDF\n")
+        f2.write_bytes(b"%PDF\n")
+        gui.list_widget.add_file(str(f1))
+        gui.list_widget.add_file(str(f2))
+
+        # Single item selected
+        item0 = gui.list_widget.item(0)
+        item0.setSelected(True)
+
+        menu = gui._create_list_context_menu([item0])
+        action_texts = [a.text() for a in menu.actions()]
+        assert any("Datei öffnen" in a for a in action_texts)
+        assert any("Im Ordner anzeigen" in a for a in action_texts)
+        assert any("Löschen" in a for a in action_texts)
+
+        # Both items done -> Merge action is offered
+        gui._on_file_done(str(f1), True)
+        gui._on_file_done(str(f2), True)
+        gui.list_widget.item(1).setSelected(True)
+
+        menu2 = gui._create_list_context_menu(gui.list_widget.selectedItems())
+        action_texts2 = [a.text() for a in menu2.actions()]
+        assert any("Markierte mergen" in a for a in action_texts2)
     finally:
         gui.close()

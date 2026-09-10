@@ -27,7 +27,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/python-3.10%2B-blue.svg" in readme_en
     assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_en
     assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_en
-    assert "badge/pytest-91%20passed-brightgreen.svg" in readme_en
+    assert "badge/pytest-103%20passed-brightgreen.svg" in readme_en
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
     assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
     assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
@@ -38,7 +38,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/python-3.10%2B-blue.svg" in readme_de
     assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_de
     assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_de
-    assert "badge/pytest-91%20bestanden-brightgreen.svg" in readme_de
+    assert "badge/pytest-103%20bestanden-brightgreen.svg" in readme_de
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
     assert "doc--bricks-orange.svg" in readme_de
     assert "open--bricks-blue.svg" in readme_de
@@ -62,10 +62,10 @@ def test_readme_badges_and_links_parity() -> None:
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert "Last-checked: 2026-08-24" in llms
+    assert "Last-checked: 2026-09-10" in llms
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
-    assert "91 verified tests" in llms or "91 passed" in llms
+    assert "103 verified tests" in llms or "103 passed" in llms
     assert "test_metadata.py" in llms
     assert "test_i18n.py" in llms
     assert "test_ui_accessibility.py" in llms

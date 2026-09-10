@@ -23,8 +23,8 @@ from datetime import datetime, timezone
 import requests
 
 # PySide6
-from PySide6.QtCore import Qt, QThread, Signal
-from PySide6.QtGui import QAction, QColor, QIcon
+from PySide6.QtCore import Qt, QThread, QUrl, Signal
+from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QKeySequence
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -89,6 +89,23 @@ def get_app_icon() -> QIcon:
     if icon_path.exists():
         return QIcon(str(icon_path))
     return QIcon()
+
+
+def open_file_path(path: str | Path) -> bool:
+    """Öffnet die Datei mit der Standardanwendung des Betriebssystems."""
+    target = Path(path)
+    if not target.exists():
+        return False
+    return QDesktopServices.openUrl(QUrl.fromLocalFile(str(target.resolve())))
+
+
+def open_file_folder(path: str | Path) -> bool:
+    """Öffnet das Verzeichnis der Datei im systemeigenen Dateimanager."""
+    target = Path(path)
+    folder = target.parent if target.is_file() else target
+    if not folder.exists():
+        return False
+    return QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder.resolve())))
 
 
 # ===== i18n (P-006 / Tier-2 Standard: DE, EN, ES, ZH, JA, RU) =====
@@ -880,6 +897,7 @@ class OCRConverterGUI(QWidget):
         self.btn_refresh = QPushButton(f"{ICON_BROOM} {tr('btn_refresh')}")
         self.btn_refresh.setShortcut("F5")
         self.btn_delete = QPushButton(f"{ICON_TRASH} {tr('btn_delete')}")
+        self.btn_delete.setShortcut(QKeySequence.Delete)
         for b in (
             self.btn_add_file,
             self.btn_start,
@@ -890,7 +908,13 @@ class OCRConverterGUI(QWidget):
             btn_layout.addWidget(b)
         self.layout.addLayout(btn_layout)
 
-        self.status_label = QLabel("")
+        # Tastenkürzel für "Markierte mergen" (Strg+M) für Tastaturbedienung & Barrierefreiheit
+        self.action_merge = QAction(self)
+        self.action_merge.setShortcut("Ctrl+M")
+        self.action_merge.triggered.connect(self.merge_selected)
+        self.addAction(self.action_merge)
+
+        self.status_label = QLabel(tr("status_ready"))
         self.status_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.status_label)
 
@@ -904,6 +928,7 @@ class OCRConverterGUI(QWidget):
         self.btn_choose_export_folder.clicked.connect(self.on_choose_export_folder)
         self.btn_reset_export_folder.clicked.connect(self.on_reset_export_folder)
         self.list_widget.customContextMenuRequested.connect(self._show_list_context_menu)
+        self.list_widget.itemDoubleClicked.connect(self._on_item_double_clicked)
         self.list_widget.folder_dropped.connect(self._register_batch_folder)
 
         # Retranslate initialisieren (setzt alle Texte, A11y-Attribute und Tooltips)
@@ -974,6 +999,9 @@ class OCRConverterGUI(QWidget):
 
         self.status_label.setAccessibleName(tr("a11y_status_label_name"))
         self.export_folder_label.setAccessibleName(tr("a11y_export_folder_label_name"))
+        self.action_merge.setText(tr("action_merge_selected"))
+        if not self.status_label.text() or self.list_widget.count() == 0:
+            self.status_label.setText(tr("status_ready"))
         self._update_export_folder_label()
 
     def add_paths_from_arguments(self, paths):
@@ -1051,15 +1079,62 @@ class OCRConverterGUI(QWidget):
 
     # ===== Merge/Stapeln (U2/U3/U5) =====
 
-    def _show_list_context_menu(self, pos):
-        """Shows the 'Markierte mergen' context menu for selected list entries (U2)."""
-        if not self.list_widget.selectedItems():
+    def _on_item_double_clicked(self, item: QListWidgetItem):
+        """Öffnet per Doppelklick das fertige OCR-Ergebnis oder die Quelldatei."""
+        if not item:
             return
+        src_path = item.data(Qt.UserRole)
+        if not src_path:
+            return
+        ocred_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
+        target = ocred_path if os.path.exists(ocred_path) else src_path
+        if os.path.exists(target):
+            open_file_path(target)
+
+    def _create_list_context_menu(self, selected_items: list) -> QMenu:
+        """Erstellt das barrierefreie Kontextmenü für Listeneinträge (Öffnen, Ordner, Mergen, Löschen)."""
         menu = QMenu(self)
-        merge_action = QAction(tr("action_merge_selected"), self)
-        merge_action.triggered.connect(self.merge_selected)
-        menu.addAction(merge_action)
+        if not selected_items:
+            return menu
+
+        first_item = selected_items[0]
+        first_path = first_item.data(Qt.UserRole)
+        ocred_path = os.path.splitext(first_path)[0] + "_ocred.pdf" if first_path else ""
+        open_target = ocred_path if (ocred_path and os.path.exists(ocred_path)) else first_path
+
+        if open_target and os.path.exists(open_target):
+            open_action = QAction(tr("action_open_file"), self)
+            open_action.triggered.connect(lambda: open_file_path(open_target))
+            menu.addAction(open_action)
+
+            folder_action = QAction(tr("action_open_folder"), self)
+            folder_action.triggered.connect(lambda: open_file_folder(open_target))
+            menu.addAction(folder_action)
+
+            menu.addSeparator()
+
+        done_items = self._selected_done_items_in_list_order()
+        if len(done_items) >= 2:
+            merge_action = QAction(tr("action_merge_selected"), self)
+            merge_action.setShortcut("Ctrl+M")
+            merge_action.triggered.connect(self.merge_selected)
+            menu.addAction(merge_action)
+            menu.addSeparator()
+
+        del_action = QAction(f"{ICON_TRASH} {tr('btn_delete')}", self)
+        del_action.setShortcut(QKeySequence.Delete)
+        del_action.triggered.connect(self.on_delete)
+        menu.addAction(del_action)
+        return menu
+
+    def _show_list_context_menu(self, pos):
+        """Zeigt das barrierefreie Kontextmenü für Listeneinträge."""
+        selected_items = self.list_widget.selectedItems()
+        if not selected_items:
+            return
+        menu = self._create_list_context_menu(selected_items)
         menu.exec(self.list_widget.mapToGlobal(pos))
+
 
     def _selected_done_items_in_list_order(self) -> list:
         """Returns the selected, already OCRed items in current list order.
@@ -1225,9 +1300,9 @@ class OCRConverterGUI(QWidget):
         self._auto_merge_completed_batches()
 
     def on_refresh(self):
-        """Clears the file list and resets the status label."""
+        """Clears the file list and resets the status label to ready."""
         self.list_widget.clear()
-        self.status_label.setText("")
+        self.status_label.setText(tr("status_ready"))
         self.status_label.setStyleSheet("")
 
     def closeEvent(self, event):
