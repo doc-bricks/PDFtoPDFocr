@@ -151,3 +151,53 @@ def test_bs6_normalize_image_for_ocr_pa_and_indexed_transparency():
     )
 
 
+def test_bs7_add_file_duplicate_detection_normalizes_paths():
+    """BS-7: add_file normalisiert Pfade (Slashes, redundante Trenner) gegen Duplikate."""
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    widget = app.PDFListWidget()
+
+    widget.add_file("C:/scans/document.pdf")
+    assert widget.count() == 1
+
+    # Gleiche Datei mit Backslashes darf kein Duplikat anlegen
+    widget.add_file(r"C:\scans\document.pdf")
+    assert widget.count() == 1
+
+    # Gleiche Datei mit redundanten Punkten/Slashes darf kein Duplikat anlegen
+    widget.add_file("C:/scans/./document.pdf")
+    assert widget.count() == 1
+
+
+def test_bs7_add_file_case_and_relative_duplicates(tmp_path):
+    """BS-7: add_file erkennt Duplikate bei relativen vs. absoluten Pfaden und Windows-Case."""
+    import os
+    import sys
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    widget = app.PDFListWidget()
+
+    # Relativer Pfad vs. absoluter Pfad
+    test_pdf = tmp_path / "relative_sample.pdf"
+    test_pdf.write_bytes(b"%PDF-1.4\n")
+
+    cwd = os.getcwd()
+    try:
+        os.chdir(str(tmp_path))
+        widget.add_file("relative_sample.pdf")
+        assert widget.count() == 1
+
+        widget.add_file(str(test_pdf))
+        assert widget.count() == 1
+
+        # Case-Insensitivität auf Windows
+        if sys.platform.startswith("win"):
+            upper_path = str(test_pdf).upper()
+            widget.add_file(upper_path)
+            assert widget.count() == 1
+    finally:
+        os.chdir(cwd)

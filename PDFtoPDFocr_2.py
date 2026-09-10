@@ -776,20 +776,37 @@ class PDFListWidget(QListWidget):
         """Adds a single file to the list if it has a supported extension and is not already listed.
 
         Args:
-            filepath: Absolute path to the file to add.
+            filepath: Path to the file to add (normalized to canonical absolute path).
             batch_id: If set, tags the item as belonging to a folder-drop batch (U5).
         """
-        if os.path.splitext(filepath)[1].lower() not in SUPPORTED_EXTS:
+        if not filepath:
             return
+        raw = str(filepath).strip("\"'")
+        try:
+            canonical_path = os.path.abspath(os.path.expanduser(raw))
+        except (OSError, ValueError):
+            return
+
+        if os.path.splitext(canonical_path)[1].lower() not in SUPPORTED_EXTS:
+            return
+
+        norm_key = os.path.normcase(canonical_path)
         for idx in range(self.count()):
-            if self.item(idx).data(Qt.UserRole) == filepath:
-                return
-        item = QListWidgetItem(os.path.basename(filepath))
-        item.setData(Qt.UserRole, filepath)
+            existing = self.item(idx).data(Qt.UserRole)
+            if existing:
+                try:
+                    if os.path.normcase(os.path.abspath(os.path.expanduser(str(existing)))) == norm_key:
+                        return
+                except (OSError, ValueError):
+                    if existing == canonical_path:
+                        return
+
+        item = QListWidgetItem(os.path.basename(canonical_path))
+        item.setData(Qt.UserRole, canonical_path)
         item.setData(Qt.UserRole + 1, 'pending')
         item.setData(Qt.UserRole + 2, "")
         item.setData(Qt.UserRole + 3, batch_id)
-        item.setToolTip(filepath)
+        item.setToolTip(canonical_path)
         self.addItem(item)
 
 

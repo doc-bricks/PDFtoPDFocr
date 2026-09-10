@@ -31,6 +31,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Behoben / Fixed
+- **Bugsweep Pfad-Normalisierung & Duplikaterkennung (`PDFListWidget.add_file`)**:
+  - `add_file` normalisiert Dateipfade defensiv via `os.path.abspath` und `os.path.normcase`.
+  - Verhindert Duplikate bei abweichenden Pfadtrennern (`/` vs. `\`, z. B. bei Drag-and-Drop / `QFileDialog` vs. CLI-Startargumenten), relativen Pfaden und Windows-Dateisystem-Case.
+
 ### Hinzugefügt / Added
 - **Software Internationalisierung & 6-Sprachen-Standard (P-006 / Tier-2-Mehrsprachigkeit)**:
   - **Vollständiger 6-Sprachen-Katalog (`translations.json`)**: Sämtliche 61 Lokalisierungsschlüssel für Benutzeroberfläche, Tooltips, Fehlermeldungen, Dialoge und Barrierefreiheitsattribute (A11y) vollständig und authentisch für Deutsch (`de`), Englisch (`en`), Spanisch (`es`), vereinfachtes Chinesisch (`zh`), Japanisch (`ja`) und Russisch (`ru`) übersetzt (100% Vollständigkeit, 0 fehlende Schlüssel).
