@@ -10,6 +10,8 @@ BS-3: merge_ocr_outputs Quell-PDFs wurden im Loop VOR merged.save() geschlossen
 BS-4: Transparente RGBA-/LA-/P-Bilder werden auf weißem Hintergrund composited.
 BS-5: 0-Byte .traineddata-Dateien werden erkannt und neu heruntergeladen.
 BS-6: normalize_image_for_ocr behandelt alle Alpha- & Transparenz-Modi (PA sowie tRNS).
+BS-7: add_file normalisiert Pfade und verhindert Duplikate bei Case-/Relativpfad-Varianten.
+BS-8: Nach Stapeln/Mergen finden Doppelklick, Kontextmenü und Manifest die nach 'Einzel-Seiten' verschobenen OCR-Ergebnisse statt der Quelldatei.
 """
 from pathlib import Path
 import py_compile
@@ -201,3 +203,132 @@ def test_bs7_add_file_case_and_relative_duplicates(tmp_path):
             assert widget.count() == 1
     finally:
         os.chdir(cwd)
+
+
+def test_bs8_double_click_and_context_menu_open_archived_ocr_result_after_merge(tmp_path, monkeypatch):
+    """BS-8: Nach Stapeln/Mergen (Einzeldateien in 'Einzel-Seiten' archiviert)
+    müssen Doppelklick und Kontextmenü das archivierte OCR-Ergebnis öffnen,
+    nicht fälschlicherweise die un-ocred Quelldatei.
+    """
+    from PIL import Image
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    gui = app.OCRConverterGUI()
+
+    opened_urls = []
+    from PySide6.QtGui import QDesktopServices
+    monkeypatch.setattr(QDesktopServices, "openUrl", lambda url: opened_urls.append(url.toLocalFile()) or True)
+
+    try:
+        f1 = tmp_path / "scan1.pdf"
+        f2 = tmp_path / "scan2.pdf"
+        f1.write_bytes(b"%PDF-source-1\n")
+        f2.write_bytes(b"%PDF-source-2\n")
+
+        gui.list_widget.add_file(str(f1))
+        gui.list_widget.add_file(str(f2))
+
+        # Erzeuge OCR-Ausgabedateien
+        o1 = tmp_path / "scan1_ocred.pdf"
+        o2 = tmp_path / "scan2_ocred.pdf"
+        Image.new("RGB", (5, 5), "white").save(o1, "PDF")
+        Image.new("RGB", (5, 5), "white").save(o2, "PDF")
+
+        item1 = gui.list_widget.item(0)
+        item2 = gui.list_widget.item(1)
+        item1.setData(Qt.UserRole + 1, "done")
+        item2.setData(Qt.UserRole + 1, "done")
+        item1.setSelected(True)
+        item2.setSelected(True)
+
+        # Merge ausführen -> Einzelseiten wandern nach 'Einzel-Seiten'
+        merged_path = gui.merge_selected(target_path=tmp_path / "merged.pdf")
+        assert merged_path.exists()
+        assert not o1.exists()
+        archived_o1 = tmp_path / app.MERGE_SUBFOLDER_NAME / "scan1_ocred.pdf"
+        assert archived_o1.exists()
+
+        # 1. Doppelklick auf Item 1 muss das archivierte OCR-Ergebnis öffnen
+        gui._on_item_double_clicked(item1)
+        assert len(opened_urls) == 1
+        assert Path(opened_urls[-1]).resolve() == archived_o1.resolve(), (
+            f"Doppelklick öffnete {opened_urls[-1]}, erwartet wurde {archived_o1}"
+        )
+
+        # 2. Kontextmenü 'Datei öffnen' muss ebenfalls das archivierte OCR-Ergebnis öffnen
+        menu = gui._create_list_context_menu([item1])
+        open_action = [a for a in menu.actions() if a.text() == app.tr("action_open_file")][0]
+        open_action.trigger()
+        assert len(opened_urls) == 2
+        assert Path(opened_urls[-1]).resolve() == archived_o1.resolve(), (
+            f"Kontextmenü 'Datei öffnen' öffnete {opened_urls[-1]}, erwartet wurde {archived_o1}"
+        )
+
+        # 3. Kontextmenü 'Ordner öffnen' muss den Archivordner öffnen
+        folder_action = [a for a in menu.actions() if a.text() == app.tr("action_open_folder")][0]
+        folder_action.trigger()
+        assert len(opened_urls) == 3
+        assert Path(opened_urls[-1]).resolve() == archived_o1.parent.resolve(), (
+            f"Kontextmenü 'Ordner öffnen' öffnete {opened_urls[-1]}, erwartet wurde {archived_o1.parent}"
+        )
+    finally:
+        gui.close()
+
+
+def test_bs8_resolve_ocr_output_path_finds_subfolder_and_export_folder(tmp_path):
+    """BS-8: resolve_ocr_output_path findet OCR-Dateien im Quellordner, im 'Einzel-Seiten'-Archiv
+    sowie im konfigurierten Exportordner.
+    """
+    from PIL import Image
+    import PDFtoPDFocr_2 as app
+
+    source = tmp_path / "docs" / "report.pdf"
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"%PDF-doc\n")
+
+    # 1. Vor dem Merge: direkt neben der Quelldatei
+    direct_ocr = source.parent / "report_ocred.pdf"
+    Image.new("RGB", (5, 5), "white").save(direct_ocr, "PDF")
+    resolved = app.resolve_ocr_output_path(source)
+    assert resolved is not None
+    assert resolved.resolve() == direct_ocr.resolve()
+
+    # 2. Nach lokalem Merge: in Einzel-Seiten verschoben
+    subfolder = source.parent / app.MERGE_SUBFOLDER_NAME
+    subfolder.mkdir()
+    archived_ocr = subfolder / "report_ocred.pdf"
+    direct_ocr.rename(archived_ocr)
+
+    resolved = app.resolve_ocr_output_path(source)
+    assert resolved is not None
+    assert resolved.resolve() == archived_ocr.resolve()
+
+    # 3. Wenn in konfigurierten Exportordner verschoben
+    export_dir = tmp_path / "custom_exports"
+    export_subfolder = export_dir / app.MERGE_SUBFOLDER_NAME
+    export_subfolder.mkdir(parents=True)
+    exp_archived = export_subfolder / "report_ocred.pdf"
+    archived_ocr.rename(exp_archived)
+
+    resolved = app.resolve_ocr_output_path(source, export_folder=export_dir)
+    assert resolved is not None
+    assert resolved.resolve() == exp_archived.resolve()
+
+
+def test_bs8_add_folder_handles_oserror_gracefully(tmp_path):
+    """BS-8: PDFListWidget.add_folder fängt OSError (z.B. nicht existenter oder unlesbarer Ordner)
+    sauber ab, statt mit unhandled exception abzustürzen.
+    """
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    widget = app.PDFListWidget()
+
+    non_existent = tmp_path / "does_not_exist_folder"
+    # Darf nicht abstürzen
+    widget.add_folder(str(non_existent), batch_id="test-batch")
+    assert widget.count() == 0

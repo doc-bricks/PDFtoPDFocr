@@ -102,10 +102,16 @@ def open_file_path(path: str | Path) -> bool:
 def open_file_folder(path: str | Path) -> bool:
     """Öffnet das Verzeichnis der Datei im systemeigenen Dateimanager."""
     target = Path(path)
-    folder = target.parent if target.is_file() else target
+    if target.is_dir():
+        folder = target
+    elif target.is_file() or target.parent.exists():
+        folder = target.parent
+    else:
+        folder = target
     if not folder.exists():
         return False
     return QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder.resolve())))
+
 
 
 # ===== i18n (P-006 / Tier-2 Standard: DE, EN, ES, ZH, JA, RU) =====
@@ -451,9 +457,16 @@ def build_job_export_payload(
     outputs = []
 
     for entry in file_entries:
-        raw_path = entry["path"]
+        raw_path = entry.get("path")
+        if not raw_path:
+            continue
         source_path = Path(raw_path)
-        output_path = source_path.with_name(f"{source_path.stem}_ocred.pdf")
+        configured_output = entry.get("output_path")
+        if configured_output and Path(configured_output).exists():
+            output_path = Path(configured_output)
+        else:
+            resolved = resolve_ocr_output_path(source_path)
+            output_path = resolved if resolved else source_path.with_name(f"{source_path.stem}_ocred.pdf")
         source_exists = source_path.exists()
         output_exists = output_path.exists()
 
@@ -586,6 +599,63 @@ def merge_ocr_outputs(
         shutil.move(str(src_path), str(dest))
 
     return merged_path
+
+
+def resolve_ocr_output_path(
+    source_path: str | Path,
+    export_folder: str | Path | None = None,
+    subfolder_name: str = MERGE_SUBFOLDER_NAME,
+) -> Path | None:
+    """Sucht die zugehörige OCR-Ergebnisdatei für eine Quelldatei.
+
+    Prüft folgende Speicherorte der Reihe nach:
+    1. Direkt neben der Quelldatei: <stem>_ocred.pdf
+    2. Im lokalen Archiv-Unterordner: <source_parent>/<subfolder_name>/<stem>_ocred.pdf
+       (inklusive disambiguierter UUID-Varianten: <stem>_ocred_*.pdf)
+    3. Im konfigurierten Exportordner:
+       a) <export_folder>/<subfolder_name>/<stem>_ocred.pdf (oder disambiguiert)
+       b) <export_folder>/<stem>_ocred.pdf
+
+    Returns:
+        Path zur existierenden OCR-Datei oder None.
+    """
+    if not source_path:
+        return None
+    src = Path(source_path)
+    base_name = f"{src.stem}_ocred.pdf"
+
+    # 1. Direkt neben der Quelldatei
+    direct = src.with_name(base_name)
+    if direct.is_file():
+        return direct
+
+    # 2. Im lokalen Archivordner neben der Quelldatei
+    local_sub = src.parent / subfolder_name
+    if local_sub.is_dir():
+        cand = local_sub / base_name
+        if cand.is_file():
+            return cand
+        for match in sorted(local_sub.glob(f"{src.stem}_ocred_*.pdf")):
+            if match.is_file():
+                return match
+
+    # 3. Im konfigurierten Exportordner
+    if export_folder:
+        exp = Path(export_folder)
+        if exp.is_dir():
+            exp_sub = exp / subfolder_name
+            if exp_sub.is_dir():
+                cand = exp_sub / base_name
+                if cand.is_file():
+                    return cand
+                for match in sorted(exp_sub.glob(f"{src.stem}_ocred_*.pdf")):
+                    if match.is_file():
+                        return match
+            exp_direct = exp / base_name
+            if exp_direct.is_file():
+                return exp_direct
+
+    return None
 
 
 def normalize_image_for_ocr(img: Image.Image) -> Image.Image:
@@ -784,7 +854,12 @@ class PDFListWidget(QListWidget):
             batch_id: If set, tags all added items as belonging to this
                 folder-drop batch (U5 automatic merge).
         """
-        for fname in sorted(os.listdir(folder)):
+        try:
+            entries = sorted(os.listdir(folder))
+        except OSError as e:
+            logging.warning("Ordner konnte nicht gelesen werden: %s (%s)", folder, e)
+            return
+        for fname in entries:
             full = os.path.join(folder, fname)
             if os.path.isfile(full):
                 self.add_file(full, batch_id=batch_id)
@@ -1086,10 +1161,17 @@ class OCRConverterGUI(QWidget):
         src_path = item.data(Qt.UserRole)
         if not src_path:
             return
-        ocred_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
-        target = ocred_path if os.path.exists(ocred_path) else src_path
-        if os.path.exists(target):
-            open_file_path(target)
+        stored_output = item.data(Qt.UserRole + 4)
+        if stored_output and os.path.exists(stored_output):
+            open_file_path(stored_output)
+            return
+        resolved = resolve_ocr_output_path(src_path, self.export_folder)
+        if resolved and resolved.exists():
+            item.setData(Qt.UserRole + 4, str(resolved))
+            open_file_path(resolved)
+            return
+        if os.path.exists(src_path):
+            open_file_path(src_path)
 
     def _create_list_context_menu(self, selected_items: list) -> QMenu:
         """Erstellt das barrierefreie Kontextmenü für Listeneinträge (Öffnen, Ordner, Mergen, Löschen)."""
@@ -1099,8 +1181,16 @@ class OCRConverterGUI(QWidget):
 
         first_item = selected_items[0]
         first_path = first_item.data(Qt.UserRole)
-        ocred_path = os.path.splitext(first_path)[0] + "_ocred.pdf" if first_path else ""
-        open_target = ocred_path if (ocred_path and os.path.exists(ocred_path)) else first_path
+        stored_output = first_item.data(Qt.UserRole + 4)
+        if stored_output and os.path.exists(stored_output):
+            open_target = stored_output
+        else:
+            resolved = resolve_ocr_output_path(first_path, self.export_folder) if first_path else None
+            if resolved and resolved.exists():
+                open_target = str(resolved)
+                first_item.setData(Qt.UserRole + 4, open_target)
+            else:
+                open_target = first_path
 
         if open_target and os.path.exists(open_target):
             open_action = QAction(tr("action_open_file"), self)
@@ -1172,9 +1262,17 @@ class OCRConverterGUI(QWidget):
                 QMessageBox.information(self, tr("info_export_title"), tr("info_merge_need_two"))
             return None
 
-        output_paths = [
-            os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf" for it in done_items
-        ]
+        output_paths = []
+        for it in done_items:
+            stored = it.data(Qt.UserRole + 4)
+            if stored and os.path.exists(stored):
+                output_paths.append(stored)
+            else:
+                resolved = resolve_ocr_output_path(it.data(Qt.UserRole), self.export_folder)
+                if resolved and resolved.exists():
+                    output_paths.append(str(resolved))
+                else:
+                    output_paths.append(os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf")
 
         if target_path is None:
             first_source = done_items[0].data(Qt.UserRole)
@@ -1192,6 +1290,10 @@ class OCRConverterGUI(QWidget):
         target = Path(target_path)
         try:
             merged_path = merge_ocr_outputs(output_paths, target.name, target.parent)
+            for it in done_items:
+                resolved = resolve_ocr_output_path(it.data(Qt.UserRole), self.export_folder or target.parent)
+                if resolved:
+                    it.setData(Qt.UserRole + 4, str(resolved))
         except Exception as e:
             QMessageBox.critical(self, tr("error_title"), tr("error_merge_failed", error=e))
             return None
@@ -1227,18 +1329,32 @@ class OCRConverterGUI(QWidget):
             folder = self._batch_folders.get(batch_id)
             if not folder:
                 continue
-            outputs = [
-                os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf" for it in done_items
-            ]
+            outputs = []
+            for it in done_items:
+                stored = it.data(Qt.UserRole + 4)
+                if stored and os.path.exists(stored):
+                    outputs.append(stored)
+                else:
+                    resolved = resolve_ocr_output_path(it.data(Qt.UserRole), self.export_folder or folder)
+                    if resolved and resolved.exists():
+                        outputs.append(str(resolved))
+                    else:
+                        outputs.append(os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf")
+
             # U5-Default: Sammel-PDF landet IM abgelegten Ordner selbst (nicht dessen
             # Elternordner) -- resolve_export_folder ist fuer Datei-Pfade gedacht,
             # `folder` hier ist bereits der Zielordner.
             configured = Path(self.export_folder) if self.export_folder else None
             export_folder = configured if configured and configured.is_dir() else Path(folder)
-            merged_name = f"{os.path.basename(os.path.normpath(folder))}_merged.pdf"
+            base_folder_name = os.path.basename(os.path.normpath(folder)) or "batch"
+            merged_name = f"{base_folder_name}_merged.pdf"
             try:
                 merge_ocr_outputs(outputs, merged_name, export_folder)
                 self._merged_batches.add(batch_id)
+                for it in done_items:
+                    resolved = resolve_ocr_output_path(it.data(Qt.UserRole), export_folder)
+                    if resolved:
+                        it.setData(Qt.UserRole + 4, str(resolved))
                 self.status_label.setText(tr("status_merge_saved", filename=merged_name))
                 self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
             except Exception as e:
@@ -1273,6 +1389,7 @@ class OCRConverterGUI(QWidget):
 
     def _on_file_done(self, path: str, success: bool):
         """Ergebnis einer einzelnen Datei anzeigen mit barrierefreiem Farbkontrast und Tooltip."""
+        dst_path = os.path.splitext(path)[0] + "_ocred.pdf"
         for i in range(self.list_widget.count()):
             item = self.list_widget.item(i)
             if item.data(Qt.UserRole) == path:
@@ -1282,6 +1399,7 @@ class OCRConverterGUI(QWidget):
                     item.setForeground(QColor('#0b6e4f'))
                     item.setData(Qt.UserRole + 1, 'done')
                     item.setData(Qt.UserRole + 2, status_text)
+                    item.setData(Qt.UserRole + 4, dst_path)
                     item.setToolTip(f"{path}\n{status_text}")
                 else:
                     status_text = tr("message_ocr_failed")
@@ -1321,11 +1439,13 @@ class OCRConverterGUI(QWidget):
         entries = []
         for i in range(self.list_widget.count()):
             item = self.list_widget.item(i)
+            output_path = item.data(Qt.UserRole + 4) or ""
             entries.append(
                 {
                     "path": item.data(Qt.UserRole),
                     "status": item.data(Qt.UserRole + 1) or "pending",
                     "message": item.data(Qt.UserRole + 2) or "",
+                    "output_path": output_path,
                 }
             )
         return entries
