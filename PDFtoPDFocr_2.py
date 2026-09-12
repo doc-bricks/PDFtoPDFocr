@@ -803,6 +803,7 @@ class PDFListWidget(QListWidget):
     """
     delete_requested = Signal()
     folder_dropped = Signal(str, str)  # batch_id, folder_path
+    open_requested = Signal(object)  # QListWidgetItem
 
     def __init__(self):
         super().__init__()
@@ -839,9 +840,21 @@ class PDFListWidget(QListWidget):
         e.acceptProposedAction()
 
     def keyPressEvent(self, event):
-        """Supports keyboard removal for selected files (Del and Backspace keys) without changing the compact UI."""
+        """Supports keyboard removal (Del, Backspace), opening (Enter, Return), and deselecting (Escape)."""
         if event.key() in (Qt.Key_Delete, Qt.Key_Backspace) and self.selectedItems():
             self.delete_requested.emit()
+            event.accept()
+            return
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            item = self.currentItem()
+            if item is None and self.selectedItems():
+                item = self.selectedItems()[0]
+            if item is not None:
+                self.open_requested.emit(item)
+                event.accept()
+                return
+        if event.key() == Qt.Key_Escape and self.selectedItems():
+            self.clearSelection()
             event.accept()
             return
         super().keyPressEvent(event)
@@ -923,6 +936,7 @@ class OCRConverterGUI(QWidget):
         ui_lang_layout = QHBoxLayout()
         self.ui_lang_label = QLabel(tr("label_ui_lang"))
         self.ui_lang_combo = QComboBox()
+        self.ui_lang_label.setBuddy(self.ui_lang_combo)
         for code in _UI_LANGUAGES:
             self.ui_lang_combo.addItem(LANGUAGE_NAMES.get(code, code), code)
         cur_lang = get_language()
@@ -956,6 +970,7 @@ class OCRConverterGUI(QWidget):
         lang_layout = QHBoxLayout()
         self.ocr_lang_label = QLabel(tr("label_ocr_lang"))
         self.lang_combo = QComboBox()
+        self.ocr_lang_label.setBuddy(self.lang_combo)
         self.lang_combo.addItems(["deu", "eng", "fra", "spa"])
         lang_layout.addWidget(self.ocr_lang_label)
         lang_layout.addWidget(self.lang_combo)
@@ -1004,7 +1019,20 @@ class OCRConverterGUI(QWidget):
         self.btn_reset_export_folder.clicked.connect(self.on_reset_export_folder)
         self.list_widget.customContextMenuRequested.connect(self._show_list_context_menu)
         self.list_widget.itemDoubleClicked.connect(self._on_item_double_clicked)
+        self.list_widget.itemActivated.connect(self._on_item_double_clicked)
+        self.list_widget.open_requested.connect(self._on_item_double_clicked)
         self.list_widget.folder_dropped.connect(self._register_batch_folder)
+
+        # Tab-Reihenfolge explizit für barrierefreie Tastaturnavigation festlegen (WCAG 2.1 AA)
+        self.setTabOrder(self.ui_lang_combo, self.list_widget)
+        self.setTabOrder(self.list_widget, self.btn_choose_export_folder)
+        self.setTabOrder(self.btn_choose_export_folder, self.btn_reset_export_folder)
+        self.setTabOrder(self.btn_reset_export_folder, self.lang_combo)
+        self.setTabOrder(self.lang_combo, self.btn_add_file)
+        self.setTabOrder(self.btn_add_file, self.btn_start)
+        self.setTabOrder(self.btn_start, self.btn_export)
+        self.setTabOrder(self.btn_export, self.btn_refresh)
+        self.setTabOrder(self.btn_refresh, self.btn_delete)
 
         # Retranslate initialisieren (setzt alle Texte, A11y-Attribute und Tooltips)
         self.retranslate_ui()
@@ -1194,6 +1222,7 @@ class OCRConverterGUI(QWidget):
 
         if open_target and os.path.exists(open_target):
             open_action = QAction(tr("action_open_file"), self)
+            open_action.setShortcut(QKeySequence(Qt.Key_Return))
             open_action.triggered.connect(lambda: open_file_path(open_target))
             menu.addAction(open_action)
 

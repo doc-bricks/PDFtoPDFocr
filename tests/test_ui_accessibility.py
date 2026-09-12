@@ -277,5 +277,70 @@ def test_context_menu_actions_and_shortcuts(tmp_path):
         menu2 = gui._create_list_context_menu(gui.list_widget.selectedItems())
         action_texts2 = [a.text() for a in menu2.actions()]
         assert any("Markierte mergen" in a for a in action_texts2)
+
+        open_action = [a for a in menu.actions() if "Datei öffnen" in a.text()][0]
+        assert open_action.shortcut().toString() in ("Return", "Enter", "Eingabetaste")
     finally:
         gui.close()
+
+
+def test_file_list_keyboard_open_return_and_enter(tmp_path, monkeypatch):
+    """File list opens selected item when Return or Enter is pressed."""
+    _qapp()
+    gui = app.OCRConverterGUI()
+    opened_paths = []
+    monkeypatch.setattr(app, "open_file_path", lambda p: opened_paths.append(str(p)) or True)
+
+    try:
+        f1 = tmp_path / "item1.pdf"
+        f1.write_bytes(b"%PDF-item1\n")
+        gui.list_widget.add_file(str(f1))
+        item = gui.list_widget.item(0)
+        item.setSelected(True)
+        gui.list_widget.setCurrentItem(item)
+
+        # Press Return
+        QTest.keyClick(gui.list_widget, Qt.Key_Return)
+        QApplication.processEvents()
+        assert len(opened_paths) == 1
+        assert opened_paths[-1] == str(f1)
+
+        # Press Numpad Enter
+        QTest.keyClick(gui.list_widget, Qt.Key_Enter)
+        QApplication.processEvents()
+        assert len(opened_paths) == 2
+        assert opened_paths[-1] == str(f1)
+    finally:
+        gui.close()
+
+
+def test_file_list_keyboard_escape_clears_selection(tmp_path):
+    """Pressing Escape in the file list clears the selection for keyboard users."""
+    _qapp()
+    gui = app.OCRConverterGUI()
+    try:
+        f1 = tmp_path / "doc.pdf"
+        f1.write_bytes(b"%PDF-doc\n")
+        gui.list_widget.add_file(str(f1))
+        item = gui.list_widget.item(0)
+        item.setSelected(True)
+        gui.list_widget.setCurrentItem(item)
+        assert len(gui.list_widget.selectedItems()) == 1
+
+        QTest.keyClick(gui.list_widget, Qt.Key_Escape)
+        QApplication.processEvents()
+        assert len(gui.list_widget.selectedItems()) == 0
+    finally:
+        gui.close()
+
+
+def test_ui_label_buddies_and_tab_order():
+    """Form labels have buddies set and tab order is explicitly configured for A11y."""
+    _qapp()
+    gui = app.OCRConverterGUI()
+    try:
+        assert gui.ui_lang_label.buddy() == gui.ui_lang_combo
+        assert gui.ocr_lang_label.buddy() == gui.lang_combo
+    finally:
+        gui.close()
+
