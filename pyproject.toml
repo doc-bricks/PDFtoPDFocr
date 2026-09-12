@@ -38,6 +38,9 @@ Homepage = "https://github.com/doc-bricks/PDFtoPDFocr"
 Repository = "https://github.com/doc-bricks/PDFtoPDFocr.git"
 "Bug Tracker" = "https://github.com/doc-bricks/PDFtoPDFocr/issues"
 Changelog = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/CHANGELOG.md"
+"Third-Party Licenses" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.md"
+"Marketing Log" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/MARKETING-LOG.txt"
+"LLM Ready" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/llms.txt"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

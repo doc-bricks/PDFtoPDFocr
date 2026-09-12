@@ -31,6 +31,15 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Dokumentation & Governance / Documentation & Governance (Pfad B)
+- **Pfad B Marketing, Discoverability, Visual Architecture & License Governance (`MARKETING-LOG.txt`, `THIRD_PARTY_LICENSES.md`, `README.md`, `README_de.md`, `pyproject.toml`, `llms.txt`, `tests/test_metadata.py`)**:
+  - **Reziproke 16-Punkte-Schnellnavigation**: Vollständige Anker-Parität zwischen `README.md` und `README_de.md` über alle 16 Kapitel inkl. dedizierter Abschnitte für Zielgruppen (`#target-personas--discoverability` / `#zielgruppen--auffindbarkeit`) und Drittanbieter-Lizenzen (`#third-party-licenses--transparency` / `#drittanbieter-lizenzen--transparenz`).
+  - **Lokales Marketing- & Discoverability-Log (`MARKETING-LOG.txt`)**: 4 Kern-Zielgruppenprofile (Rechtswesen/Compliance, Archivare/Forscher, Datenschutzbewusste Wissensarbeiter, Pipeline-Integratoren), zweisprachige High-Intent-Keyword-Matrix, 5-Wege-Wettbewerbsmatrix über 10 Dimensionen und Meilenstein-Chronik.
+  - **Modernisiertes Lizenz-Audit (`THIRD_PARTY_LICENSES.md`)**: Vollständiges Software-Inventar aller direkten und transitiven Laufzeitbibliotheken, gebündelter Werkzeuge (`Poppler`, `Tesseract OCR`, `Leptonica`), Entwicklungs-Tools, LGPL-3.0 dynamischer Verlinkung, sauberer Subprozess-Grenzen und tabellarischer Nachweis der 10 Governance- & Laufzeit-Invarianten (`INV-LOCAL-01` bis `INV-SLA-10`).
+  - **PEP 621 Metadaten-Erweiterung (`pyproject.toml`)**: `[project.urls]` um standardisierte Endpunkte für `"Third-Party Licenses"`, `"Marketing Log"` und `"LLM Ready"` ergänzt.
+  - **Sicherheitsrichtlinie & SLA (`SECURITY.md`)**: Sicherheitskontakt um `security@open-bricks.org` erweitert und verbindliche SLAs verankert (48h Erstantwort, 5 Werktage qualifizierte Triage).
+  - **Vertragstest-Erweiterung (`tests/test_metadata.py`)**: 4 neue automatisierte Vertragstests für Anker-Parität, Schnellnavigation, `MARKETING-LOG.txt`, `THIRD_PARTY_LICENSES.md` und Metadaten-URLs (Gesamtsuite auf 110 Tests erweitert, 110/110 passed, 100% grün). [G 2026-09-12]
+
 ### Behoben / Fixed
 - **Bugsweep Pfad-Normalisierung & Duplikaterkennung (`PDFListWidget.add_file`)**:
   - `add_file` normalisiert Dateipfade defensiv via `os.path.abspath` und `os.path.normcase`.

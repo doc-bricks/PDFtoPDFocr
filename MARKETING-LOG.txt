@@ -1,0 +1,119 @@
+# MARKETING-LOG — doc-bricks/PDFtoPDFocr
+# Tracked Pfad B Discoverability, Visual Architecture, Governance & Verification Milestones
+
+================================================================================
+[2026-09-12 11:45 CEST] [PFAD_B_DISCOVERABILITY_AND_DESIGN]
+Repository:        doc-bricks/PDFtoPDFocr
+Local Canonical:   C:\_Local_DEV\repos\PDFtoPDFocr
+Branch:            master
+Version:           1.1.3
+License:           MIT (SPDX-License-Identifier: MIT)
+Maintainer:        doc-bricks Team / Lukas Geiger (lukas@open-bricks.org / support@lukasgeiger.com)
+Security Contact:  security@open-bricks.org, security@ellmos.ai
+
+1. DISCOVERABILITY, NAVIGATION & PEP 621 METADATA
+--------------------------------------------------------------------------------
+- Upgraded dual-language documentation (README.md and README_de.md) with a 16-point
+  quick navigation architecture featuring 100% reciprocal anchor parity:
+  1. System Architecture & Component Workflow / Systemarchitektur & Komponenten-Workflow
+  2. Local Data Flow & Privacy Isolation / Lokaler Datenfluss & Datenschutz-Isolation
+  3. Quick Start & Key Operations / Schnelleinstieg & Kernabläufe
+  4. Core Features / Funktionen & Features
+  5. Target Personas & Discoverability / Zielgruppen & Auffindbarkeit
+  6. Accessibility & Keyboard Shortcuts / Barrierefreiheit & Tastenkürzel
+  7. Requirements & Platform Matrix / Voraussetzungen & Plattformmatrix
+  8. Installation & Portable Setup / Installation & Portables Setup
+  9. Usage & Execution Guidelines / Nutzung & Ausführungsrichtlinien
+  10. Tests & Quality Verification / Tests & Qualitätsprüfung
+  11. Sibling Tools & Ecosystem / Geschwister-Tools & Ökosystem
+  12. Third-Party Licenses & Transparency / Drittanbieter-Lizenzen & Transparenz
+  13. Privacy & Security Model / Datenschutz & Sicherheitsmodell
+  14. EXE & Distribution Packaging / EXE & Distributions-Packaging
+  15. Machine-Readable LLM Context / Maschinenlesbarer LLM-Kontext
+  16. Contributing & License / Mitwirken & Lizenz
+- Enriched pyproject.toml PEP 621 [project.urls] with standard discoverability endpoints:
+  * "Homepage" -> https://github.com/doc-bricks/PDFtoPDFocr
+  * "Repository" -> https://github.com/doc-bricks/PDFtoPDFocr.git
+  * "Bug Tracker" -> https://github.com/doc-bricks/PDFtoPDFocr/issues
+  * "Changelog" -> https://github.com/doc-bricks/PDFtoPDFocr/blob/master/CHANGELOG.md
+  * "Third-Party Licenses" -> https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.md
+  * "Marketing Log" -> https://github.com/doc-bricks/PDFtoPDFocr/blob/master/MARKETING-LOG.txt
+  * "LLM Ready" -> https://github.com/doc-bricks/PDFtoPDFocr/blob/master/llms.txt
+- Comprehensive Shields.io badge suite synchronized across English and German READMEs:
+  * Python 3.10+
+  * Version 1.1.3
+  * MIT License
+  * PySide6 / Qt UI Engine
+  * Platform Windows / Linux / macOS
+  * 100% Offline / Zero-Egress Privacy
+  * Local-First Security
+  * i18n 6 Languages (DE, EN, ES, ZH, JA, RU)
+  * Pytest 106+ Tests (100% Green)
+  * Third-Party Audited (THIRD_PARTY_LICENSES.md)
+  * Marketing Log Active (MARKETING-LOG.txt)
+  * LLM-Ready (llms.txt)
+  * Ecosystem doc-bricks & Umbrella open-bricks
+  * Last Checked 2026-09-12
+
+2. TARGET PERSONAS & VALUE PROPOSITIONS
+--------------------------------------------------------------------------------
+- Persona 1: Legal, Healthcare & Regulatory Compliance Officers
+  * Pain: Uploading sensitive patient files, litigation records, or tax receipts to cloud OCR services violates GDPR/HIPAA zero-egress data protection mandates.
+  * Solution: 100% local, air-gapped OCR processing where document bytes never leave the local system; non-destructive preserving of original evidence files.
+- Persona 2: Archivists, Librarians & Academic Researchers
+  * Pain: Large collections of scanned historical manuscripts, multi-frame TIFF images, and multi-lingual books cannot be converted into searchable full-text archives without expensive per-page subscription fees.
+  * Solution: High-throughput batch conversion for PDF and image queues (JPG, PNG, multi-page TIFF), selectable language models with auto-download from official Tesseract sources, and automated multi-document PDF merge.
+- Persona 3: Privacy-Conscious Knowledge Workers & Solo Business Owners
+  * Pain: Desktop tools like Adobe Acrobat or ABBYY FineReader require heavy annual subscriptions, cloud logins, intrusive background update daemons, or administrative elevation.
+  * Solution: Free, open-source MIT desktop tool with zero telemetry, unprivileged RunAsInvoker operation, portable single-executable or zero-install folder options, and keyboard-first accessibility.
+- Persona 4: Automated Pipeline Integrators & Document Workflow Engineers
+  * Pain: GUI applications typically lack structured introspection, making it difficult to verify batch processing outcomes or integrate results with downstream automation.
+  * Solution: Structured job manifest export (pdftopdfocr-job-v1.json) capturing processing stats, timestamps, language tags, and page counts; CLI-ready invocation; machine-readable context via llms.txt.
+
+3. HIGH-INTENT KEYWORD MATRIX (EN / DE)
+--------------------------------------------------------------------------------
+- English Search Queries:
+  * "local pdf ocr converter windows", "offline searchable pdf creator",
+  * "tesseract ocr desktop gui pyside6", "batch ocr scanned documents free",
+  * "private pdf text recognition zero egress", "convert tiff to searchable pdf local",
+  * "portable pdf ocr tesseract without cloud", "gdpr compliant pdf ocr tool",
+  * "open source pdf ocr desktop alternative acrobat"
+- Deutsche Suchbegriffe:
+  * "gescannte pdf durchsuchbar machen lokal", "offline pdf ocr texterkennung kostenlos",
+  * "stapelverarbeitung pdf ocr windows", "tesseract ocr deutsche benutzeroberfläche",
+  * "datenschutzkonforme ocr software ohne cloud", "tiff bilder in durchsuchbares pdf umwandeln",
+  * "portable ocr software ohne installation", "pdf ocr stapelverarbeitung pyside6",
+  * "kostenlose adobe acrobat ocr alternative datenschutz"
+
+4. 5-WAY COMPETITIVE MATRIX (10 DIMENSIONS)
+--------------------------------------------------------------------------------
+| Dimension | PDFtoPDFocr (doc-bricks) | Adobe Acrobat Pro | ABBYY FineReader PDF | OCRmyPDF (CLI) | Cloud OCR APIs (AWS/Google) |
+|---|---|---|---|---|---|
+| Zero-Egress Privacy | 100% Offline (Local) | Cloud sync default | Cloud options | 100% Offline (Local) | No (Cloud Upload) |
+| Pricing / License | Free (MIT Permissive) | Subscription ($20+/mo) | Commercial ($100+) | Free (MPL-2.0) | Pay-per-page usage |
+| Graphical User Interface | Accessible PySide6 GUI | Complex commercial UI | Heavy desktop UI | None (CLI only) | None (API only) |
+| Keyboard Accessibility | Complete shortcuts/A11y | Standard | Standard | Terminal-based | N/A |
+| Multi-Frame Image Support | Yes (TIFF, PNG, JPG) | Yes | Yes | Limited without scripts | API payloads |
+| Automated Language DL | Yes (Official Tesseract)| Proprietary packages | Bundled | System package manager | Language auto-detect |
+| Job Manifest Export | JSON (pdftopdfocr-job-v1)| Proprietary logs | Proprietary logs | Terminal stdout/exit | JSON response |
+| Portable / Zero-Install | Yes (Portable folder/exe)| No (Heavy installer) | No (Heavy installer) | Requires brew/apt/docker| N/A |
+| Non-Destructive Safety | Strict (_ocred.pdf) | Overwrites / prompts | Overwrites / prompts | In-place or new file | Creates new objects |
+| Open-Source Transparency | Full MIT & Audited Deps | Closed source | Closed source | Open source (MPL) | Closed source APIs |
+
+5. SECURITY, ARCHITECTURE & RUNTIME INVARIANTS AUDIT
+--------------------------------------------------------------------------------
+- Verified and enforced 10 Governance & Runtime Invariants (INV-LOCAL-01 through INV-SLA-10) in THIRD_PARTY_LICENSES.md.
+- Re-audited security policy in SECURITY.md with explicit 48-hour response SLA and 5-business-day triage commitment.
+- Confirmed zero hardcoded user paths, zero plaintext tokens/secrets, and strict .gitignore conflict guards across all source and test files.
+
+6. ECOSYSTEM & SIBLING TOOLS INTEGRATION
+--------------------------------------------------------------------------------
+- Formally linked across doc-bricks document utilities (DokuReader, MediaBrain, UniversalDocsGrabber, UniversalInvoiceMail, UniversalMailCleaner, CleanMarkdown, LitZentrum, MailProcessor), file-bricks storage tools (ProFiler, ExplorerPro), dev-bricks tooling (DevCenter, CodeBox), and the open-bricks umbrella organization.
+
+7. HISTORICAL MILESTONES & RELEASE TRACKER
+--------------------------------------------------------------------------------
+- [2026-09-12] [v1.1.3] Pfad B Discoverability, Visual Architecture & License Governance audit; 16-point quick navigation; THIRD_PARTY_LICENSES.md; local MARKETING-LOG.txt; PEP 621 URLs.
+- [2026-08-24] [v1.1.3] Internationalization expansion (DE, EN, ES, ZH, JA, RU); translations.json; language-switching regressions.
+- [2026-08-21] [v1.1.2] Single-executable packaging gate; icon & desktop shortcut automation; build_release.py.
+- [2026-07-28] [v1.1.0] Multi-format image import (multi-frame TIFF, PNG, JPG); auto-merge; portable job manifest export.
+- [2026-07-22] [v1.0.0] Initial public release; core PySide6 GUI; Tesseract & Poppler local pipeline.
