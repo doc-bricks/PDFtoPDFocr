@@ -11,7 +11,8 @@ BS-4: Transparente RGBA-/LA-/P-Bilder werden auf weißem Hintergrund composited.
 BS-5: 0-Byte .traineddata-Dateien werden erkannt und neu heruntergeladen.
 BS-6: normalize_image_for_ocr behandelt alle Alpha- & Transparenz-Modi (PA sowie tRNS).
 BS-7: add_file normalisiert Pfade und verhindert Duplikate bei Case-/Relativpfad-Varianten.
-BS-8: Nach Stapeln/Mergen finden Doppelklick, Kontextmenü und Manifest die nach 'Einzel-Seiten' verschobenen OCR-Ergebnisse statt der Quelldatei.
+BS-8: Nach Stapeln/Mergen finden Doppelklick, Kontextmenü und Manifest die nach 'Einzeldateien' verschobenen OCR-Ergebnisse statt der Quelldatei.
+BS-9: Archiv-Pfadauflösung mit Glob-Metazeichen, Re-Merge-Idempotenz in merge_ocr_outputs und CLI-/Pfad-Normalisierung mit Anführungszeichen & Whitespace.
 """
 from pathlib import Path
 import py_compile
@@ -332,3 +333,92 @@ def test_bs8_add_folder_handles_oserror_gracefully(tmp_path):
     # Darf nicht abstürzen
     widget.add_folder(str(non_existent), batch_id="test-batch")
     assert widget.count() == 0
+
+
+def test_bs9_resolve_ocr_output_path_escapes_glob_brackets(tmp_path):
+    """BS-9: resolve_ocr_output_path maskiert Glob-Metazeichen wie '[' und ']' in Dateinamen
+    damit archivierte/disambiguierte OCR-Dateien zuverlässig aufgelöst werden."""
+    import PDFtoPDFocr_2 as app
+    from PIL import Image
+
+    sub = tmp_path / app.MERGE_SUBFOLDER_NAME
+    sub.mkdir()
+
+    source = tmp_path / "Scan [2026].pdf"
+    source.write_bytes(b"%PDF-bracket\n")
+
+    archived = sub / "Scan [2026]_ocred_12345678.pdf"
+    Image.new("RGB", (5, 5), "white").save(archived, "PDF")
+
+    resolved = app.resolve_ocr_output_path(source)
+    assert resolved is not None, "resolve_ocr_output_path failed to find disambiguated file with brackets"
+    assert resolved.resolve() == archived.resolve()
+
+
+def test_bs9_merge_ocr_outputs_idempotent_for_already_archived_files(tmp_path):
+    """BS-9: merge_ocr_outputs benennt bereits in 'Einzeldateien' archivierte Dateien nicht mehrfach
+    mit zufälligen UUIDs um, wenn ein erneuter Merge aufgerufen wird."""
+    import pikepdf
+    import PDFtoPDFocr_2 as app
+
+    sub = tmp_path / app.MERGE_SUBFOLDER_NAME
+    sub.mkdir()
+
+    p1 = sub / "doc1_ocred.pdf"
+    p2 = sub / "doc2_ocred.pdf"
+    for p in (p1, p2):
+        pdf = pikepdf.Pdf.new()
+        pdf.add_blank_page()
+        pdf.save(p)
+        pdf.close()
+
+    app.merge_ocr_outputs([str(p1), str(p2)], "merged.pdf", tmp_path)
+    assert p1.exists(), "doc1_ocred.pdf should remain unchanged in subfolder without UUID rename"
+    assert p2.exists(), "doc2_ocred.pdf should remain unchanged in subfolder without UUID rename"
+
+    # Zweiter Aufruf darf keine UUID-Ketten generieren
+    app.merge_ocr_outputs([str(p1), str(p2)], "merged.pdf", tmp_path)
+    assert p1.exists()
+    assert p2.exists()
+    assert len(list(sub.glob("*.pdf"))) == 2
+
+
+def test_bs9_add_paths_from_arguments_handles_quoted_and_spaced_paths(tmp_path):
+    """BS-9: add_paths_from_arguments verarbeitet Pfade mit Anführungszeichen und Whitespace."""
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    gui = app.OCRConverterGUI()
+    try:
+        f1 = tmp_path / "arg1.pdf"
+        f2 = tmp_path / "arg2.pdf"
+        f1.write_bytes(b"%PDF-1\n")
+        f2.write_bytes(b"%PDF-2\n")
+
+        # Quoted and spaced arguments
+        count = gui.add_paths_from_arguments([f'"{f1}"', f"   {f2}   "])
+        assert count == 2
+        assert gui.list_widget.count() == 2
+    finally:
+        gui.close()
+
+
+def test_bs9_add_file_sanitizes_surrounding_whitespace(tmp_path):
+    """BS-9: add_file entfernt führende/nachlaufende Leerzeichen vor os.path.abspath."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    widget = app.PDFListWidget()
+
+    f = tmp_path / "spaced.pdf"
+    f.write_bytes(b"%PDF-spaced\n")
+
+    widget.add_file(f"   {f}   ")
+    assert widget.count() == 1
+    stored = widget.item(0).data(Qt.UserRole)
+    assert Path(stored).resolve() == f.resolve()
+    assert Path(stored).exists()
+

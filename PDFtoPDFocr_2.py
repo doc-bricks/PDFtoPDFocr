@@ -9,6 +9,7 @@ Uses pdf2image + pytesseract + pikepdf (no PyMuPDF required).
 Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
+import glob
 import io
 import json
 import logging
@@ -460,10 +461,16 @@ def build_job_export_payload(
         raw_path = entry.get("path")
         if not raw_path:
             continue
-        source_path = Path(raw_path)
+        cleaned_raw = str(raw_path).strip().strip("\"'")
+        source_path = Path(cleaned_raw)
         configured_output = entry.get("output_path")
-        if configured_output and Path(configured_output).exists():
-            output_path = Path(configured_output)
+        if configured_output:
+            cleaned_output = str(configured_output).strip().strip("\"'")
+            if Path(cleaned_output).exists():
+                output_path = Path(cleaned_output)
+            else:
+                resolved = resolve_ocr_output_path(source_path)
+                output_path = resolved if resolved else source_path.with_name(f"{source_path.stem}_ocred.pdf")
         else:
             resolved = resolve_ocr_output_path(source_path)
             output_path = resolved if resolved else source_path.with_name(f"{source_path.stem}_ocred.pdf")
@@ -589,12 +596,23 @@ def merge_ocr_outputs(
 
     # Einzelseiten erst NACH dem Speichern der Sammel-PDF verschieben, damit ein
     # Fehlschlag beim Merge keine Dateien verwaist zurücklässt.
+    # Bereits in subfolder archivierte Dateien nicht erneut mit UUIDs umbenennen (Idempotenz).
     for p in output_paths:
         src_path = Path(p)
         if not src_path.exists():
             continue
+        try:
+            if src_path.parent.resolve() == subfolder.resolve():
+                continue
+        except OSError:
+            pass
         dest = subfolder / src_path.name
         if dest.exists():
+            try:
+                if src_path.resolve() == dest.resolve():
+                    continue
+            except OSError:
+                pass
             dest = subfolder / f"{src_path.stem}_{uuid.uuid4().hex[:8]}{src_path.suffix}"
         shutil.move(str(src_path), str(dest))
 
@@ -623,6 +641,7 @@ def resolve_ocr_output_path(
         return None
     src = Path(source_path)
     base_name = f"{src.stem}_ocred.pdf"
+    escaped_stem = glob.escape(src.stem)
 
     # 1. Direkt neben der Quelldatei
     direct = src.with_name(base_name)
@@ -635,7 +654,7 @@ def resolve_ocr_output_path(
         cand = local_sub / base_name
         if cand.is_file():
             return cand
-        for match in sorted(local_sub.glob(f"{src.stem}_ocred_*.pdf")):
+        for match in sorted(local_sub.glob(f"{escaped_stem}_ocred_*.pdf")):
             if match.is_file():
                 return match
 
@@ -648,7 +667,7 @@ def resolve_ocr_output_path(
                 cand = exp_sub / base_name
                 if cand.is_file():
                     return cand
-                for match in sorted(exp_sub.glob(f"{src.stem}_ocred_*.pdf")):
+                for match in sorted(exp_sub.glob(f"{escaped_stem}_ocred_*.pdf")):
                     if match.is_file():
                         return match
             exp_direct = exp / base_name
@@ -886,9 +905,9 @@ class PDFListWidget(QListWidget):
         """
         if not filepath:
             return
-        raw = str(filepath).strip("\"'")
+        raw = str(filepath).strip().strip("\"'")
         try:
-            canonical_path = os.path.abspath(os.path.expanduser(raw))
+            canonical_path = os.path.abspath(os.path.expandvars(os.path.expanduser(raw)))
         except (OSError, ValueError):
             return
 
@@ -900,7 +919,8 @@ class PDFListWidget(QListWidget):
             existing = self.item(idx).data(Qt.UserRole)
             if existing:
                 try:
-                    if os.path.normcase(os.path.abspath(os.path.expanduser(str(existing)))) == norm_key:
+                    cleaned_existing = str(existing).strip().strip("\"'")
+                    if os.path.normcase(os.path.abspath(os.path.expandvars(os.path.expanduser(cleaned_existing)))) == norm_key:
                         return
                 except (OSError, ValueError):
                     if existing == canonical_path:
@@ -1129,8 +1149,11 @@ class OCRConverterGUI(QWidget):
         for raw in paths or []:
             if not raw or str(raw).startswith("-"):
                 continue
+            cleaned = str(raw).strip().strip("\"'")
+            if not cleaned or cleaned.startswith("-"):
+                continue
             try:
-                path = os.path.abspath(os.path.expanduser(str(raw)))
+                path = os.path.abspath(os.path.expandvars(os.path.expanduser(cleaned)))
             except (OSError, ValueError):
                 continue
             candidates = []
