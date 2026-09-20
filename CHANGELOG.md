@@ -3,6 +3,17 @@
 Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [1.1.4] - 2026-09-20
+
+### Geändert / Changed
+- **Technische Hygiene & CI-Workflow Härtung (Pfad A)**:
+  - **CI-Workflow Timeout- & Concurrency-Härtung**: `.github/workflows/tests.yml` und `.github/workflows/source-platform-smoke.yml` mit `timeout-minutes: 15`, `permissions: contents: read` und `concurrency` (Gruppe `${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: true`) gegen Endlosschleifen und Runner-Verschwendung gehärtet.
+  - **Automatisierte Issue- & PR-Lebenszyklus-Steuerung**: `.github/workflows/stale.yml` mit `actions/stale@v9`, `timeout-minutes: 10`, täglichem Cron (01:30 UTC) und Least-Privilege-Berechtigungen (`issues: write`, `pull-requests: write`) bereitgestellt.
+  - **Multi-Host Cloud-Sync- & Kanonisches Lock-System Schutz (.gitignore)**: Umfassend gegen OneDrive-Konfliktkopien (`* (kopie)*`, `* (copy)*`, `*conflicted copy*`, `*-WORKSTATION*`, `*-ASUS*`, `*-LAPTOP*`), kanonische Multi-Agent-Sperren (`LOCK`, `LOCK.*`, `LOCK*.txt`, `LOCK.permissions.json`, `*.lock`, `uv.lock`, `!package-lock.json`) und Test-Artefakte (`.coverage*`, `htmlcov/`, `*.orig`, `*.rej`) gehärtet.
+  - **PEP 621 Standard-Metadaten & Pytest-Härtung (`pyproject.toml`)**: `license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]` ergänzt; `minversion = "7.0"` und synchronisierte `norecursedirs` verankert.
+  - **Versionsharmonisierung auf 1.1.4**: Einheitliche Versionierung über `pyproject.toml` (1.1.4), `PDFtoPDFocr_2.py` (1.1.4), `store_package.json` (1.1.4.0), `WINDOWS_STORE_PREP.md`, `SECURITY.md`, `build_exe.bat`, `MARKETING-LOG.txt`, `README.md`, `README_de.md` und `llms.txt`.
+  - **Automatisierte Vertragstest-Erweiterung (`tests/test_metadata.py`)**: 4 neue Contract-Tests für CI-Timeouts, Stale-Workflow, Gitignore-Multi-Host-Schutz und Manifest-Parität hinzugefügt (Gesamtsuite auf 121 Tests erweitert, 121/121 passed, 100% grün). [G 2026-09-20]
+
 ## [1.0.5] - 2026-08-23
 
 ### Fixed

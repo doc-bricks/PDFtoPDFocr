@@ -6,7 +6,7 @@ set "PYTHONIOENCODING=utf-8"
 set "PROJECT_NAME=PDFtoPDFocr"
 set "PROJECT_ROOT=%CD%"
 set "SPEC_FILE=%PROJECT_ROOT%\PDFtoPDFocr.spec"
-set "BUILD_ROOT=C:\_Local_DEV\BUILDS\%PROJECT_NAME%\1.1.3"
+set "BUILD_ROOT=C:\_Local_DEV\BUILDS\%PROJECT_NAME%\1.1.4"
 set "DIST_DIR=%PROJECT_ROOT%\dist"
 
 echo [INFO] Starte Build fuer %PROJECT_NAME%...

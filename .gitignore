@@ -56,7 +56,7 @@ tmpclaude-*
 .claude/
 store_package/
 
-# Secrets / local config
+# Kanonisches Lock-System & Secrets
 .env
 .env.*
 credentials.json
@@ -64,13 +64,34 @@ client_secret*.json
 token.json
 *.pem
 *.key
+LOCK
+LOCK.*
 LOCK*.txt
+LOCK.permissions.json
+*.lock
+uv.lock
+!package-lock.json
 
-# Sync & Conflict Artifacts
+# Multi-Host Sync & Conflict Artifacts
+* (kopie)*
+* (Kopie)*
+* (copy)*
+* (Copy)*
+*conflicted copy*
+*-WORKSTATION*
 *-WORKSTATION-LG*
+*-ASUS*
 *-ASUS-GEI*
+*-LAPTOP*
+*-Mac Studio*
 *.conflict
 *.sync-conflict-*
+
+# Test, Coverage & Patch Caches
+.coverage*
+htmlcov/
+*.orig
+*.rej
 
 # ---- Interne Steuerungsdateien ----
 DECISIONS.md

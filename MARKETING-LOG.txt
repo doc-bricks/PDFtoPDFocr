@@ -112,8 +112,24 @@ Security Contact:  security@open-bricks.org, security@ellmos.ai
 
 7. HISTORICAL MILESTONES & RELEASE TRACKER
 --------------------------------------------------------------------------------
+- [2026-09-20] [v1.1.4] Pfad A Technical Hygiene, CI workflow timeout & concurrency hardening, stale automation, multi-host lock defense & test contract expansion.
 - [2026-09-12] [v1.1.3] Pfad B Discoverability, Visual Architecture & License Governance audit; 16-point quick navigation; THIRD_PARTY_LICENSES.md; local MARKETING-LOG.txt; PEP 621 URLs.
 - [2026-08-24] [v1.1.3] Internationalization expansion (DE, EN, ES, ZH, JA, RU); translations.json; language-switching regressions.
 - [2026-08-21] [v1.1.2] Single-executable packaging gate; icon & desktop shortcut automation; build_release.py.
 - [2026-07-28] [v1.1.0] Multi-format image import (multi-frame TIFF, PNG, JPG); auto-merge; portable job manifest export.
 - [2026-07-22] [v1.0.0] Initial public release; core PySide6 GUI; Tesseract & Poppler local pipeline.
+
+8. TECHNICAL HYGIENE, CI MATRIX & MULTI-HOST HARDENING AUDIT (PFAD A)
+--------------------------------------------------------------------------------
+- CI-Workflow Timeout & Concurrency Hardening:
+  * .github/workflows/tests.yml: concurrency group cancel-in-progress, timeout-minutes: 15, permissions: contents: read.
+  * .github/workflows/source-platform-smoke.yml: concurrency group cancel-in-progress, timeout-minutes: 15, permissions: contents: read.
+- Automated Issue & PR Lifecycle Automation:
+  * .github/workflows/stale.yml: actions/stale@v9, daily schedule 01:30 UTC, timeout-minutes: 10, least-privilege permissions (issues: write, pull-requests: write).
+- Multi-Host Cloud-Sync & Canonical Lock-System Defense:
+  * .gitignore updated with comprehensive multi-host conflict patterns (* (kopie)*, * (copy)*, *conflicted copy*, *-WORKSTATION*, *-ASUS*, *-LAPTOP*, *-Mac Studio*).
+  * Lock-system protections (LOCK, LOCK.*, LOCK*.txt, LOCK.permissions.json, *.lock, uv.lock, !package-lock.json).
+- PEP 621 Standard Manifest & Pytest Hygiene:
+  * pyproject.toml: license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"], version 1.1.4.
+  * pytest config: minversion = "7.0", norecursedirs aligned.
+- Synchronized Release Parity across manifests, documentation, and test contracts (121/121 tests 100% green).

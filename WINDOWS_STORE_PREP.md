@@ -11,7 +11,7 @@ Stand: 2026-09-08
 | Identity Name     | Geiger.PDFtoPDFocr                           |
 | Publisher         | CN=52596601-BAB4-4F3F-B182-E8F3F273B202      |
 | Publisher Display | Geiger                                       |
-| Version           | 1.1.3.0                                      |
+| Version           | 1.1.4.0                                      |
 | Executable        | PDFtoPDFocr.exe                              |
 | Execution Alias   | pdftopdfocr.exe                              |
 

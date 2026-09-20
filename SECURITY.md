@@ -16,7 +16,7 @@ PDFtoPDFocr ist als lokales, datenschutzorientiertes Desktop-Werkzeug zur OCR-Te
 
 | Version | Status |
 | --- | --- |
-| Aktueller `master` (1.1.3) | Unterstützt (Security Fixes & Updates) |
+| Aktueller `master` (1.1.4) | Unterstützt (Security Fixes & Updates) |
 
 ### Sicherheitslücken melden
 
@@ -46,7 +46,7 @@ PDFtoPDFocr is designed as a local-first, privacy-focused desktop application fo
 
 | Version | Status |
 | --- | --- |
-| Current `master` (1.1.3) | Supported (Security Fixes & Updates) |
+| Current `master` (1.1.4) | Supported (Security Fixes & Updates) |
 
 ### Reporting a Vulnerability
 
