@@ -42,6 +42,16 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Marketing, Discoverability & Visual Architecture (Pfad B) - 2026-09-21
+- **18-Punkte-Schnellnavigation mit reziproken HTML-Ankern**: `README.md` und `README_de.md` auf 18 standardisierte Abschnitte mit beidseitig auflösbaren HTML-Ankern (`<a id="..."></a>`) erweitert.
+- **Dual Mermaid-Diagramme**: Modernisiertes 5-Schichten-Systemarchitektur-Diagramm (`flowchart TD`) und asynchroner Verarbeitungslebenszyklus (`sequenceDiagram` mit `autonumber` und 0 Semikolons).
+- **Zielgruppen & SEO-Suchbegriffe**: 4 detaillierte Nutzer-Personas (`[PERSONA-01]` bis `[PERSONA-04]`) und zweisprachige High-Intent-Suchbegriffe für lokale OCR-Szenarien.
+- **10-Dimensionen-Vergleichsmatrix**: Detaillierte Gegenüberstellung vs. 5 Alternativen (Adobe Acrobat Pro, ABBYY FineReader, OCRmyPDF CLI, Smallpdf / Cloud SaaS), gemappt auf die 10 Invarianten `INV-LOCAL-01` bis `INV-SLA-10`.
+- **Gesetzlicher Haftungsausschluss (§ 521 BGB)**: Schenkungsrechtlicher Haftungsausschluss für unentgeltliche Open-Source-Software in `README.md` und `README_de.md` verankert.
+- **Level 1 SBOM & Lizenz-Governance (`THIRD_PARTY_LICENSES.md`)**: Invariant Cross-Reference Matrix Tabelle, unprivilegierte RunAsInvoker-Zertifizierung und Zero-Copyleft-GPL-Isolationsnachweis (Poppler Subprozess-Grenze, PySide6 LGPL-3.0 dynamische Verlinkung).
+- **Lokales Marketing-Log (`MARKETING-LOG.txt`)**: Stand 2026-09-21 für Pfad B Turnus mit vollständiger Audit-Dokumentation.
+- **Metadaten- & Vertragstests (`tests/test_metadata.py`)**: Testsuite erweitert zur Absicherung der 18 Navigationsanker, HTML-Anker-Tags, Mermaid-Diagramme, Vergleichsmatrix, Personas und BGB-Hinweise (100% grün). [G 2026-09-21]
+
 ### Dokumentation & Governance / Documentation & Governance (Pfad B)
 - **Pfad B Marketing, Discoverability, Visual Architecture & License Governance (`MARKETING-LOG.txt`, `THIRD_PARTY_LICENSES.md`, `README.md`, `README_de.md`, `pyproject.toml`, `llms.txt`, `tests/test_metadata.py`)**:
   - **Reziproke 16-Punkte-Schnellnavigation**: Vollständige Anker-Parität zwischen `README.md` und `README_de.md` über alle 16 Kapitel inkl. dedizierter Abschnitte für Zielgruppen (`#target-personas--discoverability` / `#zielgruppen--auffindbarkeit`) und Drittanbieter-Lizenzen (`#third-party-licenses--transparency` / `#drittanbieter-lizenzen--transparenz`).

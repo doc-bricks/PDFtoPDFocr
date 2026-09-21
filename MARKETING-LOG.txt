@@ -2,6 +2,120 @@
 # Tracked Pfad B Discoverability, Visual Architecture, Governance & Verification Milestones
 
 ================================================================================
+[2026-09-21 15:00 CEST] [PFAD_B_DISCOVERABILITY_AND_DESIGN]
+Repository:        doc-bricks/PDFtoPDFocr
+Local Canonical:   C:\_Local_DEV\repos\PDFtoPDFocr
+Branch:            master
+Version:           1.1.4 (Strictly Frozen - No Version Bump per T-20260920-167562623)
+License:           MIT (SPDX-License-Identifier: MIT)
+Maintainer:        doc-bricks Team / Lukas Geiger (lukas@open-bricks.org / support@lukasgeiger.com)
+Security Contact:  security@open-bricks.org, security@ellmos.ai
+
+1. 18-POINT BILINGUAL NAVIGATION & RECIPROCAL ANCHORS
+--------------------------------------------------------------------------------
+- Upgraded dual-language documentation (README.md and README_de.md) from 16 to 18 points:
+  1. Visual Showcase & Interface Overview / Visuelle Showcase-Galerie & Benutzeroberfläche
+     (HTML anchors: #visual-showcase / #visuelle-showcase-galerie)
+  2. System Architecture & 5-Layer Topology / Systemarchitektur & 5-Schichten-Topologie
+     (HTML anchors: #system-architecture--component-workflow / #systemarchitektur--komponenten-workflow)
+  3. Local Data Flow & Document OCR Processing Lifecycle / Lokaler Datenfluss & Dokument-OCR-Verarbeitungslebenszyklus
+     (HTML anchors: #local-data-flow--privacy-isolation / #lokaler-datenfluss--datenschutz-isolation)
+  4. Quick Start & Key Operations / Schnelleinstieg & Kernabläufe
+     (HTML anchors: #quick-start--key-operations / #schnelleinstieg--kernabläufe)
+  5. Core Features & Performance Capabilities / Funktionen & Leistungsmerkmale
+     (HTML anchors: #core-features / #funktionen--features)
+  6. Target Personas & High-Intent Search Intent / Zielgruppen & Auffindbarkeit
+     (HTML anchors: #target-personas--discoverability / #zielgruppen--auffindbarkeit)
+  7. 10-Dimension Comparative Matrix vs. 5 Alternatives / 10-Dimensionen-Vergleichsmatrix vs. 5 Alternativen
+     (HTML anchors: #comparative-matrix--alternatives / #vergleichsmatrix--alternativen)
+  8. Accessibility, WCAG Ergonomics & Keyboard Shortcuts / Barrierefreiheit, WCAG-Ergonomie & Tastenkürzel
+     (HTML anchors: #accessibility--keyboard-shortcuts / #barrierefreiheit--tastenkürzel)
+  9. Requirements & Platform Matrix / Voraussetzungen & Plattformmatrix
+     (HTML anchors: #requirements--platform-matrix / #voraussetzungen--plattformmatrix)
+  10. Installation & Portable Setup / Installation & Portables Setup
+     (HTML anchors: #installation--portable-setup / #installation--portables-setup)
+  11. Usage & Execution Guidelines / Nutzung & Ausführungsrichtlinien
+     (HTML anchors: #usage--execution-guidelines / #nutzung--ausführungsrichtlinien)
+  12. Automated Testing & Quality Verification / Automatisierte Tests & Qualitätsprüfung
+     (HTML anchors: #tests--quality-verification / #tests--qualitätsprüfung)
+  13. Sibling Tools & Ecosystem Integration / Geschwister-Tools & Ökosystem-Integration
+     (HTML anchors: #sibling-tools--ecosystem / #geschwister-tools--ökosystem)
+  14. Level 1 SBOM & Third-Party Licenses Transparency / Level 1 SBOM & Drittanbieter-Lizenzen-Transparenz
+     (HTML anchors: #third-party-licenses--transparency / #drittanbieter-lizenzen--transparenz)
+  15. Privacy & Security Model (Invariants INV-LOCAL-01..INV-SLA-10) / Datenschutz- & Sicherheitsmodell
+     (HTML anchors: #privacy--security-model / #datenschutz--sicherheitsmodell)
+  16. EXE & Distribution Packaging (Windows Store MSIX & Portable) / EXE & Distributions-Packaging
+     (HTML anchors: #exe--distribution-packaging / #exe--distributions-packaging)
+  17. Machine-Readable LLM Context (llms.txt) / Maschinenlesbarer LLM-Kontext (llms.txt)
+     (HTML anchors: #machine-readable-llm-context / #maschinenlesbarer-llm-kontext)
+  18. Statutory Notice (§ 521 BGB) & License / Gesetzlicher Hinweis (§ 521 BGB) & Lizenz
+     (HTML anchors: #statutory-notice--license / #contributing--license / #gesetzlicher-hinweis--lizenz / #mitwirken--lizenz)
+- Full reciprocal HTML anchor parity across English and German documents.
+
+2. DUAL MERMAID DIAGRAMS (5-LAYER TOPOLOGY & ZERO-SEMICOLON LIFECYCLE)
+--------------------------------------------------------------------------------
+- Diagram 1 (System Topology): Modernized 5-layer flowchart TD:
+  * Layer 1: User Interface & Ingestion (PySide6, PDFListWidget, translations.json, WCAG AA A11y)
+  * Layer 2: Async Orchestration & Dispatcher (Task Dispatcher, QThread Worker, Safe Lease Guard, Job Manifest Generator)
+  * Layer 3: Core OCR & Transformation Pipeline (pdf2image Poppler Rasterizer, Image Normalizer, Tesseract OCR Engine, pikepdf Output Assembler)
+  * Layer 4: Local Storage & Security Boundary (Local Filesystem, Non-Destructive Preserver, Security & Invariants Engine)
+  * Layer 5: Packaging & Distribution Artifacts (PyInstaller Bundle Engine, Windows Store MSIX Bridge)
+- Diagram 2 (Lifecycle Sequence): Full asynchronous document processing sequenceDiagram with autonumber and 0 semicolons:
+  * Ingestion -> Asynchronous Dispatch -> Per-Document Page Rasterization / Normalization -> Tesseract Text Extraction -> pikepdf Searchable Assembly -> Non-Destructive File Save -> Optional Portable Manifest Export.
+
+3. TARGET PERSONAS & HIGH-INTENT KEYWORD MATRIX (EN / DE)
+--------------------------------------------------------------------------------
+- [PERSONA-01] Legal, Healthcare & Regulatory Compliance Officers:
+  * Zero-egress local processing under GDPR/HIPAA without cloud leaks; unprivileged user mode; non-destructive preservation of original evidence files.
+- [PERSONA-02] Archivists, Historians & Academic Researchers:
+  * Unlimited local batch conversion for PDFs and raw image queues (JPG, PNG, multi-page TIFF); automated language model downloads; auto-merge.
+- [PERSONA-03] Privacy-Conscious Knowledge Workers & Desktop Enthusiasts:
+  * Lightweight MIT desktop tool without subscriptions, logins, or intrusive background daemons; portable zero-install option; keyboard-first ergonomics.
+- [PERSONA-04] Automated Pipeline Integrators & Document Workflow Engineers:
+  * Deterministic job manifest export (pdftopdfocr-job-v1.json); fail-closed error handling; machine-readable llms.txt context.
+- High-Intent SEO Search Queries:
+  * EN: "local pdf ocr converter windows 10 11", "tesseract ocr batch desktop gui python pyside6", "offline searchable pdf creator zero egress gdpr", "convert scanned tiff to searchable pdf desktop free", "portable pdf ocr tesseract without cloud"
+  * DE: "gescannte pdf durchsuchbar machen lokal kostenlos", "offline pdf ocr texterkennung windows tesseract", "datenschutzkonforme ocr software ohne cloud dsgvo", "tiff mehrseitig in durchsuchbare pdf umwandeln", "portable ocr software ohne installation windows"
+
+4. 10-DIMENSION COMPARATIVE MATRIX VS. 5 ALTERNATIVES
+--------------------------------------------------------------------------------
+| Evaluation Dimension | Governance Invariant | PDFtoPDFocr (doc-bricks) | Adobe Acrobat Pro | ABBYY FineReader PDF | OCRmyPDF (CLI) | Cloud SaaS (Smallpdf/iLovePDF) |
+|---|---|:---:|:---:|:---:|:---:|:---:|
+| Zero-Egress Privacy | INV-LOCAL-01 | 100% Offline (Local) | Cloud sync default | Cloud options | 100% Offline (Local) | No (Cloud Upload Mandatory) |
+| Privilege Non-Elevation | INV-UNPRIV-02 | Standard User Mode | Admin daemon / Services | Admin daemon / Services | Depends on host/Docker | Remote Cloud Host |
+| Non-Destructive Safety | INV-NONDEST-03 | Strict _ocred.pdf | Overwrites / Prompts | Overwrites / Prompts | In-place or new file | Creates cloud object |
+| Process & Copyleft Isolation | INV-ISOLATION-04 | Subprocess Boundary | Closed-source proprietary | Closed-source proprietary | MPL-2.0 / Subprocesses | Closed SaaS backend |
+| Memory Boundedness | INV-BOUNDED-05 | Bounded Page Stream | Heavy background cache | Heavy background cache | Large PDF memory spikes | Server-side allocation |
+| Portability / Zero-Install | INV-PORTABLE-06 | Portable folder / exe | Heavy system installer | Heavy system installer | Requires package manager | Browser client |
+| Verifiable Job Manifests | INV-MANIFEST-07 | pdftopdfocr-job-v1.json | Proprietary app logs | Proprietary app logs | Terminal stdout/stderr | JSON REST response |
+| Screen-Reader & Keyboard A11y | INV-A11Y-08 | Full WCAG AA & Hotkeys | Standard accessibility | Standard accessibility | CLI terminal a11y only | Web UI varies |
+| Fail-Closed Error Trapping | INV-FAILCLOSED-09 | Per-Page Error Skip | Modal dialog interruptions | Modal dialog interruptions | CLI non-zero exit code | HTTP 5xx error responses |
+| Security Response SLA | INV-SLA-10 | 48h Response / 5d Triage | Standard enterprise | Standard enterprise | Best-effort GitHub | Ticket queue |
+
+5. STATUTORY NOTICE PURSUANT TO § 521 BGB (GEFÄLLIGKEITSRECHT)
+--------------------------------------------------------------------------------
+- Incorporated German statutory disclaimer for gratuitous open-source software provision (§ 521 BGB) into both README.md and README_de.md.
+- Limits liability to intent and gross negligence; preserves standard MIT open-source warranty exclusion.
+
+6. LEVEL 1 SBOM & INVARIANT CROSS-REFERENCE MATRIX AUDIT
+--------------------------------------------------------------------------------
+- Audit Date updated to 2026-09-21 in THIRD_PARTY_LICENSES.md.
+- Added Invariant Cross-Reference & Verification Matrix mapping all 10 invariants (INV-LOCAL-01 through INV-SLA-10) to implementation files, test files, and verification status.
+- Added formal Unprivileged RunAsInvoker Non-Elevation Certification and Subprocess Boundary & Copyleft Isolation Guarantee.
+
+7. METADATA & CONTRACT TEST EXPANSION
+--------------------------------------------------------------------------------
+- Updated tests/test_metadata.py with assertions verifying:
+  * 18-point quick navigation and reciprocal anchor parity across both READMEs
+  * Reciprocal HTML anchor tags (<a id="..."></a>) for all 18 sections
+  * Dual Mermaid diagrams syntax (flowchart TD + sequenceDiagram with autonumber)
+  * Target personas ([PERSONA-01] to [PERSONA-04]) and high-intent query contracts
+  * 10-dimension comparative matrix and 10 governance invariants in READMEs and MARKETING-LOG.txt
+  * § 521 BGB statutory limitation notice in both READMEs
+  * Level 1 SBOM and Invariant Cross-Reference table in THIRD_PARTY_LICENSES.md
+- Test suite passing 100% green.
+
+================================================================================
 [2026-09-12 11:45 CEST] [PFAD_B_DISCOVERABILITY_AND_DESIGN]
 Repository:        doc-bricks/PDFtoPDFocr
 Local Canonical:   C:\_Local_DEV\repos\PDFtoPDFocr

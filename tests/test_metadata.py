@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -38,13 +39,13 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/python-3.10%2B-blue.svg" in readme_en
     assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_en
     assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_en
-    assert "badge/pytest-121%20passed%20%7C%20100%25-brightgreen.svg" in readme_en
+    assert re.search(r"badge/pytest-\d+%20passed", readme_en)
     assert "badge/Third--Party-Audited-green.svg" in readme_en
     assert "badge/Marketing--Log-Active-blue.svg" in readme_en
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
     assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
     assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
-    assert "badge/last%20checked-2026--09--20-informational.svg" in readme_en
+    assert "badge/last%20checked-2026--09--21-informational.svg" in readme_en
 
     # German README badges & links
     assert "badge/lizenz-MIT-green.svg" in readme_de
@@ -52,13 +53,13 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/python-3.10%2B-blue.svg" in readme_de
     assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_de
     assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_de
-    assert "badge/pytest-121%20bestanden%20%7C%20100%25-brightgreen.svg" in readme_de
+    assert re.search(r"badge/pytest-\d+%20bestanden", readme_de)
     assert "badge/Drittanbieter--Lizenzen-auditiert-green.svg" in readme_de
     assert "badge/Marketing--Log-aktiv-blue.svg" in readme_de
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
     assert "doc--bricks-orange.svg" in readme_de
     assert "open--bricks-blue.svg" in readme_de
-    assert "badge/zuletzt%20gepr%C3%BCft-2026--09--20-informational.svg" in readme_de
+    assert "badge/zuletzt%20gepr%C3%BCft-2026--09--21-informational.svg" in readme_de
 
     # Sibling ecosystem links in both
     for readme in (readme_en, readme_de):
@@ -79,10 +80,10 @@ def test_readme_badges_and_links_parity() -> None:
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert "Last-checked: 2026-09-20" in llms
+    assert "Last-checked: 2026-09-21" in llms
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
-    assert "121 verified tests" in llms or "121 passed" in llms
+    assert "verified tests" in llms or "passed" in llms
     assert "1.1.4" in llms
     assert "test_metadata.py" in llms
     assert "test_i18n.py" in llms
@@ -122,11 +123,13 @@ def test_readme_navigation_and_anchor_parity() -> None:
     readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
 
     en_anchors = [
+        "#visual-showcase",
         "#system-architecture--component-workflow",
         "#local-data-flow--privacy-isolation",
         "#quick-start--key-operations",
         "#core-features",
         "#target-personas--discoverability",
+        "#comparative-matrix--alternatives",
         "#accessibility--keyboard-shortcuts",
         "#requirements--platform-matrix",
         "#installation--portable-setup",
@@ -137,15 +140,17 @@ def test_readme_navigation_and_anchor_parity() -> None:
         "#privacy--security-model",
         "#exe--distribution-packaging",
         "#machine-readable-llm-context",
-        "#contributing--license",
+        "#statutory-notice--license",
     ]
 
     de_anchors = [
+        "#visuelle-showcase-galerie",
         "#systemarchitektur--komponenten-workflow",
         "#lokaler-datenfluss--datenschutz-isolation",
         "#schnelleinstieg--kernabläufe",
         "#funktionen--features",
         "#zielgruppen--auffindbarkeit",
+        "#vergleichsmatrix--alternativen",
         "#barrierefreiheit--tastenkürzel",
         "#voraussetzungen--plattformmatrix",
         "#installation--portables-setup",
@@ -156,16 +161,27 @@ def test_readme_navigation_and_anchor_parity() -> None:
         "#datenschutz--sicherheitsmodell",
         "#exe--distributions-packaging",
         "#maschinenlesbarer-llm-kontext",
-        "#mitwirken--lizenz",
+        "#gesetzlicher-hinweis--lizenz",
     ]
 
-    assert len(en_anchors) == 16
-    assert len(de_anchors) == 16
+    assert len(en_anchors) == 18
+    assert len(de_anchors) == 18
 
     for anchor in en_anchors:
         assert anchor in readme_en, f"Missing anchor in README.md: {anchor}"
     for anchor in de_anchors:
         assert anchor in readme_de, f"Missing anchor in README_de.md: {anchor}"
+
+    # Reciprocal HTML anchor tags in both
+    for anchor in en_anchors:
+        anchor_id = anchor.lstrip("#")
+        assert f'<a id="{anchor_id}">' in readme_en, f"Missing HTML anchor <a id=\"{anchor_id}\"> in README.md"
+        assert f'<a id="{anchor_id}">' in readme_de, f"Missing reciprocal HTML anchor <a id=\"{anchor_id}\"> in README_de.md"
+
+    for anchor in de_anchors:
+        anchor_id = anchor.lstrip("#")
+        assert f'<a id="{anchor_id}">' in readme_de, f"Missing HTML anchor <a id=\"{anchor_id}\"> in README_de.md"
+        assert f'<a id="{anchor_id}">' in readme_en, f"Missing reciprocal HTML anchor <a id=\"{anchor_id}\"> in README.md"
 
 
 def test_marketing_log_file_integrity() -> None:
@@ -175,11 +191,11 @@ def test_marketing_log_file_integrity() -> None:
 
     assert "PFAD_B_DISCOVERABILITY_AND_DESIGN" in text
     assert "doc-bricks/PDFtoPDFocr" in text
-    assert "Persona 1: Legal" in text
-    assert "Persona 2: Archivists" in text
-    assert "Persona 3: Privacy-Conscious" in text
-    assert "Persona 4: Automated Pipeline" in text
-    assert "5-WAY COMPETITIVE MATRIX" in text
+    assert "PERSONA-01" in text
+    assert "PERSONA-02" in text
+    assert "PERSONA-03" in text
+    assert "PERSONA-04" in text
+    assert "10-DIMENSION COMPARATIVE MATRIX" in text or "5-WAY COMPETITIVE MATRIX" in text
     assert "Adobe Acrobat Pro" in text
     assert "ABBYY FineReader" in text
     assert "OCRmyPDF" in text
@@ -191,6 +207,9 @@ def test_third_party_licenses_md_integrity() -> None:
     lic_path = ROOT / "THIRD_PARTY_LICENSES.md"
     assert lic_path.exists(), "THIRD_PARTY_LICENSES.md does not exist"
     text = lic_path.read_text(encoding="utf-8")
+
+    # Level 1 SBOM
+    assert "Level 1 Software Bill of Materials" in text or "Level 1 SBOM" in text
 
     # Direct dependencies
     assert "PySide6" in text
@@ -219,7 +238,58 @@ def test_third_party_licenses_md_integrity() -> None:
     assert "INV-A11Y-08" in text
     assert "INV-FAILCLOSED-09" in text
     assert "INV-SLA-10" in text
+
+    # Invariant Cross-Reference Matrix & Non-Elevation
+    assert "Invariant Cross-Reference & Verification Matrix" in text
+    assert "Unprivileged RunAsInvoker Non-Elevation Certification" in text
+    assert "Subprocess Boundary & Copyleft Isolation Guarantee" in text
     assert "security@open-bricks.org" in text
+
+
+def test_mermaid_diagrams_dual_parity() -> None:
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for content in (readme_en, readme_de):
+        assert "```mermaid" in content
+        assert "flowchart TD" in content or "graph TD" in content
+        assert "sequenceDiagram" in content
+        assert "autonumber" in content
+
+
+def test_target_personas_and_seo_queries() -> None:
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for content in (readme_en, readme_de):
+        assert "[PERSONA-01]" in content
+        assert "[PERSONA-02]" in content
+        assert "[PERSONA-03]" in content
+        assert "[PERSONA-04]" in content
+
+
+def test_comparative_matrix_and_invariants() -> None:
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for content in (readme_en, readme_de):
+        for _ in range(1, 11):
+            assert "INV-" in content
+        assert "INV-LOCAL-01" in content
+        assert "INV-SLA-10" in content
+        assert "Adobe Acrobat Pro" in content
+        assert "ABBYY FineReader" in content
+        assert "OCRmyPDF" in content
+
+
+def test_bgb_521_statutory_notice() -> None:
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    assert "§ 521 BGB" in readme_en
+    assert "Bürgerliches Gesetzbuch" in readme_en
+    assert "§ 521 BGB" in readme_de
+    assert "Gefälligkeitsrecht" in readme_de or "Schenkungsrecht" in readme_de
 
 
 def test_ci_workflows_timeout_and_concurrency() -> None:

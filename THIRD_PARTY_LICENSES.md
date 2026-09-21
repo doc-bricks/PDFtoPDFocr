@@ -4,8 +4,9 @@
 **Organization:** [doc-bricks](https://github.com/doc-bricks)  
 **Umbrella Ecosystem:** [open-bricks](https://github.com/open-bricks)  
 **Author / Maintainer:** doc-bricks Team / Lukas Geiger (`lukas@open-bricks.org`)  
-**Audit Date:** 2026-09-12  
-**License Compliance Status:** VERIFIED (100% Permissive / OSI-Approved & Copyleft Boundary Isolated)
+**Audit Date:** 2026-09-21  
+**License Compliance Status:** VERIFIED (100% Permissive / OSI-Approved & Copyleft Boundary Isolated)  
+**SBOM Level:** Level 1 Software Bill of Materials (Direct, Transitive & Bundled Binaries)
 
 ---
 
@@ -16,7 +17,7 @@
 All third-party runtime libraries, engines, and development dependencies have been audited for licensing compliance:
 - **Zero AGPL / SSPL Contamination:** No dependencies utilize network copyleft or restrictive commercial dual-licensing.
 - **Dynamic Linking LGPL-3.0 Compliance:** `PySide6` (Qt for Python) is dynamically linked in accordance with Section 4 of the LGPLv3; user-replaceable shared libraries are supported.
-- **Strict Subprocess Boundary for External Tools:** External engines (`Poppler` utilities like `pdftoppm` and `pdfinfo`) are invoked exclusively via isolated operating system subprocesses with bounded arguments and sanitization, preserving strict process boundaries without linking GPL code into the application codebase.
+- **Strict Subprocess Boundary for External Tools:** External engines (`Poppler` utilities like `pdftoppm` and `pdfinfo`) are invoked exclusively via isolated operating system subprocesses with bounded arguments and sanitization, preserving strict process boundaries without linking GPL code into the application codebase (`INV-ISOLATION-04`).
 - **Permissive Core Runtime:** `pytesseract` (Apache-2.0), `Pillow` (HPND permissive), `pdf2image` (MIT), `pikepdf` (MPL-2.0), and `requests` (Apache-2.0) are fully compatible with the primary **MIT License**.
 
 ---
@@ -67,7 +68,7 @@ Development, static analysis, linting, packaging, and contract test suites use t
 
 | Tool | Minimum Version | License | Purpose / Registry |
 |------|-----------------|---------|--------------------|
-| `pytest` | `>=9.1.1` | MIT | Test runner for 106+ unit, regression, accessibility, and metadata contract tests |
+| `pytest` | `>=9.1.1` | MIT | Test runner for 120+ unit, regression, accessibility, and metadata contract tests |
 | `ruff` | `>=0.1.0` | MIT / Apache-2.0 | High-performance Python linter and code formatting validation |
 | `setuptools` | `>=61.0` | MIT | PEP 517 / PEP 518 standard build backend |
 | `PyInstaller` | `>=6.0.0` | GPL-2.0 with exception | Standalone Windows desktop executable packager (runtime exception allows MIT licensing) |
@@ -93,9 +94,44 @@ Development, static analysis, linting, packaging, and contract test suites use t
 
 ---
 
-## 7. Contact & Security Inquiries
+## 7. Invariant Cross-Reference & Verification Matrix
+
+| Invariant | Code Implementation & Enforcement | Verification Test File | Status |
+|---|---|---|:---:|
+| `INV-LOCAL-01` | `PDFtoPDFocr_2.py` (Local pipeline, zero outbound telemetry) | `tests/test_security_license_contract.py` | VERIFIED |
+| `INV-UNPRIV-02` | `PDFtoPDFocr.spec` (`as_invoker` execution level in PE manifest) | `tests/test_platform_package_gate.py` | VERIFIED |
+| `INV-NONDEST-03` | `PDFtoPDFocr_2.py` (Appends `_ocred.pdf`, verifies target separation) | `tests/test_bug_regressions.py` | VERIFIED |
+| `INV-ISOLATION-04` | Subprocess invocations via `pytesseract` & `pdf2image` | `tests/test_tesseract_config.py` | VERIFIED |
+| `INV-BOUNDED-05` | `OCRThread` (QThread worker with cancellation flag) | `tests/test_bug_regressions.py` | VERIFIED |
+| `INV-PORTABLE-06` | Relative path resolution for `tesseract_portable/` & `poppler/` | `tests/test_tesseract_config.py` | VERIFIED |
+| `INV-MANIFEST-07` | `PDFtoPDFocr_2.py` (`export_job_manifest`) | `tests/test_export_format.py` | VERIFIED |
+| `INV-A11Y-08` | `setAccessibleName`, `setAccessibleDescription`, keyboard hotkeys | `tests/test_ui_accessibility.py` | VERIFIED |
+| `INV-FAILCLOSED-09` | Exception traps per page/document with error badge update | `tests/test_bug_regressions.py` | VERIFIED |
+| `INV-SLA-10` | Formal response SLA policy in `SECURITY.md` | `tests/test_metadata.py` | VERIFIED |
+
+---
+
+## 8. Unprivileged RunAsInvoker Non-Elevation Certification
+
+`PDFtoPDFocr` is explicitly designed and certified for unprivileged desktop operation:
+- **No Administrator Rights:** The application never requests `requireAdministrator` or `highestAvailable` elevation privileges.
+- **Windows UAC Manifest:** The build configuration (`PDFtoPDFocr.spec` and `store_package.json`) enforces standard user execution level (`asInvoker`).
+- **File System Sandboxing:** Temporary files are written strictly to user-scoped directories (`%TEMP%` or application-local portable cache) without mutating system folders (`C:\Windows`, `C:\Program Files`).
+- **Registry Non-Pollution:** No global registry keys or system-level services are installed.
+
+---
+
+## 9. Subprocess Boundary & Copyleft Isolation Guarantee
+
+External tools licensed under copyleft regimes (specifically Poppler under GPL-2.0 or later) are strictly decoupled:
+- **No Shared Memory or Dynamic Linking:** The Python application does not link against Poppler C++ shared libraries (`.dll` / `.so`).
+- **Process-Level Isolation:** `pdf2image` invokes `pdftoppm.exe` or `pdfinfo.exe` as independent OS subprocesses via standard pipes.
+- **LGPL Compliance for Qt:** `PySide6` is dynamically linked according to LGPL-3.0 Section 4, ensuring users retain the right and ability to replace the underlying Qt shared libraries.
+
+---
+
+## 10. Contact & Security Inquiries
 
 For questions regarding third-party licensing, compliance auditing, or vulnerability disclosures, contact:
 - **Security Team:** `security@open-bricks.org` / `security@ellmos.ai`
 - **Lead Maintainer:** Lukas Geiger (`lukas@open-bricks.org` / `support@lukasgeiger.com`)
-- **Security Policy:** [`SECURITY.md`](SECURITY.md)
