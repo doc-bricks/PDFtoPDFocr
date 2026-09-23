@@ -452,6 +452,7 @@ def build_job_export_payload(
     file_entries: list[dict],
     ocr_language: str,
     created_at: str | None = None,
+    export_folder: str | Path | None = None,
 ) -> dict:
     """Builds the portable OCR job manifest without embedding PDF content."""
     input_files = []
@@ -469,10 +470,10 @@ def build_job_export_payload(
             if Path(cleaned_output).exists():
                 output_path = Path(cleaned_output)
             else:
-                resolved = resolve_ocr_output_path(source_path)
+                resolved = resolve_ocr_output_path(source_path, export_folder=export_folder)
                 output_path = resolved if resolved else source_path.with_name(f"{source_path.stem}_ocred.pdf")
         else:
-            resolved = resolve_ocr_output_path(source_path)
+            resolved = resolve_ocr_output_path(source_path, export_folder=export_folder)
             output_path = resolved if resolved else source_path.with_name(f"{source_path.stem}_ocred.pdf")
         source_exists = source_path.exists()
         output_exists = output_path.exists()
@@ -480,7 +481,7 @@ def build_job_export_payload(
         input_files.append(
             {
                 "name": source_path.name,
-                "local_path": _manifest_path(raw_path),
+                "local_path": _manifest_path(cleaned_raw),
                 "size_bytes": source_path.stat().st_size if source_exists else None,
                 "missing": not source_exists,
             }
@@ -488,7 +489,7 @@ def build_job_export_payload(
         outputs.append(
             {
                 "input_name": source_path.name,
-                "input_local_path": _manifest_path(raw_path),
+                "input_local_path": _manifest_path(cleaned_raw),
                 "output_name": output_path.name,
                 "status": _export_status(entry.get("status", "pending")),
                 "message": entry.get("message", ""),
@@ -639,7 +640,10 @@ def resolve_ocr_output_path(
     """
     if not source_path:
         return None
-    src = Path(source_path)
+    cleaned = str(source_path).strip().strip("\"'")
+    if not cleaned:
+        return None
+    src = Path(cleaned)
     base_name = f"{src.stem}_ocred.pdf"
     escaped_stem = glob.escape(src.stem)
 
@@ -652,24 +656,27 @@ def resolve_ocr_output_path(
     local_sub = src.parent / subfolder_name
     if local_sub.is_dir():
         cand = local_sub / base_name
+        matches = [m for m in local_sub.glob(f"{escaped_stem}_ocred_*.pdf") if m.is_file()]
         if cand.is_file():
-            return cand
-        for match in sorted(local_sub.glob(f"{escaped_stem}_ocred_*.pdf")):
-            if match.is_file():
-                return match
+            matches.append(cand)
+        if matches:
+            matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+            return matches[0]
 
     # 3. Im konfigurierten Exportordner
     if export_folder:
-        exp = Path(export_folder)
-        if exp.is_dir():
+        cleaned_exp = str(export_folder).strip().strip("\"'")
+        exp = Path(cleaned_exp) if cleaned_exp else None
+        if exp and exp.is_dir():
             exp_sub = exp / subfolder_name
             if exp_sub.is_dir():
                 cand = exp_sub / base_name
+                matches = [m for m in exp_sub.glob(f"{escaped_stem}_ocred_*.pdf") if m.is_file()]
                 if cand.is_file():
-                    return cand
-                for match in sorted(exp_sub.glob(f"{escaped_stem}_ocred_*.pdf")):
-                    if match.is_file():
-                        return match
+                    matches.append(cand)
+                if matches:
+                    matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                    return matches[0]
             exp_direct = exp / base_name
             if exp_direct.is_file():
                 return exp_direct
@@ -1156,19 +1163,15 @@ class OCRConverterGUI(QWidget):
                 path = os.path.abspath(os.path.expandvars(os.path.expanduser(cleaned)))
             except (OSError, ValueError):
                 continue
-            candidates = []
             if os.path.isdir(path):
-                try:
-                    candidates = [os.path.join(path, e) for e in sorted(os.listdir(path))]
-                except OSError:
-                    continue
-            elif os.path.isfile(path):
-                candidates = [path]
-            for candidate in candidates:
-                if not os.path.isfile(candidate):
-                    continue
+                batch_id = str(uuid.uuid4())
                 before = self.list_widget.count()
-                self.list_widget.add_file(candidate)
+                self.list_widget.add_folder(path, batch_id=batch_id)
+                self._register_batch_folder(batch_id, path)
+                added += self.list_widget.count() - before
+            elif os.path.isfile(path):
+                before = self.list_widget.count()
+                self.list_widget.add_file(path)
                 added += self.list_widget.count() - before
         return added
 
@@ -1343,7 +1346,9 @@ class OCRConverterGUI(QWidget):
         try:
             merged_path = merge_ocr_outputs(output_paths, target.name, target.parent)
             for it in done_items:
-                resolved = resolve_ocr_output_path(it.data(Qt.UserRole), self.export_folder or target.parent)
+                resolved = resolve_ocr_output_path(it.data(Qt.UserRole), target.parent)
+                if not resolved and self.export_folder:
+                    resolved = resolve_ocr_output_path(it.data(Qt.UserRole), self.export_folder)
                 if resolved:
                     it.setData(Qt.UserRole + 4, str(resolved))
         except Exception as e:
@@ -1512,7 +1517,12 @@ class OCRConverterGUI(QWidget):
         del checked
         entries = self._collect_job_entries()
         if target_path is None:
-            default_dir = Path(entries[0]["path"]).parent if entries else Path.cwd()
+            if self.export_folder and Path(self.export_folder).is_dir():
+                default_dir = Path(self.export_folder)
+            elif entries:
+                default_dir = Path(entries[0]["path"]).parent
+            else:
+                default_dir = Path.cwd()
             default_name = default_dir / f"{EXPORT_SCHEMA}.json"
             chosen_path, _ = QFileDialog.getSaveFileName(
                 self,
@@ -1524,7 +1534,11 @@ class OCRConverterGUI(QWidget):
                 return None
             target_path = chosen_path
 
-        payload = build_job_export_payload(entries, self.lang_combo.currentText())
+        payload = build_job_export_payload(
+            entries,
+            self.lang_combo.currentText(),
+            export_folder=self.export_folder,
+        )
         written_path = write_job_export(target_path, payload)
         self.status_label.setText(tr("status_export_saved", filename=written_path.name))
         self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")

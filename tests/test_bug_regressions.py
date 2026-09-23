@@ -13,6 +13,7 @@ BS-6: normalize_image_for_ocr behandelt alle Alpha- & Transparenz-Modi (PA sowie
 BS-7: add_file normalisiert Pfade und verhindert Duplikate bei Case-/Relativpfad-Varianten.
 BS-8: Nach Stapeln/Mergen finden Doppelklick, Kontextmenü und Manifest die nach 'Einzeldateien' verschobenen OCR-Ergebnisse statt der Quelldatei.
 BS-9: Archiv-Pfadauflösung mit Glob-Metazeichen, Re-Merge-Idempotenz in merge_ocr_outputs und CLI-/Pfad-Normalisierung mit Anführungszeichen & Whitespace.
+BS-10: export_job_manifest und build_job_export_payload berücksichtigen konfigurierten Exportordner, merge_selected aktualisiert Zielpfade relativ zum gewählten Ausgabeordner und add_paths_from_arguments registriert Ordner-Batches.
 """
 from pathlib import Path
 import py_compile
@@ -421,4 +422,134 @@ def test_bs9_add_file_sanitizes_surrounding_whitespace(tmp_path):
     stored = widget.item(0).data(Qt.UserRole)
     assert Path(stored).resolve() == f.resolve()
     assert Path(stored).exists()
+
+
+def test_bs10_build_job_export_payload_and_manifest_respect_custom_export_folder(tmp_path):
+    """BS-10: build_job_export_payload und export_job_manifest finden OCR-Ergebnisse im konfigurierten Exportordner."""
+    import json
+    from PIL import Image
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+
+    src_dir = tmp_path / "inputs"
+    src_dir.mkdir()
+    source_file = src_dir / "document.pdf"
+    source_file.write_bytes(b"%PDF-source\n")
+
+    exp_dir = tmp_path / "custom_exports"
+    archived_dir = exp_dir / app.MERGE_SUBFOLDER_NAME
+    archived_dir.mkdir(parents=True)
+    archived_ocr = archived_dir / "document_ocred.pdf"
+    Image.new("RGB", (5, 5), "white").save(archived_ocr, "PDF")
+
+    # 1. Payload-Funktion direkt mit export_folder testen
+    payload = app.build_job_export_payload(
+        [{"path": str(source_file), "status": "done"}],
+        "deu",
+        export_folder=exp_dir,
+    )
+    assert len(payload["outputs"]) == 1
+    output_entry = payload["outputs"][0]
+    assert output_entry["output_exists"] is True
+    assert output_entry["output_local_path"] == archived_ocr.as_posix()
+
+    # 2. GUI export_job_manifest mit konfiguriertem export_folder testen
+    gui = app.OCRConverterGUI()
+    try:
+        gui.export_folder = str(exp_dir)
+        gui.list_widget.add_file(str(source_file))
+        item = gui.list_widget.item(0)
+        item.setData(Qt.UserRole + 1, "done")
+        item.setData(Qt.UserRole + 2, "OCR erfolgreich")
+
+        target_json = tmp_path / "manifest.json"
+        written = gui.export_job_manifest(target_path=target_json, show_feedback=False)
+        assert written == target_json
+        manifest_data = json.loads(target_json.read_text(encoding="utf-8"))
+        gui_output = manifest_data["outputs"][0]
+        assert gui_output["output_exists"] is True
+        assert gui_output["output_local_path"] == archived_ocr.as_posix()
+    finally:
+        gui.close()
+
+
+def test_bs10_merge_selected_updates_output_path_with_custom_target_folder(tmp_path):
+    """BS-10: merge_selected aktualisiert UserRole+4 auch dann auf den Archivpfad, wenn
+    der Benutzer einen anderen Zielordner als gui.export_folder wählt.
+    """
+    from PIL import Image
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    gui = app.OCRConverterGUI()
+    try:
+        gui.export_folder = str(tmp_path / "configured_export_dir")
+        (tmp_path / "configured_export_dir").mkdir()
+
+        # Quelldateien und OCR-Ergebnisse im Eingabeordner
+        in_dir = tmp_path / "incoming"
+        in_dir.mkdir()
+        for name in ("part1.pdf", "part2.pdf"):
+            src = in_dir / name
+            src.write_bytes(b"%PDF-doc\n")
+            out = in_dir / f"{src.stem}_ocred.pdf"
+            Image.new("RGB", (5, 5), "white").save(out, "PDF")
+            gui.list_widget.add_file(str(src))
+            item = gui.list_widget.item(gui.list_widget.count() - 1)
+            item.setData(Qt.UserRole + 1, "done")
+            item.setSelected(True)
+
+        # Merge in einen abweichenden benutzerdefinierten Ordner
+        custom_target_dir = tmp_path / "user_chosen_folder"
+        custom_target_dir.mkdir()
+        target_merged = custom_target_dir / "collective.pdf"
+
+        result = gui.merge_selected(target_path=target_merged)
+        assert result == target_merged
+        assert target_merged.exists()
+
+        # Beide Items müssen auf die in custom_target_dir/Einzeldateien verschobenen Dateien verweisen
+        expected_subfolder = custom_target_dir / app.MERGE_SUBFOLDER_NAME
+        for i in range(2):
+            stored = gui.list_widget.item(i).data(Qt.UserRole + 4)
+            assert stored is not None
+            stored_path = Path(stored)
+            assert stored_path.exists(), f"Stored path {stored_path} does not exist"
+            assert stored_path.parent.resolve() == expected_subfolder.resolve()
+    finally:
+        gui.close()
+
+
+def test_bs10_add_paths_from_arguments_tags_folder_batch(tmp_path):
+    """BS-10: add_paths_from_arguments weist beim Hinzufügen von Ordnern batch_ids zu
+    und registriert den Batch-Ordner für automatischen U5-Merge.
+    """
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QApplication
+    import PDFtoPDFocr_2 as app
+
+    _ = QApplication.instance() or QApplication([])
+    gui = app.OCRConverterGUI()
+    try:
+        batch_dir = tmp_path / "folder_batch"
+        batch_dir.mkdir()
+        (batch_dir / "doc1.pdf").write_bytes(b"%PDF-1\n")
+        (batch_dir / "doc2.pdf").write_bytes(b"%PDF-2\n")
+
+        added = gui.add_paths_from_arguments([str(batch_dir)])
+        assert added == 2
+        assert gui.list_widget.count() == 2
+
+        batch_id1 = gui.list_widget.item(0).data(Qt.UserRole + 3)
+        batch_id2 = gui.list_widget.item(1).data(Qt.UserRole + 3)
+        assert batch_id1 is not None and batch_id1 != ""
+        assert batch_id1 == batch_id2
+        assert gui._batch_folders.get(batch_id1) == str(batch_dir)
+    finally:
+        gui.close()
 
