@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]
 authors = [
-    { name = "doc-bricks Team" }
+    { name = "doc-bricks Team", email = "support@lukasgeiger.com" }
 ]
 keywords = ["pdf", "ocr", "tesseract", "searchable-pdf", "pyside6", "poppler", "desktop", "local-first"]
 classifiers = [
@@ -32,6 +32,17 @@ dependencies = [
     "pdf2image>=1.17.0",
     "pikepdf>=8.15.1",
     "requests>=2.33.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.9.0",
+]
+build = [
+    "pyinstaller>=6.10.0",
+    "altgraph>=0.17.4",
+    "packaging>=24.0",
 ]
 
 [project.urls]

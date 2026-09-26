@@ -22,8 +22,8 @@ PDFtoPDFocr ist als lokales, datenschutzorientiertes Desktop-Werkzeug zur OCR-Te
 
 Wenn Sie eine Sicherheitslücke oder ein Datenschutzproblem finden, melden Sie dies bitte verantwortungsvoll und vertraulich:
 
-1. **GitHub Private Vulnerability Reporting**: Navigieren Sie zu `Security` -> `Advisories` -> `Report a vulnerability`.
-2. **Direkte Sicherheits-E-Mail**: Schreiben Sie vertraulich an [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai) oder [support@lukasgeiger.com](mailto:support@lukasgeiger.com) mit dem Betreff `[SECURITY] PDFtoPDFocr Vulnerability Report`.
+1. **GitHub Private Vulnerability Reporting**: Nutzen Sie direkt das vertrauliche GitHub-Sicherheitsformular unter [https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new](https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new) oder navigieren Sie zu `Security` -> `Advisories` -> `Report a vulnerability`.
+2. **Direkte Sicherheits-E-Mail**: Schreiben Sie vertraulich an [security@doc-bricks.org](mailto:security@doc-bricks.org), [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai), [support@lukasgeiger.com](mailto:support@lukasgeiger.com) oder [lukas@open-bricks.org](mailto:lukas@open-bricks.org) mit dem Betreff `[SECURITY] PDFtoPDFocr Vulnerability Report`.
 3. **Reaktions- & Triage-SLA**: Wir bestätigen den Eingang innerhalb von **48 Stunden** und stellen eine qualifizierte Triage-Bewertung innerhalb von **5 Werktagen** bereit.
 4. Beschreiben Sie Reproduktionsschritte, betroffene Plattformen/Versionen und das Bedrohungsszenario.
 5. Bitte veröffentlichen Sie keine technischen Details in öffentlichen GitHub-Issues, bis eine Behebung bereitsteht.
@@ -52,8 +52,8 @@ PDFtoPDFocr is designed as a local-first, privacy-focused desktop application fo
 
 If you discover a potential vulnerability or security issue, please report it responsibly and confidentially:
 
-1. **GitHub Private Vulnerability Reporting**: Go to `Security` -> `Advisories` -> `Report a vulnerability`.
-2. **Direct Security Email**: Send details confidentially to [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai) or [support@lukasgeiger.com](mailto:support@lukasgeiger.com) with subject `[SECURITY] PDFtoPDFocr Vulnerability Report`.
+1. **GitHub Private Vulnerability Reporting**: Use the confidential GitHub advisory form directly at [https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new](https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new) or navigate to `Security` -> `Advisories` -> `Report a vulnerability`.
+2. **Direct Security Email**: Send details confidentially to [security@doc-bricks.org](mailto:security@doc-bricks.org), [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai), [support@lukasgeiger.com](mailto:support@lukasgeiger.com) or [lukas@open-bricks.org](mailto:lukas@open-bricks.org) with subject `[SECURITY] PDFtoPDFocr Vulnerability Report`.
 3. **Response & Triage SLA**: We acknowledge receipt within **48 hours** and provide an initial qualified triage determination within **5 business days**.
 4. Include clear reproduction steps, affected environment/version, and an impact assessment.
 5. Please do not publish exploit details in public issues before a patch is available.

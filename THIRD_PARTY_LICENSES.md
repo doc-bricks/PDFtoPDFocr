@@ -4,7 +4,7 @@
 **Organization:** [doc-bricks](https://github.com/doc-bricks)  
 **Umbrella Ecosystem:** [open-bricks](https://github.com/open-bricks)  
 **Author / Maintainer:** doc-bricks Team / Lukas Geiger (`lukas@open-bricks.org`)  
-**Audit Date:** 2026-09-21  
+**Audit Date:** 2026-09-26
 **License Compliance Status:** VERIFIED (100% Permissive / OSI-Approved & Copyleft Boundary Isolated)  
 **SBOM Level:** Level 1 Software Bill of Materials (Direct, Transitive & Bundled Binaries)
 

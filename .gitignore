@@ -62,8 +62,14 @@ store_package/
 credentials.json
 client_secret*.json
 token.json
+secrets.*
+keyring/
 *.pem
 *.key
+*.pfx
+*.p12
+*.cer
+*.crt
 LOCK
 LOCK.*
 LOCK*.txt
@@ -86,10 +92,14 @@ uv.lock
 *-Mac Studio*
 *.conflict
 *.sync-conflict-*
+*-conflict-*
+*-CONFLIT-*
 
 # Test, Coverage & Patch Caches
 .coverage*
 htmlcov/
+pytest_out.txt
+pytest*.txt
 *.orig
 *.rej
 

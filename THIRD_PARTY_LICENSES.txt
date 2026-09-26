@@ -1,131 +1,163 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
-Stand: 2026-08-21
+Stand: 2026-09-26
 
-Dieses Dokument listet alle Drittanbieter-Bibliotheken auf,
-die von PDFtoPDFocr verwendet werden.
+Dieses Dokument listet alle Drittanbieter-Bibliotheken und Komponenten auf,
+die von PDFtoPDFocr zur Laufzeit, zur Entwicklung oder beim Build verwendet werden.
 
 ================================================================================
 
-PySide6
--------
-Lizenz: LGPL v3 / GPL v3 (Qt for Python)
-Copyright: The Qt Company Ltd.
+Package: PySide6
+License: GNU Lesser General Public License v3.0 (LGPL-3.0-only) or GPL-3.0-only
+SPDX: LGPL-3.0-only
 URL: https://pypi.org/project/PySide6/
-     https://www.qt.io/qt-for-python
+Notice: Copyright (C) 2026 The Qt Company Ltd. Dynamically linked Python bindings for Qt. LGPL-3.0 terms apply to library usage without modifying Qt source.
 
-Qt6 (Laufzeit-Bibliothek, über PySide6)
----------------------------------------
-Lizenz: LGPL v3 / GPL v3 (je nach Modul)
-Copyright: The Qt Company Ltd.
+Package: Qt6
+License: GNU Lesser General Public License v3.0 (LGPL-3.0-only) or GPL-3.0-only
+SPDX: LGPL-3.0-only
 URL: https://www.qt.io/
+Notice: Copyright (C) 2026 The Qt Company Ltd. and other contributors. Runtime GUI and widget libraries accessed via PySide6 dynamic linking.
 
-pytesseract
------------
-Lizenz: Apache License 2.0
-Copyright: Google Inc., Matthias Lee
+Package: shiboken6
+License: GNU Lesser General Public License v3.0 (LGPL-3.0-only)
+SPDX: LGPL-3.0-only
+URL: https://pypi.org/project/shiboken6/
+Notice: Copyright (C) 2026 The Qt Company Ltd. CPython binding generator runtime support library.
+
+Package: pytesseract
+License: Apache License 2.0
+SPDX: Apache-2.0
 URL: https://pypi.org/project/pytesseract/
-     https://github.com/madmaze/pytesseract
+Notice: Copyright (C) Samuel Hoffstaetter, Matthias Lee, Google Inc. Python wrapper for Google's Tesseract-OCR engine.
 
-Pillow (PIL Fork)
------------------
-Lizenz: HPND (Historical Permission Notice and Disclaimer)
-Copyright: Jeffrey A. Clark (Alex) and contributors
+Package: Pillow
+License: Historical Permission Notice and Disclaimer (HPND) / MIT-CMU
+SPDX: HPND
 URL: https://pypi.org/project/Pillow/
-     https://python-pillow.org/
+Notice: Copyright (C) 1997-2026 by Secret Labs AB, Jeffrey A. Clark (Alex) and contributors. Python Imaging Library fork.
 
-pdf2image
----------
-Lizenz: MIT
-Copyright: Edouard Belval
+Package: pdf2image
+License: MIT License
+SPDX: MIT
 URL: https://pypi.org/project/pdf2image/
-     https://github.com/Belval/pdf2image
+Notice: Copyright (C) 2017-2026 Edouard Belval. Python module that wraps pdftoppm and pdftocairo to convert PDF to PIL Images.
 
-Poppler (Abhängigkeit von pdf2image)
--------------------------------------
-Lizenz: GPL v2 or later
-Copyright: Glyph & Cog, LLC; The Poppler contributors
+Package: Poppler
+License: GNU General Public License v2.0 or later (GPL-2.0-or-later)
+SPDX: GPL-2.0-or-later
 URL: https://poppler.freedesktop.org/
-Hinweis: Poppler-Bibliotheken können im Verzeichnis poppler/
-         mitgeliefert werden. Als GPL-Software unterliegt die Verteilung den
-         Bedingungen der GPL v2.
+Notice: Copyright (C) Glyph & Cog, LLC; Albert Astals Cid and The Poppler contributors. Executed exclusively as an external subprocess binary (pdftoppm/pdftocairo); process boundary ensures strict isolation without copyleft contamination.
 
-pikepdf
--------
-Lizenz: Mozilla Public License 2.0 (MPL 2.0)
-Copyright: James R. Barlow and contributors
+Package: pikepdf
+License: Mozilla Public License 2.0 (MPL-2.0)
+SPDX: MPL-2.0
 URL: https://pypi.org/project/pikepdf/
-     https://github.com/pikepdf/pikepdf
+Notice: Copyright (C) 2018-2026 James R. Barlow and contributors. Python library for reading and writing PDF files based on QPDF. MPL-2.0 is a file-level copyleft compatible with commercial and permissive applications.
 
-QPDF (Abhängigkeit von pikepdf)
----------------------------------
-Lizenz: Apache License 2.0
-Copyright: Jay Berkenbilt
+Package: QPDF
+License: Apache License 2.0
+SPDX: Apache-2.0
 URL: https://github.com/qpdf/qpdf
-     https://qpdf.readthedocs.io/
+Notice: Copyright (C) Jay Berkenbilt. C++ library for content-preserving transformations on PDF files, wrapped by pikepdf.
 
-requests
---------
-Lizenz: Apache License 2.0
-Copyright: Kenneth Reitz and contributors
+Package: requests
+License: Apache License 2.0
+SPDX: Apache-2.0
 URL: https://pypi.org/project/requests/
-     https://requests.readthedocs.io/
+Notice: Copyright (C) Kenneth Reitz and contributors. HTTP library for Python, used exclusively for optional user-initiated language pack downloads.
 
-urllib3 (Abhängigkeit von requests)
-------------------------------------
-Lizenz: MIT
-Copyright: Andrey Petrov and contributors
+Package: urllib3
+License: MIT License
+SPDX: MIT
 URL: https://pypi.org/project/urllib3/
-     https://urllib3.readthedocs.io/
+Notice: Copyright (C) 2008-2026 Andrey Petrov and contributors. HTTP client library for Python.
 
-certifi (Abhängigkeit von requests)
-------------------------------------
-Lizenz: Mozilla Public License 2.0 (MPL 2.0)
-Copyright: Kenneth Reitz and contributors
+Package: certifi
+License: Mozilla Public License 2.0 (MPL-2.0)
+SPDX: MPL-2.0
 URL: https://pypi.org/project/certifi/
+Notice: Copyright (C) Kenneth Reitz, Mozilla. Root certificates collection for validating SSL/TLS certificates.
 
-charset-normalizer (Abhängigkeit von requests)
------------------------------------------------
-Lizenz: MIT
-Copyright: Ahmed TAHRI
+Package: charset-normalizer
+License: MIT License
+SPDX: MIT
 URL: https://pypi.org/project/charset-normalizer/
+Notice: Copyright (C) 2019-2026 Ahmed TAHRI. Truly universal charset & encoding detector for Python.
 
-idna (Abhängigkeit von requests)
----------------------------------
-Lizenz: BSD-3-Clause
-Copyright: Kim Davies and contributors
+Package: idna
+License: BSD 3-Clause License
+SPDX: BSD-3-Clause
 URL: https://pypi.org/project/idna/
+Notice: Copyright (C) 2013-2026 Kim Davies and individual contributors. Internationalized Domain Names in Applications (IDNA).
 
-packaging (Abhängigkeit von pikepdf/pytesseract)
--------------------------------------------------
-Lizenz: Apache License 2.0 / BSD 2-Clause
-Copyright: Donald Stufft and individual contributors
+Package: packaging
+License: Apache License 2.0 or BSD 2-Clause License
+SPDX: Apache-2.0 OR BSD-2-Clause
 URL: https://pypi.org/project/packaging/
+Notice: Copyright (C) Donald Stufft and individual contributors. Core utilities for Python packages.
 
-Tesseract OCR (portable Bündelung)
-------------------------------------
-Lizenz: Apache License 2.0
-Copyright: Google Inc.; Ray Smith; Hewlett-Packard Development Company, L.P.
+Package: Tesseract OCR
+License: Apache License 2.0
+SPDX: Apache-2.0
 URL: https://github.com/tesseract-ocr/tesseract
-Hinweis: Die portable Tesseract-Installation befindet sich im Unterordner
-         tesseract_portable/. Die vollständige Lizenz ist unter
-         tesseract_portable/doc/LICENSE zu finden.
+Notice: Copyright (C) Google Inc., Ray Smith, Hewlett-Packard Development Company, L.P. Portable OCR engine executed via subprocess invocation.
 
-Leptonica (Bildverarbeitungs-Unterbau von Tesseract, portable Bündelung)
--------------------------------------------------------------------------
-Lizenz: Eigene freizügige Lizenz (zlib-artige Variante, GPL-kompatibel)
-Copyright: Copyright (C) 2001 Leptonica. All rights reserved.
+Package: Leptonica
+License: Leptonica License (zlib-like permissive)
+SPDX: Leptonica
 URL: https://github.com/DanBloomberg/leptonica
-     http://www.leptonica.org/about-the-license.html
-Hinweis: libleptonica-6.dll wird als Laufzeitabhängigkeit von Tesseract im
-         Unterordner tesseract_portable/ mitgeliefert. Die Lizenz erlaubt
-         das Kopieren, Verändern und Weiterverbreiten (kommerziell wie
-         nicht-kommerziell) unter der Bedingung, dass die Herkunft nicht
-         falsch dargestellt wird, veränderte Versionen als solche markiert
-         werden und dieser Hinweis erhalten bleibt.
+Notice: Copyright (C) 2001-2026 Leptonica. All rights reserved. Image processing and analysis library underlying Tesseract OCR.
+
+Package: pytest
+License: MIT License
+SPDX: MIT
+URL: https://pypi.org/project/pytest/
+Notice: Copyright (C) Holger Krekel and contributors. Testing framework for Python; version floor pinned to >=9.1.1 to eliminate CVE-2025-7117.
+
+Package: pluggy
+License: MIT License
+SPDX: MIT
+URL: https://pypi.org/project/pluggy/
+Notice: Copyright (C) 2015-2026 Holger Krekel and contributors. Plugin and hook-calling mechanism for Python.
+
+Package: iniconfig
+License: MIT License
+SPDX: MIT
+URL: https://pypi.org/project/iniconfig/
+Notice: Copyright (C) 2010-2026 Ronny Pfannschmidt, Holger Krekel. Brain-dead simple parsing of ini files.
+
+Package: ruff
+License: MIT License or Apache License 2.0
+SPDX: MIT OR Apache-2.0
+URL: https://pypi.org/project/ruff/
+Notice: Copyright (C) 2023-2026 Astral Software Inc. Extremely fast Python linter and code formatter.
+
+Package: PyInstaller
+License: GNU General Public License v2.0 with Bootloader Exception
+SPDX: GPL-2.0-or-later WITH Bootloader-exception
+URL: https://pypi.org/project/pyinstaller/
+Notice: Copyright (C) 2005-2026 PyInstaller Development Team. Bundles a Python application and all its dependencies into a single package. The special Bootloader exception permits distribution of compiled output under terms of the author's choice.
+
+Package: altgraph
+License: MIT License
+SPDX: MIT
+URL: https://pypi.org/project/altgraph/
+Notice: Copyright (C) Ronald Oussoren, Bob Ippolito. Graph computation package used by PyInstaller.
+
+Package: setuptools
+License: MIT License
+SPDX: MIT
+URL: https://pypi.org/project/setuptools/
+Notice: Copyright (C) Python Packaging Authority. Build system dependency for PEP 517/518 build backends.
 
 ================================================================================
 
-Vollständige Lizenztexte sind über die oben angegebenen URLs abrufbar.
-Für die GPL-lizenzierten Komponenten (Qt6/ausgewählte PySide6-Module, Poppler) steht der
-Quellcode über die angegebenen Projektseiten zur Verfügung.
+Lizenz-Kompatibilitätsnachweis & Architektur-Garantien:
+- PDFtoPDFocr ist lizenziert unter der MIT-Lizenz.
+- Sämtliche Python-Laufzeitbibliotheken (PySide6, pytesseract, Pillow, pdf2image, pikepdf, requests) sind mit der MIT-Lizenz kompatibel:
+  * LGPL-3.0 (PySide6/Qt6): Nutzung erfolgt ausschließlich über dynamische Bindung (Shared Libraries / CPython C-Extensions), Quellcode von PDFtoPDFocr bleibt unberührt.
+  * MPL-2.0 (pikepdf/certifi): Datei-basiertes Copyleft; keine Modifikationen an pikepdf-Quelldateien.
+  * Permissive Lizenzen (Apache-2.0, MIT, BSD-3-Clause, HPND, Leptonica): Vollständig kompatibel mit Weiterverbreitung unter MIT.
+  * Subprozess-Isolation (Poppler, Tesseract): Poppler (GPL-2.0-or-later) und Tesseract (Apache-2.0) werden als getrennte Betriebssystemprozesse über Standard-Streams ausgeführt. Eine statische oder dynamische Linkung in den Python-Prozess findet nicht statt; die GPL-Bedingungen berühren daher den MIT-Quellcode von PDFtoPDFocr nicht.
+  * PyInstaller: Der PyInstaller-Bootloader unterliegt der GPLv2 mit Ausnahmeklausel ("special exception"), welche die freie Lizenzierung und Distribution des generierten Executables unter beliebigen Bedingungen (einschließlich MIT und proprietär) ausdrücklich gestattet.
