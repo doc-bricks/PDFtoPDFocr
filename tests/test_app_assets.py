@@ -19,7 +19,7 @@ def test_master_icon_properties():
         assert path.exists(), f"Master icon missing: {path}"
         with Image.open(path) as img:
             assert img.format == "PNG"
-            assert img.size == (512, 512)
+            assert img.size in ((512, 512), (1024, 1024))
             assert img.mode in ("RGBA", "RGB")
 
 

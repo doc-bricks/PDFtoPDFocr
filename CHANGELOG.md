@@ -3,6 +3,16 @@
 Alle wesentlichen Änderungen an diesem Projekt werden hier dokumentiert.
 Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
+## [Unreleased]
+
+### App-Icons, Multi-Layer ICOs & Mobile PWA Suite (2026-09-28)
+- **Multi-Resolution Windows Explorer ICOs:** Vollwertige 7-Layer `.ico`-Dateien (`PDFtoPDFocr.ico`, `DesktopIcon.ico`, `icon.ico`, `ICO.ico`, `assets/PDFtoPDFocr.ico`, `assets/pdftopdfocr.ico`, `assets/DesktopIcon.ico`, `assets/icon.ico`, `assets/app_icon.ico`) mit 16x16, 24x24, 32x32, 48x48, 64x64, 128x128 und 256x256 Pixeln bei 32bpp RGBA erzeugt bzw. gehärtet (schließt fehlende 24x24-Ebene in `ICO.ico` sowie fehlende Root- und Asset-Icons).
+- **Master-PNGs & Favicon-Parität:** Hochauflösende 1024x1024 RGBA Master-Icons (`PDFtoPDFocr.png`, `DesktopIcon.png`, `icon.png`, `assets/PDFtoPDFocr.png`, `assets/DesktopIcon.png`, `assets/icon.png`) verankert sowie Multi-Layer `favicon.ico` (16, 24, 32, 48, 64 px) und Web-Favicons `favicon.png` in Root, `assets/` und `mobile_icons/` bereitgestellt.
+- **PWA & Mobile Icon Suite (`mobile_icons/`):** Vollständiges mobiles Icon-Paket inklusive W3C `manifest.json`, Standard-Icons (`icon-192.png`, `icon-512.png`), maskierbaren Varianten (`icon-maskable-192.png`, `icon-maskable-512.png`) mit 80%-Safe-Zone auf Dark-Slate-Hintergrund (`#0f172a`), Apple-Touch-Icons (180x180 px), Favicons und Unterordner `icons/` angelegt.
+- **Microsoft Store & Windows Kacheln (`store_assets/`):** Vollständige Store-Kachel-Suite (`icon_44x44.png`, `Square44x44Logo.png`, `icon_50x50.png`, `Square50x50Logo.png`, `StoreLogo.png`, `icon_150x150.png`, `Square150x150Logo.png`, `icon_310x150.png`, `Wide310x150Logo.png`, `icon_310x310.png`, `Square310x310Logo.png`) und Dokumentation `store_assets/README.md`.
+- **Laufzeit-Icon-Integration:** `app_icon_loader.py` mit `load_app_icon()` und `get_app_icon()` für robustes Multi-Pfad-Fallback implementiert; in `PDFtoPDFocr.spec` gebündelt und `load_app_icon`-Alias in `PDFtoPDFocr_2.py` verankert.
+- **Automatisierte Vertragstests:** Neue Testsuite `tests/test_assets_and_icons.py` mit 5 Contract-Tests (Master-Icons, Multi-Layer ICOs, Assets-Parität, Mobile/PWA Manifest, Store-Kacheln und QIcon-Laufzeitloader) implementiert; Pytest-Gesamtsuite auf 136 Tests erweitert (136/136 passed, 100% grün). [G 2026-09-28]
+
 ## [1.1.4] - 2026-09-20
 
 ### Geändert / Changed

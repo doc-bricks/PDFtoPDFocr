@@ -92,6 +92,10 @@ def get_app_icon() -> QIcon:
     return QIcon()
 
 
+load_app_icon = get_app_icon
+
+
+
 def open_file_path(path: str | Path) -> bool:
     """Öffnet die Datei mit der Standardanwendung des Betriebssystems."""
     target = Path(path)

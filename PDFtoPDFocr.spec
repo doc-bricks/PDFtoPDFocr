@@ -36,6 +36,7 @@ datas = [
     ('assets', 'assets'),
     ('PDFtoPDFocr.ico', '.'),
     ('ICO.ico', '.'),
+    ('app_icon_loader.py', '.'),
 ]
 
 # Nur einbinden wenn vorhanden
