@@ -45,7 +45,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
     assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
     assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
-    assert "badge/last%20checked-2026--09--21-informational.svg" in readme_en
+    assert "badge/last%20checked-2026--09--29-informational.svg" in readme_en
 
     # German README badges & links
     assert "badge/lizenz-MIT-green.svg" in readme_de
@@ -59,7 +59,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
     assert "doc--bricks-orange.svg" in readme_de
     assert "open--bricks-blue.svg" in readme_de
-    assert "badge/zuletzt%20gepr%C3%BCft-2026--09--21-informational.svg" in readme_de
+    assert "badge/zuletzt%20gepr%C3%BCft-2026--09--29-informational.svg" in readme_de
 
     # Sibling ecosystem links in both
     for readme in (readme_en, readme_de):
@@ -80,7 +80,7 @@ def test_readme_badges_and_links_parity() -> None:
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert "Last-checked: 2026-09-21" in llms
+    assert "Last-checked: 2026-09-29" in llms
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
     assert "verified tests" in llms or "passed" in llms

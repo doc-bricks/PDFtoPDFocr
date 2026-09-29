@@ -5,6 +5,10 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Software GitHub Check, Verifikation & Dokumentations-Aktualisierung (2026-09-29)
+- **Turnusgemäßer GitHub Check & Verifikation**: Vollständiger Hygiene-, Privacy- und Lizenz-Check erfolgreich durchgeführt (0 aktive Locks, 0 Privacy Leaks, 0 Klartext-Secrets, `.gitignore` schützt zuverlässig gegen Konfliktkopien und Locks).
+- **Metadaten- & Badges-Synchronisation**: Badges in `README.md`, `README_de.md` und `llms.txt` auf Prüfstand 2026-09-29 und 136 bestandene Tests synchronisiert; Vertragstests in `tests/test_metadata.py` aktualisiert und validiert. [G 2026-09-29]
+
 ### App-Icons, Multi-Layer ICOs & Mobile PWA Suite (2026-09-28)
 - **Multi-Resolution Windows Explorer ICOs:** Vollwertige 7-Layer `.ico`-Dateien (`PDFtoPDFocr.ico`, `DesktopIcon.ico`, `icon.ico`, `ICO.ico`, `assets/PDFtoPDFocr.ico`, `assets/pdftopdfocr.ico`, `assets/DesktopIcon.ico`, `assets/icon.ico`, `assets/app_icon.ico`) mit 16x16, 24x24, 32x32, 48x48, 64x64, 128x128 und 256x256 Pixeln bei 32bpp RGBA erzeugt bzw. gehärtet (schließt fehlende 24x24-Ebene in `ICO.ico` sowie fehlende Root- und Asset-Icons).
 - **Master-PNGs & Favicon-Parität:** Hochauflösende 1024x1024 RGBA Master-Icons (`PDFtoPDFocr.png`, `DesktopIcon.png`, `icon.png`, `assets/PDFtoPDFocr.png`, `assets/DesktopIcon.png`, `assets/icon.png`) verankert sowie Multi-Layer `favicon.ico` (16, 24, 32, 48, 64 px) und Web-Favicons `favicon.png` in Root, `assets/` und `mobile_icons/` bereitgestellt.
