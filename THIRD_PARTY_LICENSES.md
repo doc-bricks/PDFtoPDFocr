@@ -2,11 +2,13 @@
 
 **Project:** `PDFtoPDFocr`  
 **Organization:** [doc-bricks](https://github.com/doc-bricks)  
-**Umbrella Ecosystem:** [open-bricks](https://github.com/open-bricks)  
-**Author / Maintainer:** doc-bricks Team / Lukas Geiger (`lukas@open-bricks.org`)  
-**Audit Date:** 2026-09-26
-**License Compliance Status:** VERIFIED (100% Permissive / OSI-Approved & Copyleft Boundary Isolated)  
+**Umbrella Ecosystem:** [open-bricks](https://github.com/open-bricks)
+**Author / Maintainer:** doc-bricks Team / Lukas Geiger (`lukas@open-bricks.org`)
+**Audit Date:** 2026-09-30
+**License Compliance Status:** VERIFIED (100% Permissive / OSI-Approved & Copyleft Boundary Isolated)
 **SBOM Level:** Level 1 Software Bill of Materials (Direct, Transitive & Bundled Binaries)
+**Attribution & Notice:** See `NOTICE` file in repository root
+**Plain-Text Companion:** See `THIRD_PARTY_LICENSES.txt` in repository root
 
 ---
 

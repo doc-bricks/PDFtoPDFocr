@@ -86,20 +86,45 @@ uv.lock
 *conflicted copy*
 *-WORKSTATION*
 *-WORKSTATION-LG*
+*_WORKSTATION*
+*_WORKSTATION-LG*
+*-WORKSTATION.*
+*-WORKSTATION-LG.*
 *-ASUS*
 *-ASUS-GEI*
 *-LAPTOP*
+*-IDEAPAD*
+*-IDEAPAD-GEI*
 *-Mac Studio*
+*-MacBook*
 *.conflict
 *.sync-conflict-*
 *-conflict-*
 *-CONFLIT-*
+
+# Kanonisches Lock-System & Automation Locks
+LOCK.dev.*
+LOCK.antigravity.*
+LOCK.bugsearch.*
+.automation-lock
+
+# OS & Editor Artifacts
+Desktop.ini
+ehthumbs.db
+*.swo
+TASKPLAN_*.md
 
 # Test, Coverage & Patch Caches
 .coverage*
 htmlcov/
 pytest_out.txt
 pytest*.txt
+.pytest_temp/
+.pytest_tmp*
+.hypothesis/
+.turbo/
+.nyc_output/
+.tox/
 *.orig
 *.rej
 

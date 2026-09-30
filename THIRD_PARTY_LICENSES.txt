@@ -1,9 +1,11 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
-Stand: 2026-09-26
+Stand: 2026-09-30
 
 Dieses Dokument listet alle Drittanbieter-Bibliotheken und Komponenten auf,
 die von PDFtoPDFocr zur Laufzeit, zur Entwicklung oder beim Build verwendet werden.
+Urheberrechtshinweise und zentrale Attributionen befinden sich in NOTICE.
+Ausführliche Markdown-Dokumentation befindet sich in THIRD_PARTY_LICENSES.md.
 
 ================================================================================
 
@@ -154,10 +156,22 @@ Notice: Copyright (C) Python Packaging Authority. Build system dependency for PE
 ================================================================================
 
 Lizenz-Kompatibilitätsnachweis & Architektur-Garantien:
-- PDFtoPDFocr ist lizenziert unter der MIT-Lizenz.
+- PDFtoPDFocr ist lizenziert unter der MIT-Lizenz (siehe LICENSE und NOTICE).
 - Sämtliche Python-Laufzeitbibliotheken (PySide6, pytesseract, Pillow, pdf2image, pikepdf, requests) sind mit der MIT-Lizenz kompatibel:
   * LGPL-3.0 (PySide6/Qt6): Nutzung erfolgt ausschließlich über dynamische Bindung (Shared Libraries / CPython C-Extensions), Quellcode von PDFtoPDFocr bleibt unberührt.
   * MPL-2.0 (pikepdf/certifi): Datei-basiertes Copyleft; keine Modifikationen an pikepdf-Quelldateien.
   * Permissive Lizenzen (Apache-2.0, MIT, BSD-3-Clause, HPND, Leptonica): Vollständig kompatibel mit Weiterverbreitung unter MIT.
   * Subprozess-Isolation (Poppler, Tesseract): Poppler (GPL-2.0-or-later) und Tesseract (Apache-2.0) werden als getrennte Betriebssystemprozesse über Standard-Streams ausgeführt. Eine statische oder dynamische Linkung in den Python-Prozess findet nicht statt; die GPL-Bedingungen berühren daher den MIT-Quellcode von PDFtoPDFocr nicht.
   * PyInstaller: Der PyInstaller-Bootloader unterliegt der GPLv2 mit Ausnahmeklausel ("special exception"), welche die freie Lizenzierung und Distribution des generierten Executables unter beliebigen Bedingungen (einschließlich MIT und proprietär) ausdrücklich gestattet.
+
+Architektur- und Governance-Invarianten (INV-LOCAL-01 bis INV-SLA-10):
+- INV-LOCAL-01: 100% Lokale Ausführung / Zero-Egress für Dokumentendaten (VERIFIED)
+- INV-UNPRIV-02: Non-Elevation / RunAsInvoker Standard-Benutzerkontext (VERIFIED)
+- INV-NONDEST-03: Verlustfreier Erhalt von Originaldateien (_ocred.pdf) (VERIFIED)
+- INV-ISOLATION-04: Subprozess-Isolation für Tesseract/Poppler CLI Binaries (VERIFIED)
+- INV-BOUNDED-05: Deterministische OCR-Limits und Timeout-Schranken (VERIFIED)
+- INV-PORTABLE-06: Autarke Portable-Ausführung ohne Systeminstallation (VERIFIED)
+- INV-MANIFEST-07: Strukturierter Job-Export ohne Rohtext-Leaks (VERIFIED)
+- INV-A11Y-08: Barrierefreie Benutzeroberfläche & Tastatur-Ergonomie (VERIFIED)
+- INV-FAILCLOSED-09: Fail-Closed Fehlerbehandlung bei beschädigten PDFs (VERIFIED)
+- INV-SLA-10: 48h Security Response SLA via security@open-bricks.org (VERIFIED)

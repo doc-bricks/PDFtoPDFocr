@@ -5,6 +5,29 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Pfad A: Repository-Hygiene, CI-Lifecycle-Workflows, NOTICE-Attribution & Level 1 SBOM Text-Begleitdatei (2026-09-30)
+- **Formelle NOTICE-Datei**: Urheberrechts- und Open-Source-Attributions-Hinweis im Root für Lukas Geiger, doc-bricks und open-bricks contributors angelegt (`NOTICE`).
+- **Level 1 SBOM Text-Begleitdatei (`THIRD_PARTY_LICENSES.txt`)**: Re-auditiert Stand 2026-09-30 unter Bestätigung aller 10 Architektur- und Governance-Invarianten (INV-LOCAL-01 bis INV-SLA-10), unprivileged RunAsInvoker Non-Elevation (INV-UNPRIV-02) sowie Zero-Copyleft / Zero-Egress Offline Architektur.
+- **CI-Lifecycle-Workflows & Governance**:
+  - `.github/workflows/auto-assign.yml`: Automatisierte Issue- und PR-Zuweisung mit Least-Privilege-Berechtigungen (`pull-requests: write`, `issues: write`), 5 Min. Timeout und Concurrency-Härtung.
+  - `.github/workflows/label-sync.yml`: Automatischer Label-Sync via `EndBug/label-sync@v2` bei Änderungen an `.github/labels.yml`.
+  - `.github/labels.yml`: 11 kanonische Standard-Labels gemäß `GOVERNANCE.md` §4.2 angelegt.
+  - `.github/workflows/welcome.yml`: Willkommens-Bot für erste Issues und PRs via `actions/first-interaction@v3` mit Concurrency-Härtung.
+- **Multi-Host Cloud-Sync-, Lock- & Cache-Defense (`.gitignore`)**:
+  - Zusätzliche Host-Token (`*-IDEAPAD*`, `*-IDEAPAD-GEI*`, `*_WORKSTATION*`, `*_WORKSTATION-LG*`, `*-WORKSTATION.*`, `*-WORKSTATION-LG.*`, `*-MacBook*`).
+  - Erweiterte Kanonische Lock-Dateien (`LOCK.dev.*`, `LOCK.antigravity.*`, `LOCK.bugsearch.*`, `.automation-lock`).
+  - Cache- & Temp-Dateien (`Desktop.ini`, `ehthumbs.db`, `*.swo`, `TASKPLAN_*.md`, `.pytest_temp/`, `.pytest_tmp*`).
+- **PEP 621 Standardisierung in `pyproject.toml`**:
+  - `license-files` Whitelist um `NOTICE` und `THIRD_PARTY_LICENSES.txt` erweitert (`["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]`).
+  - `[project.urls]` um 'Contributing', 'Plain-Text License', 'Third-Party Licenses (Text)', 'Level 1 SBOM' und 'Notice' erweitert.
+  - Pytest addopts um `--basetemp=.pytest_temp` erweitert und `norecursedirs` um `.pytest_temp`, `.pytest_tmp*`, `.hypothesis`, `.turbo`, `.nyc_output`, `.tox` synchronisiert (auch in `pytest.ini`).
+  - Version 1.1.4 strikt unverändert gemäß `T-20260920-167562623` beibehalten.
+- **Contributing Guidelines (`CONTRIBUTING.md`)**: Um Plan D Local Dev Setup, Pre-Commit Quality Gates und Version-Freeze-Disziplin ergänzt.
+- **Dokumentation & Badges**:
+  - `README.md`, `README_de.md` und `llms.txt` auf Prüfstand 2026-09-30, Attribution NOTICE, Level 1 SBOM Text-Begleitdatei und Teststand synchronisiert unter Wahrung aller 18 Schnellnavigations-Anker.
+  - Lokales `MARKETING-LOG.txt` um Pfad A Revisionsbericht Stand 2026-09-30 erweitert.
+- **Automatisierte Vertragstests (`tests/test_metadata.py`)**: 7 neue Contract-Tests für NOTICE-Attribution, CI-Workflows, labels.yml, welcome.yml, Contributing Guidelines, Level 1 SBOM Invarianten und CHANGELOG-Eintrag implementiert. [G 2026-09-30]
+
 ### Software GitHub Check, Verifikation & Dokumentations-Aktualisierung (2026-09-29)
 - **Turnusgemäßer GitHub Check & Verifikation**: Vollständiger Hygiene-, Privacy- und Lizenz-Check erfolgreich durchgeführt (0 aktive Locks, 0 Privacy Leaks, 0 Klartext-Secrets, `.gitignore` schützt zuverlässig gegen Konfliktkopien und Locks).
 - **Metadaten- & Badges-Synchronisation**: Badges in `README.md`, `README_de.md` und `llms.txt` auf Prüfstand 2026-09-29 und 136 bestandene Tests synchronisiert; Vertragstests in `tests/test_metadata.py` aktualisiert und validiert. [G 2026-09-29]

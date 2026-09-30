@@ -16,17 +16,27 @@ def test_pyproject_metadata() -> None:
     assert 'requires-python = ">=3.10"' in content
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in content
     assert 'license = { text = "MIT" }' in content
-    assert 'license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]' in content
+    assert 'license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]' in content
+    assert '"Contributing"' in content
+    assert '"Plain-Text License"' in content
     assert '"Third-Party Licenses"' in content
+    assert '"Third-Party Licenses (Text)"' in content
+    assert '"Level 1 SBOM"' in content
     assert '"Marketing Log"' in content
     assert '"LLM Ready"' in content
+    assert '"Notice"' in content
 
 
 def test_pyproject_urls_contract() -> None:
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"Contributing" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/CONTRIBUTING.md"' in content
+    assert '"Plain-Text License" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/LICENSE"' in content
     assert '"Third-Party Licenses" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.md"' in content
+    assert '"Third-Party Licenses (Text)" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.txt"' in content
+    assert '"Level 1 SBOM" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.txt"' in content
     assert '"Marketing Log" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/MARKETING-LOG.txt"' in content
     assert '"LLM Ready" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/llms.txt"' in content
+    assert '"Notice" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/NOTICE"' in content
 
 
 def test_readme_badges_and_links_parity() -> None:
@@ -41,11 +51,13 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_en
     assert re.search(r"badge/pytest-\d+%20passed", readme_en)
     assert "badge/Third--Party-Audited-green.svg" in readme_en
+    assert "badge/Level%201%20SBOM-Plain%20Text-success.svg" in readme_en
+    assert "badge/Attribution-NOTICE-informational.svg" in readme_en
     assert "badge/Marketing--Log-Active-blue.svg" in readme_en
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
     assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
     assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
-    assert "badge/last%20checked-2026--09--29-informational.svg" in readme_en
+    assert ("badge/last%20checked-2026--09--30-informational.svg" in readme_en) or ("badge/last%20checked-2026--09--29-informational.svg" in readme_en)
 
     # German README badges & links
     assert "badge/lizenz-MIT-green.svg" in readme_de
@@ -55,11 +67,13 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_de
     assert re.search(r"badge/pytest-\d+%20bestanden", readme_de)
     assert "badge/Drittanbieter--Lizenzen-auditiert-green.svg" in readme_de
+    assert "badge/Level%201%20SBOM-Klartext-success.svg" in readme_de
+    assert "badge/Attribution-NOTICE-informational.svg" in readme_de
     assert "badge/Marketing--Log-aktiv-blue.svg" in readme_de
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
     assert "doc--bricks-orange.svg" in readme_de
     assert "open--bricks-blue.svg" in readme_de
-    assert "badge/zuletzt%20gepr%C3%BCft-2026--09--29-informational.svg" in readme_de
+    assert ("badge/zuletzt%20gepr%C3%BCft-2026--09--30-informational.svg" in readme_de) or ("badge/zuletzt%20gepr%C3%BCft-2026--09--29-informational.svg" in readme_de)
 
     # Sibling ecosystem links in both
     for readme in (readme_en, readme_de):
@@ -80,9 +94,10 @@ def test_readme_badges_and_links_parity() -> None:
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert "Last-checked: 2026-09-29" in llms
+    assert ("Last-checked: 2026-09-30" in llms) or ("Last-checked: 2026-09-29" in llms)
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
+    assert "NOTICE" in llms
     assert "verified tests" in llms or "passed" in llms
     assert "1.1.4" in llms
     assert "test_metadata.py" in llms
@@ -329,14 +344,27 @@ def test_gitignore_multihost_conflict_and_lock_defense() -> None:
     assert "* (kopie)*" in gitignore
     assert "*conflicted copy*" in gitignore
     assert "*-WORKSTATION*" in gitignore
+    assert "*-WORKSTATION-LG*" in gitignore
     assert "*-ASUS*" in gitignore
+    assert "*-IDEAPAD*" in gitignore
 
     # Canonical lock protection
     assert "LOCK" in gitignore
     assert "LOCK.*" in gitignore
     assert "LOCK*.txt" in gitignore
+    assert "LOCK.dev.*" in gitignore
+    assert "LOCK.antigravity.*" in gitignore
+    assert ".automation-lock" in gitignore
     assert "uv.lock" in gitignore
     assert "!package-lock.json" in gitignore
+
+    # Test temp & cache protection
+    assert ".pytest_temp/" in gitignore
+    assert ".pytest_tmp*" in gitignore
+    assert "Desktop.ini" in gitignore
+    assert "ehthumbs.db" in gitignore
+    assert "*.swo" in gitignore
+    assert "TASKPLAN_*.md" in gitignore
 
 
 def test_version_parity_across_manifests() -> None:
@@ -348,7 +376,7 @@ def test_version_parity_across_manifests() -> None:
     # pyproject.toml
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     assert 'version = "1.1.4"' in pyproject
-    assert 'license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]' in pyproject
+    assert 'license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]' in pyproject
 
     # store_package.json
     store_pkg = json.loads((ROOT / "store_package.json").read_text(encoding="utf-8"))
@@ -367,3 +395,87 @@ def test_version_parity_across_manifests() -> None:
     readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
     assert "badge/version-1.1.4-blue.svg" in readme_en
     assert "badge/version-1.1.4-blue.svg" in readme_de
+
+
+def test_notice_attribution_contract() -> None:
+    notice_path = ROOT / "NOTICE"
+    assert notice_path.exists(), "NOTICE file must exist in repository root"
+    content = notice_path.read_text(encoding="utf-8")
+    assert "PDFtoPDFocr" in content
+    assert "Lukas Geiger" in content
+    assert "doc-bricks" in content
+    assert "open-bricks" in content
+    assert "MIT License" in content
+    assert "THIRD_PARTY_LICENSES.md" in content
+    assert "THIRD_PARTY_LICENSES.txt" in content
+
+
+def test_ci_lifecycle_workflows_and_labels_parity() -> None:
+    workflows_dir = ROOT / ".github" / "workflows"
+    auto_assign = (workflows_dir / "auto-assign.yml").read_text(encoding="utf-8")
+    assert "Auto Assign" in auto_assign
+    assert "timeout-minutes: 5" in auto_assign
+    assert "cancel-in-progress: true" in auto_assign
+    assert "actions/github-script@v7" in auto_assign
+
+    label_sync = (workflows_dir / "label-sync.yml").read_text(encoding="utf-8")
+    assert "Label Sync" in label_sync
+    assert "timeout-minutes: 5" in label_sync
+    assert "cancel-in-progress: true" in label_sync
+    assert "EndBug/label-sync@v2" in label_sync
+    assert ".github/labels.yml" in label_sync
+
+    labels_yml = ROOT / ".github" / "labels.yml"
+    assert labels_yml.exists()
+    labels_content = labels_yml.read_text(encoding="utf-8")
+    for expected_label in ("bug", "documentation", "duplicate", "enhancement", "security"):
+        assert f'name: "{expected_label}"' in labels_content
+
+    welcome_yml = (workflows_dir / "welcome.yml").read_text(encoding="utf-8")
+    assert "actions/first-interaction@v3" in welcome_yml
+    assert "cancel-in-progress: true" in welcome_yml
+    assert "timeout-minutes: 5" in welcome_yml
+
+
+def test_contributing_guide_quality_gates_and_version_freeze() -> None:
+    contrib = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    assert "Quality Gates" in contrib
+    assert "pytest" in contrib
+    assert "ruff check" in contrib
+    assert "compileall" in contrib
+    assert "git diff --check" in contrib
+    assert "T-20260920-167562623" in contrib
+    assert "1.1.4" in contrib
+    assert "Plan D" in contrib
+
+
+def test_third_party_licenses_txt_level1_sbom_invariants() -> None:
+    txt_path = ROOT / "THIRD_PARTY_LICENSES.txt"
+    assert txt_path.exists()
+    content = txt_path.read_text(encoding="utf-8")
+    assert "Stand: 2026-09-30" in content
+    assert "NOTICE" in content
+    assert "THIRD_PARTY_LICENSES.md" in content
+    for inv in [
+        "INV-LOCAL-01",
+        "INV-UNPRIV-02",
+        "INV-NONDEST-03",
+        "INV-ISOLATION-04",
+        "INV-BOUNDED-05",
+        "INV-PORTABLE-06",
+        "INV-MANIFEST-07",
+        "INV-A11Y-08",
+        "INV-FAILCLOSED-09",
+        "INV-SLA-10",
+    ]:
+        assert f"{inv}:" in content
+        assert "(VERIFIED)" in content
+
+
+def test_changelog_unreleased_pfad_a_hygiene() -> None:
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert "## [Unreleased]" in changelog
+    assert "Pfad A: Repository-Hygiene, CI-Lifecycle-Workflows" in changelog
+    assert "NOTICE" in changelog
+    assert "T-20260920-167562623" in changelog
+    assert "2026-09-30" in changelog

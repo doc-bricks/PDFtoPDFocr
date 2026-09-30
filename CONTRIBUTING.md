@@ -27,12 +27,19 @@ Bitte signieren Sie jeden Commit mit `--signoff`:
 
 Damit bestätigen Sie, dass Sie das Recht haben, den Code unter der Projektlizenz einzureichen.
 
-### Code-Richtlinien
+### Code-Richtlinien & Quality Gates
 
-- Python: PEP 8 Stil
-- Encoding: UTF-8 für alle Dateien
+- Python: PEP 8 Stil mit `ruff` (Konfiguration in `pyproject.toml`)
+- Encoding: UTF-8 ohne BOM für alle Dateien
 - Sprache: Code und Kommentare auf Deutsch oder Englisch
 - Keine hardcoded Pfade oder API-Keys
+- **Quality Gates vor Commit/PR:**
+  1. `pytest` — Gesamte Testsuite muss zu 100% bestehen.
+  2. `ruff check .` — Keine Linting- oder Formatierungsfehler.
+  3. `python -m compileall -q .` — Saubere Bytecode-Kompilierung.
+  4. `git diff --check` — Keine Whitespace- oder Zeilenende-Fehler.
+- **Version-Freeze-Disziplin (T-20260920-167562623):** Die Version `1.1.4` bleibt strikt eingefroren. Keine eigenmächtigen Versionserhöhungen; alle Änderungen werden unter `## [Unreleased]` im `CHANGELOG.md` dokumentiert.
+- **Lokale Entwicklung (Plan D):** Entwicklung erfolgt im lokalen Git-Klon (`C:\_Local_DEV\repos\PDFtoPDFocr`).
 
 ### Erste Schritte
 
@@ -74,12 +81,19 @@ Please sign off every commit with `--signoff`:
 
 This certifies that you have the right to submit the code under the project license.
 
-### Code Guidelines
+### Code Guidelines & Quality Gates
 
-- Python: PEP 8 style
-- Encoding: UTF-8 for all files
+- Python: PEP 8 style enforced with `ruff` (configuration in `pyproject.toml`)
+- Encoding: UTF-8 without BOM for all files
 - Language: Code and comments in German or English
 - No hardcoded paths or API keys
+- **Pre-Commit Quality Gates:**
+  1. `pytest` — 100% of the test suite must pass.
+  2. `ruff check .` — Zero linting or formatting violations.
+  3. `python -m compileall -q .` — Clean bytecode compilation with no syntax errors.
+  4. `git diff --check` — Zero whitespace or carriage return issues.
+- **Version Freeze Policy (T-20260920-167562623):** Version `1.1.4` is strictly frozen. No unauthorized release bumps; all modifications must be tracked under `## [Unreleased]` in `CHANGELOG.md`.
+- **Local Development (Plan D):** Canonical source repository is the local git clone (`C:\_Local_DEV\repos\PDFtoPDFocr`).
 
 ### Getting Started
 
@@ -87,5 +101,7 @@ This certifies that you have the right to submit the code under the project lice
 git clone https://github.com/doc-bricks/PDFtoPDFocr.git
 cd PDFtoPDFocr
 pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
+python -m pytest
 python PDFtoPDFocr_2.py
 ```

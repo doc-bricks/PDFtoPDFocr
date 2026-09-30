@@ -12,13 +12,15 @@
 [![Datenschutz](https://img.shields.io/badge/datenschutz-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#datenschutz--sicherheitsmodell)
 [![Sicherheit](https://img.shields.io/badge/sicherheit-Local--First-blue.svg)](SECURITY.md)
 [![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#funktionen--features)
-[![Pytest](https://img.shields.io/badge/pytest-136%20bestanden%20%7C%20100%25-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-141%20bestanden%20%7C%20100%25-brightgreen.svg)](tests/)
 [![Drittanbieter-Lizenzen](https://img.shields.io/badge/Drittanbieter--Lizenzen-auditiert-green.svg)](THIRD_PARTY_LICENSES.md)
+[![Level 1 SBOM](https://img.shields.io/badge/Level%201%20SBOM-Klartext-success.svg)](THIRD_PARTY_LICENSES.txt)
+[![Attribution](https://img.shields.io/badge/Attribution-NOTICE-informational.svg)](NOTICE)
 [![Marketing-Log](https://img.shields.io/badge/Marketing--Log-aktiv-blue.svg)](MARKETING-LOG.txt)
 [![LLM-Bereit](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ökosystem](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Dachorganisation](https://img.shields.io/badge/Dachorganisation-open--bricks-blue.svg)](https://github.com/open-bricks)
-[![Zuletzt geprüft](https://img.shields.io/badge/zuletzt%20gepr%C3%BCft-2026--09--29-informational.svg)](tests/)
+[![Zuletzt geprüft](https://img.shields.io/badge/zuletzt%20gepr%C3%BCft-2026--09--30-informational.svg)](tests/)
 
 Wandelt gescannte PDF-Dateien und Bilddokumente in durchsuchbare PDFs um: per lokaler OCR (optische Zeichenerkennung) mit Tesseract. Bietet Mehrformat-Stapelverarbeitung, auswählbare OCR-Sprache mit automatischem Sprachpaket-Download, verlustfreien Erhalt der Originaldateien, barrierefreie Benutzeroberfläche und portable Tesseract/Poppler-Integration.
 

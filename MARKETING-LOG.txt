@@ -1,5 +1,55 @@
 # MARKETING-LOG — doc-bricks/PDFtoPDFocr
-# Tracked Pfad B Discoverability, Visual Architecture, Governance & Verification Milestones
+# Tracked Pfad A & Pfad B Milestones, Technical Hygiene, Governance & Verification
+
+================================================================================
+[2026-09-30 16:30 CEST] [PFAD_A_TECHNICAL_HYGIENE_AND_CI_HARDENING]
+Repository:        doc-bricks/PDFtoPDFocr
+Local Canonical:   C:\_Local_DEV\repos\PDFtoPDFocr
+Branch:            master
+Version:           1.1.4 (Strictly Frozen - No Version Bump per T-20260920-167562623)
+License:           MIT (SPDX-License-Identifier: MIT)
+Maintainer:        doc-bricks Team / Lukas Geiger (lukas@open-bricks.org / support@lukasgeiger.com)
+Security Contact:  security@open-bricks.org, security@ellmos.ai
+
+1. FORMAL NOTICE FILE & ATTRIBUTION
+--------------------------------------------------------------------------------
+- Created root NOTICE attribution file honoring Lukas Geiger, doc-bricks, and open-bricks contributors under MIT.
+- Added reciprocal cross-references between LICENSE, NOTICE, THIRD_PARTY_LICENSES.md, and THIRD_PARTY_LICENSES.txt.
+- Added NOTICE and THIRD_PARTY_LICENSES.txt to pyproject.toml license-files array.
+
+2. LEVEL 1 SBOM TEXT COMPANION RE-AUDIT (THIRD_PARTY_LICENSES.txt)
+--------------------------------------------------------------------------------
+- Re-audited THIRD_PARTY_LICENSES.txt to Stand: 2026-09-30.
+- Confirmed full compliance with all 10 architecture and governance invariants (INV-LOCAL-01 through INV-SLA-10).
+- Certified unprivileged RunAsInvoker non-elevation (INV-UNPRIV-02) and subprocess isolation for Tesseract and Poppler binaries.
+
+3. CI LIFECYCLE WORKFLOWS & GOVERNANCE
+--------------------------------------------------------------------------------
+- .github/workflows/auto-assign.yml: PR and Issue auto-assigner (actions/github-script@v7, timeout 5m, cancel-in-progress: true).
+- .github/workflows/label-sync.yml: Label synchronization from .github/labels.yml (EndBug/label-sync@v2, timeout 5m, cancel-in-progress: true).
+- .github/labels.yml: Canonical 11 issue/PR labels per GOVERNANCE.md §4.2.
+- .github/workflows/welcome.yml: First interaction welcome bot (actions/first-interaction@v3, timeout 5m, cancel-in-progress: true).
+
+4. MULTI-HOST CLOUD-SYNC, LOCK & CACHE DEFENSE (.gitignore)
+--------------------------------------------------------------------------------
+- Hardened .gitignore against host tokens (*-IDEAPAD*, *-IDEAPAD-GEI*, *_WORKSTATION*, *_WORKSTATION-LG*, *-WORKSTATION.*, *-WORKSTATION-LG.*, *-MacBook*).
+- Hardened canonical locks (LOCK.dev.*, LOCK.antigravity.*, LOCK.bugsearch.*, .automation-lock).
+- Hardened temp & cache files (Desktop.ini, ehthumbs.db, *.swo, TASKPLAN_*.md, .pytest_temp/, .pytest_tmp*).
+
+5. PEP 621 STANDARDIZATION & PYTEST HARDENING
+--------------------------------------------------------------------------------
+- pyproject.toml: license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]
+- pyproject.toml: project.urls enriched with Contributing, Plain-Text License, Third-Party Licenses (Text), Level 1 SBOM, Notice.
+- pytest.ini & pyproject.toml: addopts includes --basetemp=.pytest_temp; norecursedirs includes .pytest_temp, .pytest_tmp*, .hypothesis, .turbo, .nyc_output, .tox.
+
+6. CONTRIBUTING GUIDELINES ENHANCEMENT
+--------------------------------------------------------------------------------
+- CONTRIBUTING.md enriched with Quality Gates, Plan D Local Dev Setup, and Version-Freeze discipline.
+
+7. AUTOMATED CONTRACT TEST SUITE EXPANSION
+--------------------------------------------------------------------------------
+- Expanded tests/test_metadata.py with contract tests for NOTICE, CI workflows, labels.yml, welcome.yml, CONTRIBUTING, Level 1 SBOM invariants, and CHANGELOG [Unreleased] hygiene.
+- Verified 100% test pass rate via pytest, ruff clean, compileall clean, git diff --check clean.
 
 ================================================================================
 [2026-09-21 15:00 CEST] [PFAD_B_DISCOVERABILITY_AND_DESIGN]

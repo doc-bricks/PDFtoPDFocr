@@ -1,0 +1,9 @@
+PDFtoPDFocr
+Copyright (c) 2026 Lukas Geiger, doc-bricks and open-bricks contributors
+
+This product includes software developed by Lukas Geiger and the doc-bricks open-source initiative.
+Licensed under the MIT License. See LICENSE for details.
+
+Third-party components, dependencies, and their licenses are documented in:
+- THIRD_PARTY_LICENSES.md
+- THIRD_PARTY_LICENSES.txt
