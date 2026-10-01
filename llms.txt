@@ -1,6 +1,6 @@
 # PDFtoPDFocr
 
-## Last-checked: 2026-09-30
+## Last-checked: 2026-10-01
 
 ## Canonical Links
 
@@ -23,6 +23,13 @@ PDFtoPDFocr is a local-first Windows desktop tool for converting scanned PDF fil
 
 The app is designed for private document workflows such as invoices, letters, contracts, forms, and archive scans. PDF files are processed locally and are not uploaded. Network access is limited to downloading missing public Tesseract language packs from GitHub.
 
+## Architectural Topology (4 Views)
+
+- **View 1 (Ingestion & UI)**: PySide6 Desktop GUI (`PDFtoPDFocr_2.py`), drag-and-drop batch queue (`PDFListWidget`), WCAG AA a11y, 6-language i18n, unprivileged execution (`INV-UNPRIV-02`).
+- **View 2 (Async Orchestration)**: Asynchronous non-blocking QThread worker execution, cancellation & safe lease guard, portable job manifest (`pdftopdfocr-job-v1.json`, `INV-MANIFEST-07`), fail-closed page error trapping (`INV-FAILCLOSED-09`).
+- **View 3 (Core OCR Pipeline)**: Poppler/pdf2image multi-page rasterizer (`INV-BOUNDED-05`), alpha-normalizer, Tesseract OCR engine with official GitHub traineddata auto-download, pikepdf lossless PDF assembler (`INV-NONDEST-03`).
+- **View 4 (Air-Gap Perimeter & Governance)**: 100% local-first zero-egress perimeter (`INV-LOCAL-01`), subprocess isolation (`INV-ISOLATION-04`), permissive MIT/Apache/MPL runtime, Level 1 SBOM (`THIRD_PARTY_LICENSES.txt`), 48h security SLA (`INV-SLA-10`).
+
 ## Interfaces
 
 - Desktop GUI: `python PDFtoPDFocr_2.py`
@@ -30,7 +37,7 @@ The app is designed for private document workflows such as invoices, letters, co
 - Translation Auditor & Scanner: `python manage_translations.py --check`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (141 verified tests: 141 passed) [2026-09-30]
+- Test suite: `python -m pytest` (145 verified tests: 145 passed) [2026-10-01]
 - Package configuration: `pyproject.toml` (PEP 621 metadata)
 - Key test files: `tests/test_assets_and_icons.py`, `tests/test_i18n.py`, `tests/test_ui_accessibility.py`, `tests/test_security_license_contract.py`, `tests/test_metadata.py`, `tests/test_tesseract_config.py`, `tests/test_export_format.py`, `tests/test_bug_regressions.py`, `tests/test_app_assets.py`, `tests/test_cli_file_arguments.py`
 

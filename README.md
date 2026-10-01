@@ -12,7 +12,7 @@
 [![Privacy](https://img.shields.io/badge/privacy-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#privacy--security-model)
 [![Security](https://img.shields.io/badge/security-Local--First-blue.svg)](SECURITY.md)
 [![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#core-features)
-[![Pytest](https://img.shields.io/badge/pytest-141%20passed%20%7C%20100%25-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-145%20passed%20%7C%20100%25-brightgreen.svg)](tests/)
 [![Third-Party Audited](https://img.shields.io/badge/Third--Party-Audited-green.svg)](THIRD_PARTY_LICENSES.md)
 [![Level 1 SBOM](https://img.shields.io/badge/Level%201%20SBOM-Plain%20Text-success.svg)](THIRD_PARTY_LICENSES.txt)
 [![Attribution](https://img.shields.io/badge/Attribution-NOTICE-informational.svg)](NOTICE)
@@ -20,7 +20,7 @@
 [![LLM-Ready](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ecosystem](https://img.shields.io/badge/Ecosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Umbrella](https://img.shields.io/badge/Umbrella-open--bricks-blue.svg)](https://github.com/open-bricks)
-[![Last Checked](https://img.shields.io/badge/last%20checked-2026--09--30-informational.svg)](tests/)
+[![Last Checked](https://img.shields.io/badge/last%20checked-2026--10--01-informational.svg)](tests/)
 
 Converts scanned PDF files and raw images into searchable PDFs using local OCR (optical character recognition) with Tesseract. Features multi-format batch processing, selectable OCR language with automatic language pack download, non-destructive original file preservation, accessible UI ergonomics, and portable Tesseract/Poppler integration.
 
@@ -120,6 +120,50 @@ flowchart TD
     SEC -.-> FS
     PYINSTALLER -.-> GUI
     MSIX -.-> GUI
+```
+
+<a id="four-view-architectural-topology-projection"></a>
+<a id="vier-sichten-architektur-topologie-projektion"></a>
+### Four-View Architectural Topology Projection
+
+```
++===================================================================================================================+
+|                                    PDFtoPDFocr ARCHITECTURAL TOPOLOGY (4 VIEWS)                                   |
++===================================================================================================================+
+| [VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]                                                          |
+|  * PySide6 Desktop GUI (PDFtoPDFocr_2.py) with drag-and-drop batch file queue (PDFListWidget)                      |
+|  * WCAG AA Screen-reader accessibility (QAccessibleInterface), high-contrast badges & keyboard hotkeys            |
+|  * Dynamic 6-Language Localization Engine (DE / EN / ES / ZH / JA / RU) via translations.json                     |
+|  * Unprivileged user-mode execution [INV-UNPRIV-02] -- Strict RunAsInvoker, zero UAC elevation prompts            |
++-------------------------------------------------------------------------------------------------------------------+
+                                                          |
+                                                          v
++-------------------------------------------------------------------------------------------------------------------+
+| [VIEW 2: ASYNC ORCHESTRATION, WORKER THREAD & DISPATCHER ENGINE]                                                  |
+|  * Asynchronous non-blocking QThread worker execution for seamless UI responsiveness and batch processing        |
+|  * Cancellation & Safe Lease Guard with thread-safe interruption traps & real-time progress reporting             |
+|  * Portable Job Manifest Generator producing verifiable pdftopdfocr-job-v1.json [INV-MANIFEST-07]                 |
+|  * Fail-Closed per-page error trapping [INV-FAILCLOSED-09] preventing document corruption                         |
++-------------------------------------------------------------------------------------------------------------------+
+                                                          |
+                                                          v
++-------------------------------------------------------------------------------------------------------------------+
+| [VIEW 3: CORE OCR PIPELINE, POPPLER RASTERIZER & TESSERACT ENGINE]                                                |
+|  * Poppler / pdf2image multi-page rasterizer with stream memory buffering [INV-BOUNDED-05]                         |
+|  * Alpha-compositing image normalizer for multi-frame TIFF, PNG, and JPG scans                                    |
+|  * Tesseract OCR engine (portable binary + on-demand official GitHub traineddata auto-download)                    |
+|  * pikepdf lossless PDF assembler injecting searchable full-text OCR layer into non-destructive targets [INV-03] |
++-------------------------------------------------------------------------------------------------------------------+
+                                                          |
+                                                          v
++-------------------------------------------------------------------------------------------------------------------+
+| [VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]                                            |
+|  * 100% Local-first & Zero-Egress Perimeter [INV-LOCAL-01] -- zero document uploads or telemetry                  |
+|  * Strict subprocess isolation [INV-ISOLATION-04] keeping external binaries cleanly separated                     |
+|  * Zero-Copyleft & Permissive Runtime (MIT, Apache-2.0, HPND, MPL-2.0, dynamic LGPL-3.0 linking)                   |
+|  * Level 1 SBOM text companion (THIRD_PARTY_LICENSES.txt) audited with 10 runtime invariants [INV-LOCAL-01..10]   |
+|  * Dual Security Response SLA [INV-SLA-10] -- 48h initial response & 5-day triage commitment                      |
++===================================================================================================================+
 ```
 
 ---

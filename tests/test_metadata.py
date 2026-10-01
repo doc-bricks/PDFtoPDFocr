@@ -57,7 +57,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
     assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
     assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
-    assert ("badge/last%20checked-2026--09--30-informational.svg" in readme_en) or ("badge/last%20checked-2026--09--29-informational.svg" in readme_en)
+    assert ("badge/last%20checked-2026--10--01-informational.svg" in readme_en) or ("badge/last%20checked-2026--09--30-informational.svg" in readme_en)
 
     # German README badges & links
     assert "badge/lizenz-MIT-green.svg" in readme_de
@@ -73,7 +73,7 @@ def test_readme_badges_and_links_parity() -> None:
     assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
     assert "doc--bricks-orange.svg" in readme_de
     assert "open--bricks-blue.svg" in readme_de
-    assert ("badge/zuletzt%20gepr%C3%BCft-2026--09--30-informational.svg" in readme_de) or ("badge/zuletzt%20gepr%C3%BCft-2026--09--29-informational.svg" in readme_de)
+    assert ("badge/zuletzt%20gepr%C3%BCft-2026--10--01-informational.svg" in readme_de) or ("badge/zuletzt%20gepr%C3%BCft-2026--09--30-informational.svg" in readme_de)
 
     # Sibling ecosystem links in both
     for readme in (readme_en, readme_de):
@@ -94,7 +94,7 @@ def test_readme_badges_and_links_parity() -> None:
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert ("Last-checked: 2026-09-30" in llms) or ("Last-checked: 2026-09-29" in llms)
+    assert ("Last-checked: 2026-10-01" in llms) or ("Last-checked: 2026-09-30" in llms)
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
     assert "NOTICE" in llms
@@ -453,7 +453,7 @@ def test_third_party_licenses_txt_level1_sbom_invariants() -> None:
     txt_path = ROOT / "THIRD_PARTY_LICENSES.txt"
     assert txt_path.exists()
     content = txt_path.read_text(encoding="utf-8")
-    assert "Stand: 2026-09-30" in content
+    assert ("Stand: 2026-10-01" in content) or ("Stand: 2026-09-30" in content)
     assert "NOTICE" in content
     assert "THIRD_PARTY_LICENSES.md" in content
     for inv in [
@@ -479,3 +479,51 @@ def test_changelog_unreleased_pfad_a_hygiene() -> None:
     assert "NOTICE" in changelog
     assert "T-20260920-167562623" in changelog
     assert "2026-09-30" in changelog
+
+
+def test_ascii_four_view_topology_projection() -> None:
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    # English 4-view topology
+    assert "Four-View Architectural Topology Projection" in readme_en
+    assert "[VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]" in readme_en
+    assert "[VIEW 2: ASYNC ORCHESTRATION, WORKER THREAD & DISPATCHER ENGINE]" in readme_en
+    assert "[VIEW 3: CORE OCR PIPELINE, POPPLER RASTERIZER & TESSERACT ENGINE]" in readme_en
+    assert "[VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]" in readme_en
+
+    # German 4-view topology
+    assert "Vier-Sichten Architektur-Topologie Projektion" in readme_de
+    assert "[SICHT 1: AUFNAHME, DRAG-AND-DROP-WARTESCHLANGE & BARRIEREFREIHEIT]" in readme_de
+    assert "[SICHT 2: ASYNCHRONE ORCHESTRIERUNG, WORKER-THREAD & DISPATCHER-ENGINE]" in readme_de
+    assert "[SICHT 3: KERN-OCR-PIPELINE, POPPLER-RASTERISIERER & TESSERACT-ENGINE]" in readme_de
+    assert "[SICHT 4: AIR-GAP-SICHERHEITSPERIMETER, ZERO-EGRESS & DATEISYSTEMGRENZE]" in readme_de
+
+    # Reciprocal anchors in both
+    for content in (readme_en, readme_de):
+        assert 'id="four-view-architectural-topology-projection"' in content
+        assert 'id="vier-sichten-architektur-topologie-projektion"' in content
+
+
+def test_pep621_seo_keywords_expansion() -> None:
+    content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    for keyword in ("zero-egress", "offline-first", "batch-ocr", "accessibility", "local-first", "pdf", "ocr"):
+        assert f'"{keyword}"' in content
+
+
+def test_marketing_log_pfad_b_recency() -> None:
+    log_path = ROOT / "MARKETING-LOG.txt"
+    assert log_path.exists()
+    content = log_path.read_text(encoding="utf-8")
+    assert "2026-10-01" in content
+    assert "[PFAD_B_DISCOVERABILITY_AND_DESIGN]" in content
+    assert "FOUR-VIEW ARCHITECTURAL TOPOLOGY" in content
+    assert "doc-bricks/PDFtoPDFocr" in content
+
+
+def test_changelog_pfad_b_recency() -> None:
+    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    assert "## [Unreleased]" in changelog
+    assert "Pfad B: Discoverability, Visuelle Vier-Sichten-Architektur, Level 1 SBOM Re-Audit & Vertragstests (2026-10-01)" in changelog
+    assert "T-20260920-167562623" in changelog
+    assert "2026-10-01" in changelog

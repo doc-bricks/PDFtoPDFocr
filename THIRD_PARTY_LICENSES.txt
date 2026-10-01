@@ -1,6 +1,6 @@
 Third-Party Licenses — PDFtoPDFocr
 ====================================
-Stand: 2026-09-30
+Stand: 2026-10-01
 
 Dieses Dokument listet alle Drittanbieter-Bibliotheken und Komponenten auf,
 die von PDFtoPDFocr zur Laufzeit, zur Entwicklung oder beim Build verwendet werden.

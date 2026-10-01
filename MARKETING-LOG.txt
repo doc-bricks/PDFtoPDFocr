@@ -2,6 +2,60 @@
 # Tracked Pfad A & Pfad B Milestones, Technical Hygiene, Governance & Verification
 
 ================================================================================
+[2026-10-01 23:55 CEST] [PFAD_B_DISCOVERABILITY_AND_DESIGN]
+Repository:        doc-bricks/PDFtoPDFocr
+Local Canonical:   C:\_Local_DEV\repos\PDFtoPDFocr
+Branch:            master
+Version:           1.1.4 (Strictly Frozen - No Version Bump per T-20260920-167562623)
+License:           MIT (SPDX-License-Identifier: MIT)
+Maintainer:        doc-bricks Team / Lukas Geiger (lukas@open-bricks.org / support@lukasgeiger.com)
+Security Contact:  security@open-bricks.org, security@ellmos.ai
+
+1. VISUAL FOUR-VIEW ARCHITECTURAL TOPOLOGY (ASCII TOPOLOGY PROJECTION)
+--------------------------------------------------------------------------------
+- Integrated ASCII Four-View Architectural Topology into Section 2 of README.md and README_de.md:
+  * [VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]: PySide6 Desktop GUI, drag-and-drop batch queue, WCAG AA screen-reader support, 6-language i18n, unprivileged execution (INV-UNPRIV-02).
+  * [VIEW 2: ASYNC ORCHESTRATION, WORKER THREAD & DISPATCHER ENGINE]: Non-blocking QThread worker execution, cancellation & safe lease guard, portable job manifest (INV-MANIFEST-07), fail-closed error trapping (INV-FAILCLOSED-09).
+  * [VIEW 3: CORE OCR PIPELINE, POPPLER RASTERIZER & TESSERACT ENGINE]: Stream rasterization (INV-BOUNDED-05), alpha normalizer, portable Tesseract engine with official GitHub traineddata auto-download, pikepdf lossless PDF assembler (INV-NONDEST-03).
+  * [VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]: 100% local-first zero-egress perimeter (INV-LOCAL-01), subprocess isolation (INV-ISOLATION-04), permissive MIT/Apache/MPL runtime, Level 1 SBOM, 48h security SLA (INV-SLA-10).
+- Harmonized bilateral HTML anchors #four-view-architectural-topology-projection and #vier-sichten-architektur-topologie-projektion.
+
+2. LEVEL 1 SBOM TEXT COMPANION RE-AUDIT (THIRD_PARTY_LICENSES.txt)
+--------------------------------------------------------------------------------
+- Re-audited THIRD_PARTY_LICENSES.txt to Stand: 2026-10-01.
+- Validated all 10 architecture and governance invariants (INV-LOCAL-01 through INV-SLA-10).
+- Certified unprivileged RunAsInvoker non-elevation (INV-UNPRIV-02) and subprocess isolation for Tesseract and Poppler binaries.
+- Certified zero network copyleft (AGPL/SSPL) and clean dynamic linking compliance for PySide6 (LGPL-3.0).
+
+3. 4 TARGET PERSONAS & HIGH-INTENT DISCOVERABILITY
+--------------------------------------------------------------------------------
+- [PERSONA-01] Legal, Healthcare & Regulatory Compliance Officers: Strict GDPR/HIPAA zero-egress document OCR, no cloud leaks.
+- [PERSONA-02] Archivists, Historians & Academic Researchers: Unlimited local batch queues for multi-frame TIFF and historical PDFs.
+- [PERSONA-03] Privacy-Conscious Knowledge Workers & Desktop Enthusiasts: Free MIT open-source desktop tool with no account, no subscriptions, and portable execution.
+- [PERSONA-04] Automated Pipeline Integrators & Document Workflow Engineers: Structured exchange via pdftopdfocr-job-v1.json and llms.txt integration.
+
+4. 10-DIMENSION COMPARATIVE MATRIX VS. 5 ALTERNATIVES
+--------------------------------------------------------------------------------
+- Maintained detailed comparative evaluation vs. Adobe Acrobat Pro, ABBYY FineReader PDF, OCRmyPDF (CLI), and Cloud SaaS (Smallpdf/iLovePDF) mapped against INV-LOCAL-01 through INV-SLA-10.
+
+5. PEP 621 METADATA & HIGH-INTENT SEO ENRICHMENT
+--------------------------------------------------------------------------------
+- Expanded pyproject.toml keywords array with high-intent discovery terms:
+  "zero-egress", "offline-first", "batch-ocr", "accessibility".
+- Synchronized project URLs for Level 1 SBOM, Plain-Text License, Contributing, and Notice.
+
+6. NON-AUTOMATED MARKETING & DESIGN RECOMMENDATIONS
+--------------------------------------------------------------------------------
+- Recommendation 1 (Visuals): Capture dark-mode high-DPI screenshots of the queue with active status badges for Windows Store and website promotion.
+- Recommendation 2 (Video Demo): Produce a 30-second silent GIF/WebM showing drag-and-drop batch OCR of 5 documents with instant local conversion.
+- Recommendation 3 (Distribution): Provide a GitHub Release asset tagged v1.1.4 with pre-bundled portable Tesseract/Poppler zip archive for zero-prerequisite evaluation.
+
+7. AUTOMATED CONTRACT TEST HARNESS & GOVERNANCE VERIFICATION
+--------------------------------------------------------------------------------
+- Expanded tests/test_metadata.py with contract tests for ASCII Four-View Topology, Level 1 SBOM 2026-10-01 currency, PEP 621 SEO keywords, and CHANGELOG/MARKETING-LOG recency.
+- Verified 100% test pass rate via pytest (145/145 passed), ruff check clean, compileall clean, git diff --check clean.
+
+================================================================================
 [2026-09-30 16:30 CEST] [PFAD_A_TECHNICAL_HYGIENE_AND_CI_HARDENING]
 Repository:        doc-bricks/PDFtoPDFocr
 Local Canonical:   C:\_Local_DEV\repos\PDFtoPDFocr

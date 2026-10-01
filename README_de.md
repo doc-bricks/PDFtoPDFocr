@@ -12,7 +12,7 @@
 [![Datenschutz](https://img.shields.io/badge/datenschutz-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#datenschutz--sicherheitsmodell)
 [![Sicherheit](https://img.shields.io/badge/sicherheit-Local--First-blue.svg)](SECURITY.md)
 [![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#funktionen--features)
-[![Pytest](https://img.shields.io/badge/pytest-141%20bestanden%20%7C%20100%25-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-145%20bestanden%20%7C%20100%25-brightgreen.svg)](tests/)
 [![Drittanbieter-Lizenzen](https://img.shields.io/badge/Drittanbieter--Lizenzen-auditiert-green.svg)](THIRD_PARTY_LICENSES.md)
 [![Level 1 SBOM](https://img.shields.io/badge/Level%201%20SBOM-Klartext-success.svg)](THIRD_PARTY_LICENSES.txt)
 [![Attribution](https://img.shields.io/badge/Attribution-NOTICE-informational.svg)](NOTICE)
@@ -20,7 +20,7 @@
 [![LLM-Bereit](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
 [![Ökosystem](https://img.shields.io/badge/%C3%96kosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
 [![Dachorganisation](https://img.shields.io/badge/Dachorganisation-open--bricks-blue.svg)](https://github.com/open-bricks)
-[![Zuletzt geprüft](https://img.shields.io/badge/zuletzt%20gepr%C3%BCft-2026--09--30-informational.svg)](tests/)
+[![Zuletzt geprüft](https://img.shields.io/badge/zuletzt%20gepr%C3%BCft-2026--10--01-informational.svg)](tests/)
 
 Wandelt gescannte PDF-Dateien und Bilddokumente in durchsuchbare PDFs um: per lokaler OCR (optische Zeichenerkennung) mit Tesseract. Bietet Mehrformat-Stapelverarbeitung, auswählbare OCR-Sprache mit automatischem Sprachpaket-Download, verlustfreien Erhalt der Originaldateien, barrierefreie Benutzeroberfläche und portable Tesseract/Poppler-Integration.
 
@@ -120,6 +120,50 @@ flowchart TD
     SEC -.-> FS
     PYINSTALLER -.-> GUI
     MSIX -.-> GUI
+```
+
+<a id="vier-sichten-architektur-topologie-projektion"></a>
+<a id="four-view-architectural-topology-projection"></a>
+### Vier-Sichten Architektur-Topologie Projektion
+
+```
++===================================================================================================================+
+|                                    PDFtoPDFocr ARCHITEKTUR-TOPOLOGIE (4 SICHTEN)                                  |
++===================================================================================================================+
+| [SICHT 1: AUFNAHME, DRAG-AND-DROP-WARTESCHLANGE & BARRIEREFREIHEIT]                                               |
+|  * PySide6 Desktop-GUI (PDFtoPDFocr_2.py) mit Drag-and-Drop Batch-Warteschlange (PDFListWidget)                   |
+|  * WCAG AA Screen-Reader-Barrierefreiheit (QAccessibleInterface), Kontrast-Badges & Tastaturkürzel               |
+|  * Dynamische 6-Sprachen Lokalisierungs-Engine (DE / EN / ES / ZH / JA / RU) via translations.json               |
+|  * Ausführung im Standard-Benutzermodus [INV-UNPRIV-02] -- Striktes RunAsInvoker, null Administrator-Prompts      |
++-------------------------------------------------------------------------------------------------------------------+
+                                                          |
+                                                          v
++-------------------------------------------------------------------------------------------------------------------+
+| [SICHT 2: ASYNCHRONE ORCHESTRIERUNG, WORKER-THREAD & DISPATCHER-ENGINE]                                           |
+|  * Asynchrone blockierungsfreie QThread-Ausführung für unterbrechungsfreie UI-Reaktion und Batch-Verarbeitung    |
+|  * Abbruch- und Safe-Lease-Guard mit threadsicheren Abbruchfallen und Echtzeit-Fortschrittsrückmeldung           |
+|  * Portabler Job-Manifest-Generator erzeugt verifizierbare pdftopdfocr-job-v1.json [INV-MANIFEST-07]              |
+|  * Fail-Closed fehlerisolierte Seitenverarbeitung [INV-FAILCLOSED-09] gegen Dokumentenbeschädigung                |
++-------------------------------------------------------------------------------------------------------------------+
+                                                          |
+                                                          v
++-------------------------------------------------------------------------------------------------------------------+
+| [SICHT 3: KERN-OCR-PIPELINE, POPPLER-RASTERISIERER & TESSERACT-ENGINE]                                            |
+|  * Poppler / pdf2image Mehrseiten-Rasterisierer mit beschränkter Speicherpufferung [INV-BOUNDED-05]               |
+|  * Alpha-Compositing Bildnormalisierer für mehrseitige TIFF-, PNG- und JPG-Scans                                  |
+|  * Tesseract OCR Engine (portable Binärdatei + automatischer Bedarfsdownload offizieller GitHub-Sprachpakete)     |
+|  * pikepdf verlustfreier PDF-Assembler bettet durchsuchbare Volltext-Ebene in unberührte Ziel-PDFs ein [INV-03]   |
++-------------------------------------------------------------------------------------------------------------------+
+                                                          |
+                                                          v
++-------------------------------------------------------------------------------------------------------------------+
+| [SICHT 4: AIR-GAP-SICHERHEITSPERIMETER, ZERO-EGRESS & DATEISYSTEMGRENZE]                                          |
+|  * 100% Lokaler Zero-Egress-Perimeter [INV-LOCAL-01] -- null Dokumenten-Uploads oder Telemetrie                  |
+|  * Strikte Subprozess-Isolation [INV-ISOLATION-04] zur sauberen Trennung externer Binärdateien                    |
+|  * Zero-Copyleft & Permissiver Stack (MIT, Apache-2.0, HPND, MPL-2.0, dynamische LGPL-3.0-Bindung)               |
+|  * Level 1 SBOM Text-Begleitdatei (THIRD_PARTY_LICENSES.txt) auditiert mit 10 Laufzeit-Invarianten               |
+|  * Verbindliche Sicherheits-Reaktions-SLA [INV-SLA-10] -- 48h Erstantwort & 5 Werktage Triage-Zusage             |
++===================================================================================================================+
 ```
 
 ---

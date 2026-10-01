@@ -13,7 +13,20 @@ license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LI
 authors = [
     { name = "doc-bricks Team", email = "support@lukasgeiger.com" }
 ]
-keywords = ["pdf", "ocr", "tesseract", "searchable-pdf", "pyside6", "poppler", "desktop", "local-first"]
+keywords = [
+    "pdf",
+    "ocr",
+    "tesseract",
+    "searchable-pdf",
+    "pyside6",
+    "poppler",
+    "desktop",
+    "local-first",
+    "zero-egress",
+    "offline-first",
+    "batch-ocr",
+    "accessibility",
+]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",

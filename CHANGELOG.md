@@ -5,6 +5,24 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Pfad B: Discoverability, Visuelle Vier-Sichten-Architektur, Level 1 SBOM Re-Audit & Vertragstests (2026-10-01)
+- **Visuelle Vier-Sichten-Architektur (ASCII Four-View Architectural Topology)**:
+  - Vollständige zweisprachige ASCII Four-View Architectural Topology in `README.md` und `README_de.md` in Section 2 direkt unterhalb des Mermaid-Diagramms implementiert (`[VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]` bis `[VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]` sowie `[SICHT 1]` bis `[SICHT 4]`).
+  - Bilaterale HTML-Anker `#four-view-architectural-topology-projection` und `#vier-sichten-architektur-topologie-projektion` in beiden Sprachfassungen reziprok verankert.
+- **Level 1 SBOM Text-Begleitdatei Re-Audit (`THIRD_PARTY_LICENSES.txt`)**:
+  - Re-auditiert Stand: 2026-10-01 mit lückenloser Bestätigung aller 10 Architektur- und Governance-Invarianten (INV-LOCAL-01 bis INV-SLA-10).
+  - Unprivileged RunAsInvoker Non-Elevation (`INV-UNPRIV-02`), Subprozess-Isolation für Tesseract/Poppler (`INV-ISOLATION-04`) und 100% Zero-Copyleft / Zero-Egress Perimeter re-zertifiziert.
+- **PEP 621 SEO-Keywords-Erweiterung (`pyproject.toml`)**:
+  - `keywords`-Array um High-Intent Suchbegriffe (`zero-egress`, `offline-first`, `batch-ocr`, `accessibility`) erweitert.
+  - Strikte Version-Freeze-Disziplin: Version 1.1.4 unverändert beibehalten (gemäß `T-20260920-167562623`).
+- **Dokumentations- & KI-Kontext-Synchronisation**:
+  - `README.md` und `README_de.md`: Badges für `last checked` / `zuletzt geprüft` (2026-10-01) und Pytest (145 passed / 100%) synchronisiert.
+  - `llms.txt`: Stand 2026-10-01, 145 Tests und 4-View-Topologie-Zusammenfassung hinterlegt.
+  - `MARKETING-LOG.txt`: Umfassende Pfad B Revisionsdokumentation Stand 2026-10-01 mit 4 Personas, 10-Dimensionen-Vergleichsmatrix und konkreten Discoverability-Empfehlungen angelegt.
+- **Automatisierte Vertragstests (`tests/test_metadata.py`)**:
+  - 4 neue automatisierte Contract-Tests für ASCII-Vier-Sichten-Topologie, Level 1 SBOM Recency 2026-10-01, PEP 621 SEO-Keywords, MARKETING-LOG.txt und CHANGELOG.md Recency hinzugefügt.
+  - Gesamt-Prüfstand auf 145/145 Tests ausgebaut (100% grün). [G 2026-10-01]
+
 ### Pfad A: Repository-Hygiene, CI-Lifecycle-Workflows, NOTICE-Attribution & Level 1 SBOM Text-Begleitdatei (2026-09-30)
 - **Formelle NOTICE-Datei**: Urheberrechts- und Open-Source-Attributions-Hinweis im Root für Lukas Geiger, doc-bricks und open-bricks contributors angelegt (`NOTICE`).
 - **Level 1 SBOM Text-Begleitdatei (`THIRD_PARTY_LICENSES.txt`)**: Re-auditiert Stand 2026-09-30 unter Bestätigung aller 10 Architektur- und Governance-Invarianten (INV-LOCAL-01 bis INV-SLA-10), unprivileged RunAsInvoker Non-Elevation (INV-UNPRIV-02) sowie Zero-Copyleft / Zero-Egress Offline Architektur.
