@@ -191,6 +191,7 @@ def test_ocr_worker_progress_uses_tr_for_localization():
 def test_ocr_pdf_fallback_closes_src_pdf_before_unlink(tmp_path, monkeypatch):
     """Fallback handles must close before private PDF files are removed."""
     import io
+    from pathlib import Path
     from PIL import Image as PILImage
     import pikepdf
 
@@ -209,7 +210,8 @@ def test_ocr_pdf_fallback_closes_src_pdf_before_unlink(tmp_path, monkeypatch):
         if isinstance(source, io.BytesIO):
             raise pikepdf.PdfError("synthetic BytesIO failure")
         pdf = original_open(source, *args, **kwargs)
-        fallback_ids.append(id(pdf))
+        if Path(source).name.startswith("page-"):
+            fallback_ids.append(id(pdf))
         return pdf
 
     def patched_close(pdf):

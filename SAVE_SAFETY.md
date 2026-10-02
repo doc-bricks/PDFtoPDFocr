@@ -5,6 +5,8 @@ Stand: 2026-10-02. Version 1.1.4 bleibt unverändert.
 PDFtoPDFocr veröffentlicht eine OCR-Ausgabe erst, wenn alle gerenderten
 Quellseiten beziehungsweise Bildframes jeweils genau eine gültige OCR-PDF-Seite
 ergeben haben. Bei PDFs muss die Anzahl gerenderter Seiten zur Quell-PDF passen.
+Das fertig geschriebene OCR-/Merge-PDF wird vor der Veröffentlichung erneut
+geöffnet und seine Seitenzahl geprüft.
 Eine leere OCR-Antwort wird als Fehler behandelt; sie darf keine unvollständige
 Ausgabe mit Erfolgsstatus erzeugen. OCR-Erkennungsgenauigkeit ist davon getrennt.
 
@@ -40,11 +42,11 @@ keinen Speicherefolg; das vorherige Manifest bleibt unverändert.
 
 ## Prüfung und Grenzen
 
-`tests/test_save_safety.py` enthält 17 Verhaltenstests mit synthetischen PDFs,
+`tests/test_save_safety.py` enthält 19 Verhaltenstests mit synthetischen PDFs,
 kontrollierten OCR-Antworten sowie Schreib-, Veröffentlichungs-, Archivierungs-
 und Bereinigungsfehlern. Die ursprünglichen sieben Gegenproben scheiterten am
 unveränderten GitHub-Stand `a825ee1`. Die korrigierte Quellcode-Suite erreicht
-161 bestandene Tests und eine dokumentierte Überspringung: Der lokale
+163 bestandene Tests und eine dokumentierte Überspringung: Der lokale
 Aufgabenabgleich benötigt die bewusst nicht versionierte `AUFGABEN.txt`.
 
 Diese Tests belegen den geprüften Seiten-/Speichervertrag, keine allgemeine

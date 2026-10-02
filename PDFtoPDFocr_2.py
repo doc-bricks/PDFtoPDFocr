@@ -553,6 +553,13 @@ class MergeArchiveError(OSError):
         self.merged_path = merged_path
 
 
+def validate_pdf_output(path: Path, expected_pages: int) -> None:
+    """Read the written stage before publishing it."""
+    with pikepdf.Pdf.open(path) as written:
+        if not expected_pages or len(written.pages) != expected_pages:
+            raise ValueError("Written PDF does not contain the expected pages")
+
+
 # ===== Merge/Stapeln (Welle-1 U2/U3/U4/U5) =====
 
 def resolve_export_folder(
@@ -626,6 +633,7 @@ def merge_ocr_outputs(
                     raise ValueError("Merge-Quelle enthält keine Seiten")
                 merged.pages.extend(src_pdf.pages)
             merged.save(staged)
+            validate_pdf_output(staged, len(merged.pages))
         finally:
             for src_pdf in opened_sources:
                 src_pdf.close()
@@ -845,6 +853,7 @@ class OCRWorker(QThread):
                         raise ValueError("OCR output page count differs from the source")
                     # Lazy page sources and buffers remain open through the save.
                     out_pdf.save(staged_path)
+                    validate_pdf_output(staged_path, len(images))
                 finally:
                     for _src_pdf, _tmp in page_sources:
                         _src_pdf.close()

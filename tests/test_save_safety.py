@@ -223,3 +223,24 @@ def test_gui_manifest_failure_has_no_success_feedback(tmp_path,monkeypatch):
     finally:
         gui.close()
         qt.processEvents()
+
+
+@pytest.mark.parametrize('operation',['ocr','merge'])
+def test_silently_corrupted_written_pdf_is_not_published(tmp_path,monkeypatch,operation):
+    source = synthetic_pdf(tmp_path/'scan.pdf')
+    second = synthetic_pdf(tmp_path/'second.pdf')
+    target = tmp_path/('scan_ocred.pdf' if operation == 'ocr' else 'merged.pdf')
+    target.write_bytes(b'previous')
+    worker = synthetic_worker(monkeypatch,1)
+    page = pdf_bytes()
+    monkeypatch.setattr(app.pytesseract,'image_to_pdf_or_hocr',lambda *a,**kw:page)
+    def invalid_save(pdf,path,*args,**kwargs):
+        Path(path).write_bytes(b'not a valid PDF')
+    monkeypatch.setattr(app.pikepdf.Pdf,'save',invalid_save)
+    if operation == 'ocr':
+        assert worker._ocr_pdf(str(source),'eng') is False
+    else:
+        with pytest.raises(pikepdf.PdfError):
+            app.merge_ocr_outputs([str(source),str(second)],'merged.pdf',tmp_path)
+    assert target.read_bytes() == b'previous'
+    assert source.exists() and second.exists()
