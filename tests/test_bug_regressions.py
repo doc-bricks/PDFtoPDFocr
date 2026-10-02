@@ -30,7 +30,7 @@ def test_bs1_pikepdf_sources_collected():
 
 def test_bs1_sources_closed_after_save():
     """Quell-PDFs duerfen erst NACH out_pdf.save() geschlossen werden."""
-    i_save = _SRC.find("out_pdf.save(dst_path)")
+    i_save = _SRC.find("out_pdf.save(staged_path)")
     i_close_loop = _SRC.find("for _src_pdf, _tmp in page_sources")
     assert 0 <= i_save < i_close_loop, (
         "Quell-PDFs werden vor out_pdf.save() geschlossen -> Lazy-Copy-Korruption"
@@ -45,7 +45,7 @@ def test_bs2_ocr_error_uses_logging_not_print():
 
 def test_bs3_merge_ocr_outputs_sources_closed_after_save():
     """Beim Mergen duerfen Quell-PDFs erst NACH merged.save() geschlossen werden."""
-    i_save = _SRC.find("merged.save(merged_path)")
+    i_save = _SRC.find("merged.save(staged)")
     i_close_loop = _SRC.find("for src_pdf in opened_sources:")
     assert 0 <= i_save < i_close_loop, (
         "Quell-PDFs in merge_ocr_outputs werden vor merged.save() geschlossen"
