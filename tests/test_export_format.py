@@ -189,52 +189,49 @@ def test_ocr_worker_progress_uses_tr_for_localization():
 
 
 def test_ocr_pdf_fallback_closes_src_pdf_before_unlink(tmp_path, monkeypatch):
-    """Bug #3: src_pdf.close() muss vor os.unlink() im Fallback-Temp-Pfad kommen."""
+    """Fallback handles must close before private PDF files are removed."""
+    import io
     from PIL import Image as PILImage
     import pikepdf
 
     _qapp()
     worker = app.OCRWorker(pending_paths=[], lang="eng")
+    image = PILImage.new("RGB", (10, 10), "white")
+    monkeypatch.setattr(worker, "_load_source_images", lambda _: [image])
+    buffer = io.BytesIO()
+    image.save(buffer, "PDF")
+    monkeypatch.setattr(app.pytesseract, "image_to_pdf_or_hocr", lambda *a, **kw: buffer.getvalue())
+    events, fallback_ids = [], []
+    original_open = pikepdf.Pdf.open
+    original_close = pikepdf.Pdf.close
 
-    fake_image = PILImage.new("RGB", (10, 10))
-    monkeypatch.setattr("PDFtoPDFocr_2.convert_from_path", lambda *a, **kw: [fake_image])
-    monkeypatch.setattr(
-        "PDFtoPDFocr_2.pytesseract.image_to_pdf_or_hocr",
-        lambda *a, **kw: b"%PDF-fake",
-    )
+    def patched_open(source, *args, **kwargs):
+        if isinstance(source, io.BytesIO):
+            raise pikepdf.PdfError("synthetic BytesIO failure")
+        pdf = original_open(source, *args, **kwargs)
+        fallback_ids.append(id(pdf))
+        return pdf
 
-    events = []
-    mock_src_pdf = MagicMock()
-    mock_src_pdf.pages = []
-    mock_src_pdf.close = lambda: events.append("close")
+    def patched_close(pdf):
+        events.append(("close", id(pdf)))
+        original_close(pdf)
 
-    open_calls = [0]
-
-    def patched_open(source, *a, **kw):
-        open_calls[0] += 1
-        if open_calls[0] == 1:
-            raise Exception("forced BytesIO failure")
-        return mock_src_pdf
+    original_unlink = app.os.unlink
+    def patched_unlink(path, *args, **kwargs):
+        events.append(("unlink", str(path)))
+        original_unlink(path, *args, **kwargs)
 
     monkeypatch.setattr(pikepdf.Pdf, "open", patched_open)
-
-    _original_unlink = app.os.unlink
-
-    def patched_unlink(p):
-        events.append("unlink")
-        _original_unlink(p)
-
+    monkeypatch.setattr(pikepdf.Pdf, "close", patched_close)
     monkeypatch.setattr(app.os, "unlink", patched_unlink)
-
-    src = tmp_path / "test.pdf"
-    src.write_bytes(b"%PDF-1.4\n")
-    worker._ocr_pdf(str(src), "eng")
-
-    assert "close" in events, "src_pdf.close() wurde im Fallback-Pfad nie aufgerufen"
-    assert "unlink" in events, "os.unlink() wurde nie aufgerufen — Temp-Datei wurde nicht gelöscht"
-    assert events.index("close") < events.index("unlink"), (
-        f"src_pdf.close() muss vor os.unlink() kommen; Reihenfolge war: {events}"
-    )
+    source = tmp_path / "source.pdf"
+    source.write_bytes(buffer.getvalue())
+    assert worker._ocr_pdf(str(source), "eng") is True
+    assert len(fallback_ids) == 1
+    close_index = events.index(("close", fallback_ids[0]))
+    unlink_index = next(i for i, event in enumerate(events) if event[0] == "unlink" and "page-0" in event[1])
+    assert close_index < unlink_index
+    assert not list(tmp_path.glob("pdftopdfocr-output-*"))
 
 
 def test_ocr_pdf_returns_false_when_all_pages_yield_empty_bytes(tmp_path, monkeypatch):

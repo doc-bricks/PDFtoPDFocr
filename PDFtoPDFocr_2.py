@@ -10,6 +10,7 @@ Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
 import glob
+from contextlib import contextmanager
 import io
 import json
 import logging
@@ -521,12 +522,35 @@ def build_job_export_payload(
 def write_job_export(target_path: str | Path, payload: dict) -> Path:
     """Writes the OCR job manifest as UTF-8 JSON without BOM."""
     export_path = Path(target_path)
-    export_path.parent.mkdir(parents=True, exist_ok=True)
-    export_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    serialized = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    with staged_output(export_path) as staged:
+        staged.write_text(serialized, encoding="utf-8")
     return export_path
+
+
+@contextmanager
+def staged_output(target: str | Path):
+    """Replace the destination only after its writer and file handles finish."""
+    target = Path(target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = tempfile.TemporaryDirectory(prefix="pdftopdfocr-output-", dir=target.parent)
+    try:
+        staged = Path(temporary.name) / ("output" + target.suffix)
+        yield staged
+        os.replace(staged, target)
+    finally:
+        try:
+            temporary.cleanup()
+        except OSError as error:
+            logging.warning("Temporary output cleanup failed: %s", error)
+
+
+class MergeArchiveError(OSError):
+    """The collective PDF was saved, but subsequent archiving failed."""
+
+    def __init__(self, merged_path: Path, cause: OSError):
+        super().__init__(str(cause))
+        self.merged_path = merged_path
 
 
 # ===== Merge/Stapeln (Welle-1 U2/U3/U4/U5) =====
@@ -556,6 +580,7 @@ def merge_ocr_outputs(
     merged_name: str,
     export_folder: str | Path,
     subfolder_name: str = MERGE_SUBFOLDER_NAME,
+    archive_warnings: list[str] | None = None,
 ) -> Path:
     """Merges already-OCRed single-file result PDFs into one collective PDF (U2).
 
@@ -576,28 +601,35 @@ def merge_ocr_outputs(
     """
     if len(output_paths) < 2:
         raise ValueError("merge_ocr_outputs benötigt mindestens 2 Dateien")
+    if not merged_name or merged_name in (".", "..") or "/" in merged_name or "\\" in merged_name:
+        raise ValueError("Merge-Ausgabe benötigt einen einfachen Dateinamen")
 
     export_folder = Path(export_folder)
+    merged_path = export_folder / merged_name
+    for source in output_paths:
+        if merged_path.resolve() == Path(source).resolve() or (
+            merged_path.exists() and os.path.samefile(merged_path, source)
+        ):
+            raise ValueError("Merge-Ausgabe darf keine Quelldatei ersetzen")
     export_folder.mkdir(parents=True, exist_ok=True)
     subfolder = export_folder / subfolder_name
     subfolder.mkdir(parents=True, exist_ok=True)
 
-    merged = pikepdf.Pdf.new()
-    opened_sources: list[pikepdf.Pdf] = []
-    try:
-        for p in output_paths:
-            src_pdf = pikepdf.Pdf.open(p)
-            opened_sources.append(src_pdf)
-            merged.pages.extend(src_pdf.pages)
-        merged_path = export_folder / merged_name
-        merged.save(merged_path)
-    finally:
-        for src_pdf in opened_sources:
-            try:
+    with staged_output(merged_path) as staged:
+        merged = pikepdf.Pdf.new()
+        opened_sources: list[pikepdf.Pdf] = []
+        try:
+            for p in output_paths:
+                src_pdf = pikepdf.Pdf.open(p)
+                opened_sources.append(src_pdf)
+                if not src_pdf.pages:
+                    raise ValueError("Merge-Quelle enthält keine Seiten")
+                merged.pages.extend(src_pdf.pages)
+            merged.save(staged)
+        finally:
+            for src_pdf in opened_sources:
                 src_pdf.close()
-            except Exception:
-                pass
-        merged.close()
+            merged.close()
 
     # Einzelseiten erst NACH dem Speichern der Sammel-PDF verschieben, damit ein
     # Fehlschlag beim Merge keine Dateien verwaist zurücklässt.
@@ -619,7 +651,15 @@ def merge_ocr_outputs(
             except OSError:
                 pass
             dest = subfolder / f"{src_path.stem}_{uuid.uuid4().hex[:8]}{src_path.suffix}"
-        shutil.move(str(src_path), str(dest))
+        try:
+            with staged_output(dest) as staged:
+                shutil.copyfile(src_path, staged)
+            src_path.unlink()
+        except OSError as error:
+            logging.warning("Merged PDF saved, but archiving failed for %s: %s", src_path, error)
+            if archive_warnings is None:
+                raise MergeArchiveError(merged_path, error) from error
+            archive_warnings.append(f"{src_path.name}: {error}")
 
     return merged_path
 
@@ -755,7 +795,12 @@ class OCRWorker(QThread):
         ext = os.path.splitext(src_path)[1].lower()
         if ext not in IMAGE_EXTS:
             poppler_path = self.poppler_path or None
-            return convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
+            with pikepdf.Pdf.open(src_path) as source:
+                expected_pages = len(source.pages)
+            images = convert_from_path(src_path, dpi=300, poppler_path=poppler_path)
+            if not expected_pages or len(images) != expected_pages:
+                raise ValueError("PDF rasterization did not produce all source pages")
+            return images
 
         images: List[Image.Image] = []
         with Image.open(src_path) as im:
@@ -766,59 +811,49 @@ class OCRWorker(QThread):
         return images
 
     def _ocr_pdf(self, src_path: str, lang: str) -> bool:
-        """Führt OCR auf einer PDF- oder Bilddatei aus (läuft im Worker-Thread)."""
+        """Publish an OCR PDF only when every source page produced one PDF page."""
         try:
-            images: List[Image.Image] = self._load_source_images(src_path)
-
-            out_pdf = pikepdf.Pdf.new()
-            # FIX: pikepdf kopiert Seiten LAZY -> die Quell-PDFs (und temp-Dateien)
-            # muessen bis NACH out_pdf.save() geoeffnet bleiben. Vorher wurde src_pdf
-            # im Loop VOR dem Speichern geschlossen (und tmp geloescht) -> korrupte/
-            # fehlende OCR-Seiten moeglich. Daher sammeln, erst im finally schliessen.
-            page_sources = []  # (pikepdf.Pdf, tmp_path_or_None)
-            try:
-                for img in images:
-                    img = normalize_image_for_ocr(img)
-                    pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, lang=lang, extension='pdf')
-                    if not pdf_bytes:
-                        continue
-                    try:
-                        src_pdf = pikepdf.Pdf.open(io.BytesIO(pdf_bytes))
-                        out_pdf.pages.extend(src_pdf.pages)
-                        page_sources.append((src_pdf, None))
-                    except Exception as e:
-                        logging.warning(f"PDF operation failed: {e}")
-                        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                        tmp.write(pdf_bytes)
-                        tmp.flush()
-                        tmp.close()
-                        src_pdf = pikepdf.Pdf.open(tmp.name)
-                        out_pdf.pages.extend(src_pdf.pages)
-                        page_sources.append((src_pdf, tmp.name))
-
-                if len(out_pdf.pages) == 0:
-                    raise ValueError("OCR produced no pages — all pages yielded empty PDF bytes")
-                dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
-                out_pdf.save(dst_path)
-            finally:
-                # Quell-PDFs + temp-Dateien erst NACH save() schliessen/aufraeumen.
-                for _src_pdf, _tmp in page_sources:
-                    try:
-                        _src_pdf.close()
-                    except Exception:
-                        pass
-                    if _tmp:
+            images = self._load_source_images(src_path)
+            if not images:
+                raise ValueError("OCR produced no source images")
+            dst_path = os.path.splitext(src_path)[0] + "_ocred.pdf"
+            with staged_output(dst_path) as staged_path:
+                out_pdf = pikepdf.Pdf.new()
+                page_sources = []
+                page_buffers = []
+                try:
+                    for img in images:
+                        img = normalize_image_for_ocr(img)
+                        pdf_bytes = pytesseract.image_to_pdf_or_hocr(img, lang=lang, extension='pdf')
+                        if not pdf_bytes:
+                            raise ValueError("OCR returned an empty page")
+                        buffer = io.BytesIO(pdf_bytes)
+                        page_buffers.append(buffer)
                         try:
-                            os.unlink(_tmp)
-                        except OSError:
-                            pass
-                out_pdf.close()
+                            src_pdf = pikepdf.Pdf.open(buffer)
+                            temporary_path = None
+                        except pikepdf.PdfError:
+                            # Keep the fallback inside the private output directory.
+                            temporary_path = staged_path.parent / f"page-{len(page_sources)}.pdf"
+                            temporary_path.write_bytes(pdf_bytes)
+                            src_pdf = pikepdf.Pdf.open(temporary_path)
+                        page_sources.append((src_pdf, temporary_path))
+                        if len(src_pdf.pages) != 1:
+                            raise ValueError("OCR must produce exactly one PDF page per source image")
+                        out_pdf.pages.extend(src_pdf.pages)
+                    if len(out_pdf.pages) != len(images):
+                        raise ValueError("OCR output page count differs from the source")
+                    # Lazy page sources and buffers remain open through the save.
+                    out_pdf.save(staged_path)
+                finally:
+                    for _src_pdf, _tmp in page_sources:
+                        _src_pdf.close()
+                    for buffer in page_buffers:
+                        buffer.close()
+                    out_pdf.close()
             return True
-        except Exception as e:
-            # logging statt print: im windowed-PyInstaller ist sys.stdout None ->
-            # print() wuerde den Worker-Thread crashen (finished_all nie emittiert,
-            # GUI haengt mit dauerhaft deaktiviertem Start-Button).
-            logging.error("OCR-Fehler bei %s: %s", src_path, e)
+        except Exception as error:
+            logging.error("OCR-Fehler bei %s: %s", src_path, error)
             return False
 
 
@@ -1347,8 +1382,9 @@ class OCRConverterGUI(QWidget):
             target_path = chosen_path
 
         target = Path(target_path)
+        archive_warnings = []
         try:
-            merged_path = merge_ocr_outputs(output_paths, target.name, target.parent)
+            merged_path = merge_ocr_outputs(output_paths, target.name, target.parent, archive_warnings=archive_warnings)
             for it in done_items:
                 resolved = resolve_ocr_output_path(it.data(Qt.UserRole), target.parent)
                 if not resolved and self.export_folder:
@@ -1361,7 +1397,15 @@ class OCRConverterGUI(QWidget):
 
         self.status_label.setText(tr("status_merge_saved", filename=merged_path.name))
         self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
+        if archive_warnings:
+            self._show_merge_archive_warning(archive_warnings)
         return merged_path
+
+    def _show_merge_archive_warning(self, warnings):
+        message = tr("warning_merge_archive", error="\n".join(warnings))
+        self.status_label.setText(self.status_label.text() + " " + message)
+        self.status_label.setStyleSheet("color: #8a4b00; font-weight: bold;")
+        QMessageBox.warning(self, tr("error_title"), message)
 
     def _register_batch_folder(self, batch_id: str, folder_path: str):
         """Remembers which folder a folder-drop batch originated from (U5)."""
@@ -1409,8 +1453,9 @@ class OCRConverterGUI(QWidget):
             export_folder = configured if configured and configured.is_dir() else Path(folder)
             base_folder_name = os.path.basename(os.path.normpath(folder)) or "batch"
             merged_name = f"{base_folder_name}_merged.pdf"
+            archive_warnings = []
             try:
-                merge_ocr_outputs(outputs, merged_name, export_folder)
+                merge_ocr_outputs(outputs, merged_name, export_folder, archive_warnings=archive_warnings)
                 self._merged_batches.add(batch_id)
                 for it in done_items:
                     resolved = resolve_ocr_output_path(it.data(Qt.UserRole), export_folder)
@@ -1418,6 +1463,8 @@ class OCRConverterGUI(QWidget):
                         it.setData(Qt.UserRole + 4, str(resolved))
                 self.status_label.setText(tr("status_merge_saved", filename=merged_name))
                 self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
+                if archive_warnings:
+                    self._show_merge_archive_warning(archive_warnings)
             except Exception as e:
                 logging.warning(f"Auto-Merge fuer Batch {batch_id} fehlgeschlagen: {e}")
 
@@ -1538,12 +1585,20 @@ class OCRConverterGUI(QWidget):
                 return None
             target_path = chosen_path
 
-        payload = build_job_export_payload(
-            entries,
-            self.lang_combo.currentText(),
-            export_folder=self.export_folder,
-        )
-        written_path = write_job_export(target_path, payload)
+        try:
+            payload = build_job_export_payload(
+                entries,
+                self.lang_combo.currentText(),
+                export_folder=self.export_folder,
+            )
+            written_path = write_job_export(target_path, payload)
+        except Exception as error:
+            message = tr("error_export_failed", error=error)
+            self.status_label.setText(message)
+            self.status_label.setStyleSheet("color: #b00020; font-weight: bold;")
+            if show_feedback:
+                QMessageBox.critical(self, tr("error_title"), message)
+            return None
         self.status_label.setText(tr("status_export_saved", filename=written_path.name))
         self.status_label.setStyleSheet("color: #0b6e4f; font-weight: bold;")
         if show_feedback:
