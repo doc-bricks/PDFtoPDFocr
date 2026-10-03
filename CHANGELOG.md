@@ -5,6 +5,32 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Bug-Sweep BS-11: EXIF-Metadaten-Erhalt, Merge-Härtung, Worker-Abbruchsicherheit & Pfad-Resilienz (2026-10-03)
+- **EXIF-Metadaten & Bild-Transposition (`_load_source_images`)**:
+  - `_load_source_images` überträgt `info` und `_exif` (aus `im.getexif()`) nun explizit auf die zurückgegebenen Bildframes, da `Image.copy()` diese standardmäßig verwirft. Dadurch funktioniert `ImageOps.exif_transpose` in `normalize_image_for_ocr` nun auch verlässlich für smartphone- und scan-basierte Bilddateien (Orientierungs-Tags 3, 6, 8).
+  - Resiliente Behandlung von `EOFError`/`OSError` beim Frame-Seek (`im.seek()`) für abgeschnittene oder unvollständige Multiframe-TIFFs.
+- **Tempfile-Leak-Prävention (`_ocr_pdf`)**:
+  - Im Fallback-Pfad für NamedTemporaryFiles (`tmp.name`) wird die temporäre PDF-Datei bei einem Fehler während `pikepdf.Pdf.open()` sofort per try-except entkoppelt und gelöscht, statt als Datenmüll auf der Festplatte zu verbleiben.
+- **System-Shell & Pfad-Sicherheit (`open_file_path`, `open_file_folder`)**:
+  - `open_file_path` und `open_file_folder` weisen `None`, leere Strings und Whitespace strikt ab (`return False`). Verhindert fehlerhaftes Öffnen des aktuellen Arbeitsverzeichnisses (CWD) durch `Path("")` und `TypeError` bei `None`.
+  - `open_file_path` öffnet ausschließlich reguläre Dateien (`is_file()`).
+- **Merge- & Stapel-Resilienz (`merge_ocr_outputs`, `merge_selected`, `_auto_merge_completed_batches`)**:
+  - `merge_ocr_outputs` sanitisiert `merged_name` gegen Verzeichnis-Traversal (`Path.name`) und erzwingt eine `.pdf`-Endung, wenn diese weggelassen wurde.
+  - Überprüfung auf mindestens zwei existierende PDF-Dateien vor der Verarbeitung.
+  - Abfang von `OSError` bei `shutil.move()`, sodass vorübergehend gesperrte Einzelseiten nicht den gesamten erfolgreichen Merge-Lauf abbrechen.
+  - In `merge_selected` und `_auto_merge_completed_batches` werden Ausgabepfade nur dann hinzugefügt, wenn sie tatsächlich auf der Festplatte existieren.
+- **Worker-Thread Concurrency & Lebenszyklus (`OCRWorker`, `OCRConverterGUI`)**:
+  - `OCRWorker` um `_is_cancelled`-Flag und `stop()`-Methode erweitert, um die Abarbeitung verbleibender Dateien bei Schließen des Fensters geordnet zu stoppen.
+  - `on_start()` schützt mit Re-Entrance-Guard vor Mehrfachstarts und verhindert die Zerstörung laufender QThreads.
+  - `closeEvent()` signalisiert dem Worker einen Stopp und wartet mit sicherem Timeout.
+- **Pfad- & Eingabevalidierung (`ensure_tesseract`, `PDFListWidget.add_file`, `resolve_ocr_output_path`)**:
+  - `ensure_tesseract` sanitisiert den `lang`-Parameter gegen Pfad-Traversal (`../`) und weist ungültige/leere Eingaben ab.
+  - `add_file` weist Ordner mit unterstützten Dateiendungen (z.B. `ordner.pdf`) ab und initialisiert `UserRole + 4` definiert mit `None`.
+  - `resolve_ocr_output_path` sortiert Funde mittels `_safe_mtime` und defensiven `_safe_is_file`/`_safe_is_dir` Prüfungen ab, um Rennbedingungen bei paralleler Dateilöschung zu verhindern.
+- **Automatisierte Regressionstests (`tests/test_bugsweep_exif_merge_worker_resilience_20261003.py`)**:
+  - 10 neue hermetische Unit- und Regressionstests für alle 10 Facetten hinzugefügt (10/10 passed).
+  - Gesamt-Prüfstand auf 155/155 Tests ausgebaut (100% grün). [G 2026-10-03]
+
 ### Pfad B: Discoverability, Visuelle Vier-Sichten-Architektur, Level 1 SBOM Re-Audit & Vertragstests (2026-10-01)
 - **Visuelle Vier-Sichten-Architektur (ASCII Four-View Architectural Topology)**:
   - Vollständige zweisprachige ASCII Four-View Architectural Topology in `README.md` und `README_de.md` in Section 2 direkt unterhalb des Mermaid-Diagramms implementiert (`[VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]` bis `[VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]` sowie `[SICHT 1]` bis `[SICHT 4]`).
