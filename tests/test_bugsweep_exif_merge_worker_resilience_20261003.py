@@ -118,9 +118,10 @@ def test_bs11_ocr_pdf_tempfile_cleanup_on_open_failure(tmp_path, monkeypatch):
 
     success = worker._ocr_pdf(str(dummy_pdf), "deu")
     assert success is False
-    assert len(created_temp_files) == 1
-    # Ensure temporary file was cleanly unlinked and not leaked
-    assert not Path(created_temp_files[0]).exists()
+    # Fallback pages are staged inside the private output directory (see SAVE_SAFETY.md),
+    # so no system temp file may be created and nothing may be left beside the source.
+    assert all(not Path(name).exists() for name in created_temp_files)
+    assert sorted(item.name for item in tmp_path.iterdir()) == ["test.pdf"]
 
 
 def test_bs11_open_file_path_and_folder_rejects_none_empty_and_dirs(tmp_path):

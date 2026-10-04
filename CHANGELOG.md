@@ -5,6 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### OCR completeness and safe output publication (2026-10-02)
+- Reject missing rasterized pages, empty per-page OCR results and OCR results with more than one page per source image; preserve previous output on failure.
+- Write OCR PDFs, merged PDFs and JSON manifests to private same-directory staging files before replacing their targets. Keep lazy PDF sources open through staging, then close them before publication. Clean failed disk fallbacks without masking the primary error.
+- Prevent a merged output from replacing an input or its filesystem alias. Archive individual results by staging a complete copy before removing the original. Report archiving failures separately from an already saved collective PDF, including localized GUI warnings.
+- Reopen written PDF stages and verify their page count before publication. Catch manifest-export failures in the GUI and retain the previous manifest. Add 19 behavior regressions; see `SAVE_SAFETY.md` for evidence and limits. Version 1.1.4 remains frozen.
 ### Bug-Sweep BS-11: EXIF-Metadaten-Erhalt, Merge-Härtung, Worker-Abbruchsicherheit & Pfad-Resilienz (2026-10-03)
 - **EXIF-Metadaten & Bild-Transposition (`_load_source_images`)**:
   - `_load_source_images` überträgt `info` und `_exif` (aus `im.getexif()`) nun explizit auf die zurückgegebenen Bildframes, da `Image.copy()` diese standardmäßig verwirft. Dadurch funktioniert `ImageOps.exif_transpose` in `normalize_image_for_ocr` nun auch verlässlich für smartphone- und scan-basierte Bilddateien (Orientierungs-Tags 3, 6, 8).

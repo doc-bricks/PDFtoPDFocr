@@ -1,4 +1,20 @@
 {
+  "error_export_failed": {
+    "de": "Job-Manifest konnte nicht gespeichert werden: {error}",
+    "en": "Could not save the job manifest: {error}",
+    "es": "No se pudo guardar el manifiesto del trabajo: {error}",
+    "zh": "无法保存任务清单：{error}",
+    "ja": "ジョブマニフェストを保存できませんでした：{error}",
+    "ru": "Не удалось сохранить манифест задания: {error}"
+  },
+  "warning_merge_archive": {
+    "de": "Sammel-PDF gespeichert. Einige Einzeldateien konnten nicht archiviert werden und bleiben an ihrem bisherigen Ort: {error}",
+    "en": "Merged PDF saved. Some individual files could not be archived and remain in their previous location: {error}",
+    "es": "PDF combinado guardado. Algunos archivos individuales no se pudieron archivar y permanecen en su ubicación anterior: {error}",
+    "zh": "合并的 PDF 已保存。部分单独文件无法归档，仍保留在原来的位置：{error}",
+    "ja": "結合したPDFを保存しました。一部の個別ファイルはアーカイブできず、元の場所に残っています：{error}",
+    "ru": "Объединённый PDF сохранён. Некоторые отдельные файлы не удалось архивировать; они остаются на прежнем месте: {error}"
+  },
   "window_title": {
     "de": "PDF OCR Werkzeug",
     "en": "PDF OCR Tool",
