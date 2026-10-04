@@ -9,6 +9,7 @@
 - Attribution & Notice: `NOTICE`
 - Contributing Guide: `CONTRIBUTING.md`
 - Primary app: `PDFtoPDFocr_2.py`
+- README languages: `README.md` (EN), `README_de.md`, `README_es.md`, `README_zh.md`, `README_ja.md`, `README_ru.md`
 - Localization: `translator.py`, `manage_translations.py`, `translations.json` (6 languages: DE, EN, ES, ZH, JA, RU)
 - Export contract: `EXPORTFORMAT.md`
 - Privacy policy: `PRIVACY_POLICY.md`
@@ -37,7 +38,7 @@ The app is designed for private document workflows such as invoices, letters, co
 - Translation Auditor & Scanner: `python manage_translations.py --check`
 - Portable build: `python build_release.py --clean`
 - Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (145 verified tests: 145 passed) [2026-10-01]
+- Test suite: `python -m pytest` (174 collected: 173 passed, 1 skipped) [2026-10-04]
 - Package configuration: `pyproject.toml` (PEP 621 metadata)
 - Key test files: `tests/test_assets_and_icons.py`, `tests/test_i18n.py`, `tests/test_ui_accessibility.py`, `tests/test_security_license_contract.py`, `tests/test_metadata.py`, `tests/test_tesseract_config.py`, `tests/test_export_format.py`, `tests/test_bug_regressions.py`, `tests/test_app_assets.py`, `tests/test_cli_file_arguments.py`
 
