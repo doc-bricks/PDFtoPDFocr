@@ -5,6 +5,8 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-10-04
+
 ### OCR completeness and safe output publication (2026-10-02)
 - Reject missing rasterized pages, empty per-page OCR results and OCR results with more than one page per source image; preserve previous output on failure.
 - Write OCR PDFs, merged PDFs and JSON manifests to private same-directory staging files before replacing their targets. Keep lazy PDF sources open through staging, then close them before publication. Clean failed disk fallbacks without masking the primary error.
@@ -89,7 +91,7 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - **Laufzeit-Icon-Integration:** `app_icon_loader.py` mit `load_app_icon()` und `get_app_icon()` für robustes Multi-Pfad-Fallback implementiert; in `PDFtoPDFocr.spec` gebündelt und `load_app_icon`-Alias in `PDFtoPDFocr_2.py` verankert.
 - **Automatisierte Vertragstests:** Neue Testsuite `tests/test_assets_and_icons.py` mit 5 Contract-Tests (Master-Icons, Multi-Layer ICOs, Assets-Parität, Mobile/PWA Manifest, Store-Kacheln und QIcon-Laufzeitloader) implementiert; Pytest-Gesamtsuite auf 136 Tests erweitert (136/136 passed, 100% grün). [G 2026-09-28]
 
-## [1.1.4] - 2026-09-20
+### Bereits am 2026-09-20 fuer 1.1.4 vorbereitet
 
 ### Geändert / Changed
 - **Technische Hygiene & CI-Workflow Härtung (Pfad A)**:
