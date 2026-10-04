@@ -12,7 +12,7 @@
 [![Privacy](https://img.shields.io/badge/privacy-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#privacy--security-model)
 [![Security](https://img.shields.io/badge/security-Local--First-blue.svg)](SECURITY.md)
 [![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#core-features)
-[![Pytest](https://img.shields.io/badge/pytest-155%20passed%20%7C%20100%25-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-173%20passed%20%7C%201%20skipped-brightgreen.svg)](tests/)
 [![Third-Party Audited](https://img.shields.io/badge/Third--Party-Audited-green.svg)](THIRD_PARTY_LICENSES.md)
 [![Level 1 SBOM](https://img.shields.io/badge/Level%201%20SBOM-Plain%20Text-success.svg)](THIRD_PARTY_LICENSES.txt)
 [![Attribution](https://img.shields.io/badge/Attribution-NOTICE-informational.svg)](NOTICE)
@@ -223,7 +223,7 @@ sequenceDiagram
 | **Direct Image OCR** | Drop JPG, PNG, or multi-frame TIFF images | Assembled searchable PDF document |
 | **Merge into Single PDF** | Enable "Auto-Merge" in toolbar | Consolidated multi-document searchable PDF |
 | **Export Job Manifest** | Click "Job-Export" (`Ctrl+E`) | Portable `pdftopdfocr-job-v1.json` manifest |
-| **Run Verification Suite** | `python -m pytest` | 120+ verified unit, regression, accessibility, and metadata tests |
+| **Run Verification Suite** | `python -m pytest` | 170+ verified unit, regression, accessibility, and metadata tests |
 | **Portable Build** | `python build_release.py --clean` | Self-contained executable in `dist/PDFtoPDFocr/` |
 
 ---
@@ -237,7 +237,7 @@ sequenceDiagram
 - **Selectable OCR Language** — Quick selection for German, English, French, Spanish, and dozens of other languages.
 - **Auto-Download** — Missing Tesseract language packs (`.traineddata`) are downloaded automatically on-demand from official GitHub repositories.
 - **Auto-Merge & Stacking** — Merge multiple processed OCR results into a single consolidated PDF document.
-- **Portable Tesseract & Poppler** — Tesseract OCR is bundled locally; no global system installation required.
+- **Portable Tesseract & Poppler** — Portable builds (`python build_release.py`) bundle Tesseract and Poppler; when running from source, Tesseract and Poppler must be installed or placed in `tesseract_portable/` and `poppler/` next to the app.
 - **Original File Preserved** — Results are saved with the `_ocred.pdf` suffix or in a configured output folder; source files remain untouched.
 - **Job Manifest Export** — Save portable `pdftopdfocr-job-v1.json` manifests containing job settings, execution status, and file metadata.
 - **Full Accessibility (A11y) & Ergonomics** — Screen-reader accessible names and descriptions across all controls, informative tooltips in active language, and complete keyboard shortcuts (`Ctrl+O`, `Ctrl+Return`, `Ctrl+E`, `F5`, `Ctrl+Shift+O`, `Del`/`Backspace`).
@@ -340,7 +340,7 @@ sequenceDiagram
 pip install -r requirements.txt
 ```
 
-Poppler must be available for `pdf2image` (configured via PATH or portable inside the project directory).
+Tesseract OCR and Poppler must be available when running from source: either on `PATH` (Tesseract can also be set via `TESSERACT_CMD`) or portable inside the project directory (`tesseract_portable/`, `poppler/`). Missing language packs are downloaded automatically.
 
 ---
 

@@ -12,7 +12,7 @@
 [![Datenschutz](https://img.shields.io/badge/datenschutz-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#datenschutz--sicherheitsmodell)
 [![Sicherheit](https://img.shields.io/badge/sicherheit-Local--First-blue.svg)](SECURITY.md)
 [![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#funktionen--features)
-[![Pytest](https://img.shields.io/badge/pytest-155%20bestanden%20%7C%20100%25-brightgreen.svg)](tests/)
+[![Pytest](https://img.shields.io/badge/pytest-173%20bestanden%20%7C%201%20uebersprungen-brightgreen.svg)](tests/)
 [![Drittanbieter-Lizenzen](https://img.shields.io/badge/Drittanbieter--Lizenzen-auditiert-green.svg)](THIRD_PARTY_LICENSES.md)
 [![Level 1 SBOM](https://img.shields.io/badge/Level%201%20SBOM-Klartext-success.svg)](THIRD_PARTY_LICENSES.txt)
 [![Attribution](https://img.shields.io/badge/Attribution-NOTICE-informational.svg)](NOTICE)
@@ -223,7 +223,7 @@ sequenceDiagram
 | **Direkte Bild-OCR** | JPG, PNG oder mehrseitige TIFF-Dateien hineinziehen | Zusammengefügtes durchsuchbares PDF-Dokument |
 | **In Sammel-PDF vereinen** | "Auto-Merge" in Menüleiste aktivieren | Konsolidierte mehrseitige durchsuchbare Sammel-PDF |
 | **Job-Manifest exportieren** | Klick auf "Job-Export" (`Strg+E`) | Portables `pdftopdfocr-job-v1.json` Manifest |
-| **Testsuite ausführen** | `python -m pytest` | 120+ verifizierte Unit-, Regressions-, Barrierefreiheits- und Metadaten-Tests |
+| **Testsuite ausführen** | `python -m pytest` | 170+ verifizierte Unit-, Regressions-, Barrierefreiheits- und Metadaten-Tests |
 | **Portablen Build erzeugen** | `python build_release.py --clean` | Eigenständige ausführbare Datei in `dist/PDFtoPDFocr/` |
 
 ---
@@ -237,7 +237,7 @@ sequenceDiagram
 - **Auswählbare OCR-Sprache** – Schnellwahl für Deutsch, Englisch, Französisch, Spanisch und dutzende weitere Sprachen.
 - **Auto-Download** – Fehlende Tesseract-Sprachpakete (`.traineddata`) werden bei Bedarf automatisch von offiziellen GitHub-Repositories geladen.
 - **Auto-Merge & Stapeln** – Mehrere verarbeitete OCR-Ergebnisse zu einer konsolidierten Sammel-PDF zusammenfassen.
-- **Portable Tesseract & Poppler** – Tesseract OCR ist lokal gebündelt; keine systemweite Installation erforderlich.
+- **Portable Tesseract & Poppler** – Portable Builds (`python build_release.py`) bündeln Tesseract und Poppler; beim Start aus dem Quellcode müssen Tesseract und Poppler installiert sein oder in `tesseract_portable/` und `poppler/` neben der App liegen.
 - **Verlustfreier Originaldateischutz** – Ergebnisse werden standardmäßig mit dem Suffix `_ocred.pdf` oder im Zielordner abgelegt; Originale bleiben unberührt.
 - **Job-Manifest-Export** – Speichert portable `pdftopdfocr-job-v1.json`-Dateien mit Einstellungen, Status und Metadaten.
 - **Vollständige Barrierefreiheit (A11y)** – Screen-Reader-gerechte Bezeichnungen aller Steuerelemente, Tooltips in aktiver Sprache und vollständige Tastaturkürzel (`Strg+O`, `Strg+Eingabetaste`, `Strg+E`, `F5`, `Strg+Umschalt+O`, `Entf`/`Rücktaste`).
@@ -338,7 +338,7 @@ sequenceDiagram
 pip install -r requirements.txt
 ```
 
-Poppler muss für `pdf2image` verfügbar sein (entweder im System-PATH oder portabel im Projektverzeichnis hinterlegt).
+Beim Start aus dem Quellcode müssen Tesseract OCR und Poppler verfügbar sein: entweder im System-`PATH` (Tesseract alternativ über `TESSERACT_CMD`) oder portabel im Projektverzeichnis (`tesseract_portable/`, `poppler/`). Fehlende Sprachpakete werden automatisch nachgeladen.
 
 ---
 
