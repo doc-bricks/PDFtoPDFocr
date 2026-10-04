@@ -97,26 +97,40 @@ load_app_icon = get_app_icon
 
 
 
-def open_file_path(path: str | Path) -> bool:
+def open_file_path(path: str | Path | None) -> bool:
     """Öffnet die Datei mit der Standardanwendung des Betriebssystems."""
-    target = Path(path)
-    if not target.exists():
+    if not path:
         return False
-    return QDesktopServices.openUrl(QUrl.fromLocalFile(str(target.resolve())))
+    cleaned = str(path).strip().strip("\"'")
+    if not cleaned:
+        return False
+    try:
+        target = Path(cleaned)
+        if not target.is_file():
+            return False
+        return QDesktopServices.openUrl(QUrl.fromLocalFile(str(target.resolve())))
+    except (OSError, ValueError):
+        return False
 
 
-def open_file_folder(path: str | Path) -> bool:
+def open_file_folder(path: str | Path | None) -> bool:
     """Öffnet das Verzeichnis der Datei im systemeigenen Dateimanager."""
-    target = Path(path)
-    if target.is_dir():
-        folder = target
-    elif target.is_file() or target.parent.exists():
-        folder = target.parent
-    else:
-        folder = target
-    if not folder.exists():
+    if not path:
         return False
-    return QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder.resolve())))
+    cleaned = str(path).strip().strip("\"'")
+    if not cleaned:
+        return False
+    try:
+        target = Path(cleaned)
+        if target.is_dir():
+            folder = target
+        elif target.is_file() or target.parent.is_dir():
+            folder = target.parent
+        else:
+            return False
+        return QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder.resolve())))
+    except (OSError, ValueError):
+        return False
 
 
 
@@ -380,6 +394,13 @@ def ensure_tesseract(lang: str) -> bool:
     Returns:
         True if Tesseract and the language pack are ready, False otherwise.
     """
+    if not lang:
+        return False
+    cleaned_lang = "".join(c for c in str(lang).strip() if c.isalnum() or c in ("_", "-"))
+    if not cleaned_lang:
+        return False
+    lang = cleaned_lang
+
     if not configure_tesseract():
         QMessageBox.critical(None, tr("error_title"),
             tr("error_tesseract_not_found"))
@@ -480,14 +501,28 @@ def build_job_export_payload(
         else:
             resolved = resolve_ocr_output_path(source_path, export_folder=export_folder)
             output_path = resolved if resolved else source_path.with_name(f"{source_path.stem}_ocred.pdf")
-        source_exists = source_path.exists()
-        output_exists = output_path.exists()
+        try:
+            source_exists = source_path.is_file()
+        except OSError:
+            source_exists = False
+
+        try:
+            output_exists = output_path.is_file()
+        except OSError:
+            output_exists = False
+
+        size_bytes = None
+        if source_exists:
+            try:
+                size_bytes = source_path.stat().st_size
+            except OSError:
+                size_bytes = None
 
         input_files.append(
             {
                 "name": source_path.name,
                 "local_path": _manifest_path(cleaned_raw),
-                "size_bytes": source_path.stat().st_size if source_exists else None,
+                "size_bytes": size_bytes,
                 "missing": not source_exists,
             }
         )
@@ -608,8 +643,15 @@ def merge_ocr_outputs(
     """
     if len(output_paths) < 2:
         raise ValueError("merge_ocr_outputs benötigt mindestens 2 Dateien")
-    if not merged_name or merged_name in (".", "..") or "/" in merged_name or "\\" in merged_name:
-        raise ValueError("Merge-Ausgabe benötigt einen einfachen Dateinamen")
+    merged_name = Path(str(merged_name or "").strip().replace("\\", "/")).name
+    if merged_name in ("", ".", ".."):
+        merged_name = "merged.pdf"
+    if not merged_name.lower().endswith(".pdf"):
+        merged_name = f"{merged_name}.pdf"
+
+    valid_paths = [str(p) for p in output_paths if p and Path(p).is_file()]
+    if len(valid_paths) < 2:
+        raise ValueError("merge_ocr_outputs benötigt mindestens 2 existierende PDF-Dateien")
 
     export_folder = Path(export_folder)
     merged_path = export_folder / merged_name
@@ -626,7 +668,7 @@ def merge_ocr_outputs(
         merged = pikepdf.Pdf.new()
         opened_sources: list[pikepdf.Pdf] = []
         try:
-            for p in output_paths:
+            for p in valid_paths:
                 src_pdf = pikepdf.Pdf.open(p)
                 opened_sources.append(src_pdf)
                 if not src_pdf.pages:
@@ -642,7 +684,7 @@ def merge_ocr_outputs(
     # Einzelseiten erst NACH dem Speichern der Sammel-PDF verschieben, damit ein
     # Fehlschlag beim Merge keine Dateien verwaist zurücklässt.
     # Bereits in subfolder archivierte Dateien nicht erneut mit UUIDs umbenennen (Idempotenz).
-    for p in output_paths:
+    for p in valid_paths:
         src_path = Path(p)
         if not src_path.exists():
             continue
@@ -699,38 +741,62 @@ def resolve_ocr_output_path(
     base_name = f"{src.stem}_ocred.pdf"
     escaped_stem = glob.escape(src.stem)
 
+    def _safe_mtime(p: Path) -> float:
+        try:
+            return p.stat().st_mtime
+        except OSError:
+            return 0.0
+
+    def _safe_is_file(p: Path) -> bool:
+        try:
+            return p.is_file()
+        except OSError:
+            return False
+
+    def _safe_is_dir(p: Path) -> bool:
+        try:
+            return p.is_dir()
+        except OSError:
+            return False
+
     # 1. Direkt neben der Quelldatei
     direct = src.with_name(base_name)
-    if direct.is_file():
+    if _safe_is_file(direct):
         return direct
 
     # 2. Im lokalen Archivordner neben der Quelldatei
     local_sub = src.parent / subfolder_name
-    if local_sub.is_dir():
+    if _safe_is_dir(local_sub):
         cand = local_sub / base_name
-        matches = [m for m in local_sub.glob(f"{escaped_stem}_ocred_*.pdf") if m.is_file()]
-        if cand.is_file():
+        try:
+            matches = [m for m in local_sub.glob(f"{escaped_stem}_ocred_*.pdf") if _safe_is_file(m)]
+        except OSError:
+            matches = []
+        if _safe_is_file(cand):
             matches.append(cand)
         if matches:
-            matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+            matches.sort(key=_safe_mtime, reverse=True)
             return matches[0]
 
     # 3. Im konfigurierten Exportordner
     if export_folder:
         cleaned_exp = str(export_folder).strip().strip("\"'")
         exp = Path(cleaned_exp) if cleaned_exp else None
-        if exp and exp.is_dir():
+        if exp and _safe_is_dir(exp):
             exp_sub = exp / subfolder_name
-            if exp_sub.is_dir():
+            if _safe_is_dir(exp_sub):
                 cand = exp_sub / base_name
-                matches = [m for m in exp_sub.glob(f"{escaped_stem}_ocred_*.pdf") if m.is_file()]
-                if cand.is_file():
+                try:
+                    matches = [m for m in exp_sub.glob(f"{escaped_stem}_ocred_*.pdf") if _safe_is_file(m)]
+                except OSError:
+                    matches = []
+                if _safe_is_file(cand):
                     matches.append(cand)
                 if matches:
-                    matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                    matches.sort(key=_safe_mtime, reverse=True)
                     return matches[0]
             exp_direct = exp / base_name
-            if exp_direct.is_file():
+            if _safe_is_file(exp_direct):
                 return exp_direct
 
     return None
@@ -781,11 +847,20 @@ class OCRWorker(QThread):
         self.pending_paths = pending_paths
         self.lang = lang
         self.poppler_path = poppler_path
+        self._is_cancelled = False
+
+    def stop(self):
+        """Signals the worker to stop processing remaining files."""
+        self._is_cancelled = True
 
     def run(self):
         for path in self.pending_paths:
+            if self._is_cancelled:
+                break
             self.progress.emit(tr("status_processing", filename=os.path.basename(path)))
             success = self._ocr_pdf(path, self.lang)
+            if self._is_cancelled:
+                break
             self.file_done.emit(path, success)
         self.finished_all.emit()
 
@@ -814,8 +889,23 @@ class OCRWorker(QThread):
         with Image.open(src_path) as im:
             frame_count = getattr(im, "n_frames", 1)
             for i in range(frame_count):
-                im.seek(i)
-                images.append(im.copy())
+                try:
+                    im.seek(i)
+                except (EOFError, OSError):
+                    break
+                frame = im.copy()
+                if hasattr(im, "info"):
+                    try:
+                        frame.info = dict(im.info)
+                    except Exception:
+                        pass
+                try:
+                    exif = im.getexif()
+                    if exif:
+                        frame._exif = exif
+                except Exception:
+                    pass
+                images.append(frame)
         return images
 
     def _ocr_pdf(self, src_path: str, lang: str) -> bool:
@@ -968,6 +1058,8 @@ class PDFListWidget(QListWidget):
 
         if os.path.splitext(canonical_path)[1].lower() not in SUPPORTED_EXTS:
             return
+        if os.path.isdir(canonical_path):
+            return
 
         norm_key = os.path.normcase(canonical_path)
         for idx in range(self.count()):
@@ -981,11 +1073,13 @@ class PDFListWidget(QListWidget):
                     if existing == canonical_path:
                         return
 
-        item = QListWidgetItem(os.path.basename(canonical_path))
+        item_label = os.path.basename(canonical_path) or canonical_path
+        item = QListWidgetItem(item_label)
         item.setData(Qt.UserRole, canonical_path)
         item.setData(Qt.UserRole + 1, 'pending')
         item.setData(Qt.UserRole + 2, "")
         item.setData(Qt.UserRole + 3, batch_id)
+        item.setData(Qt.UserRole + 4, None)
         item.setToolTip(canonical_path)
         self.addItem(item)
 
@@ -1375,7 +1469,9 @@ class OCRConverterGUI(QWidget):
                 if resolved and resolved.exists():
                     output_paths.append(str(resolved))
                 else:
-                    output_paths.append(os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf")
+                    cand = os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf"
+                    if os.path.exists(cand):
+                        output_paths.append(cand)
 
         if target_path is None:
             first_source = done_items[0].data(Qt.UserRole)
@@ -1453,7 +1549,9 @@ class OCRConverterGUI(QWidget):
                     if resolved and resolved.exists():
                         outputs.append(str(resolved))
                     else:
-                        outputs.append(os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf")
+                        cand = os.path.splitext(it.data(Qt.UserRole))[0] + "_ocred.pdf"
+                        if os.path.exists(cand):
+                            outputs.append(cand)
 
             # U5-Default: Sammel-PDF landet IM abgelegten Ordner selbst (nicht dessen
             # Elternordner) -- resolve_export_folder ist fuer Datei-Pfade gedacht,
@@ -1479,6 +1577,8 @@ class OCRConverterGUI(QWidget):
 
     def on_start(self):
         """Startet OCR-Verarbeitung für alle ausstehenden Dateien in einem QThread (GUI bleibt responsiv)."""
+        if self._ocr_worker is not None and self._ocr_worker.isRunning():
+            return
         self.status_label.setText("")
         pending_items = [self.list_widget.item(i) for i in range(self.list_widget.count())
                          if self.list_widget.item(i).data(Qt.UserRole + 1) == 'pending']
@@ -1543,13 +1643,16 @@ class OCRConverterGUI(QWidget):
     def closeEvent(self, event):
         """Wartet auf laufenden OCR-Worker bevor das Fenster geschlossen wird."""
         if self._ocr_worker is not None and self._ocr_worker.isRunning():
-            self._ocr_worker.wait()
+            self._ocr_worker.stop()
+            self._ocr_worker.wait(3000)
         event.accept()
 
     def on_delete(self):
         """Removes the currently selected entries from the file list."""
         for item in self.list_widget.selectedItems():
-            self.list_widget.takeItem(self.list_widget.row(item))
+            row = self.list_widget.row(item)
+            if row >= 0:
+                self.list_widget.takeItem(row)
 
     def _collect_job_entries(self) -> list[dict]:
         """Collects the current GUI state for export and later companion use."""
