@@ -2,6 +2,8 @@
 
 [English](README.md) | [Deutsch](README_de.md) | [Español](README_es.md) | [中文](README_zh.md) | [日本語](README_ja.md) | [Русский](README_ru.md)
 
+*Traducción asistida por máquina; el README en inglés es la versión de referencia.*
+
 # PDFtoPDFocr - Conversor OCR de PDF con enfoque local
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)

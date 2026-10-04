@@ -2,6 +2,8 @@
 
 [English](README.md) | [Deutsch](README_de.md) | [Español](README_es.md) | [中文](README_zh.md) | [日本語](README_ja.md) | [Русский](README_ru.md)
 
+*機械支援による翻訳です。正式な内容は英語版 README が優先されます。*
+
 # PDFtoPDFocr - ローカルファーストの PDF OCR 変換ツール
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)

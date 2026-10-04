@@ -2,6 +2,8 @@
 
 [English](README.md) | [Deutsch](README_de.md) | [Español](README_es.md) | [中文](README_zh.md) | [日本語](README_ja.md) | [Русский](README_ru.md)
 
+*机器辅助翻译；以英文 README 为准。*
+
 # PDFtoPDFocr - 本地优先的 PDF OCR 转换器
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
