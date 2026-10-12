@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-import re
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -15,14 +19,16 @@ def test_pyproject_metadata() -> None:
     assert 'version = "1.1.4"' in content
     assert 'requires-python = ">=3.10"' in content
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in content
-    assert 'license = { text = "MIT" }' in content
-    assert 'license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]' in content
+    metadata = tomllib.loads(content)
+    assert "setuptools>=77.0.0" in metadata["build-system"]["requires"]
+    assert metadata["project"]["license"] == "MIT"
+    assert metadata["project"]["license-files"] == ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]
+    assert all(not item.startswith("License ::") for item in metadata["project"]["classifiers"])
+    assert metadata["tool"]["setuptools"]["packages"] == []
     assert '"Contributing"' in content
     assert '"Plain-Text License"' in content
     assert '"Third-Party Licenses"' in content
     assert '"Third-Party Licenses (Text)"' in content
-    assert '"Level 1 SBOM"' in content
-    assert '"Marketing Log"' in content
     assert '"LLM Ready"' in content
     assert '"Notice"' in content
 
@@ -33,90 +39,44 @@ def test_pyproject_urls_contract() -> None:
     assert '"Plain-Text License" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/LICENSE"' in content
     assert '"Third-Party Licenses" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.md"' in content
     assert '"Third-Party Licenses (Text)" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.txt"' in content
-    assert '"Level 1 SBOM" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.txt"' in content
-    assert '"Marketing Log" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/MARKETING-LOG.txt"' in content
     assert '"LLM Ready" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/llms.txt"' in content
     assert '"Notice" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/NOTICE"' in content
 
 
-def test_readme_badges_and_links_parity() -> None:
+def test_readme_version_license_and_sibling_links() -> None:
     readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
     readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
 
-    # English README badges & links
-    assert "badge/license-MIT-green.svg" in readme_en
-    assert "badge/version-1.1.4-blue.svg" in readme_en
-    assert "badge/python-3.10%2B-blue.svg" in readme_en
-    assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_en
-    assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_en
-    assert re.search(r"badge/pytest-\d+%20passed", readme_en)
-    assert "badge/Third--Party-Audited-green.svg" in readme_en
-    assert "badge/Level%201%20SBOM-Plain%20Text-success.svg" in readme_en
-    assert "badge/Attribution-NOTICE-informational.svg" in readme_en
-    assert "badge/Marketing--Log-Active-blue.svg" in readme_en
-    assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_en
-    assert "badge/Ecosystem-doc--bricks-orange.svg" in readme_en
-    assert "badge/Umbrella-open--bricks-blue.svg" in readme_en
-    assert ("badge/last%20checked-2026--10--01-informational.svg" in readme_en) or ("badge/last%20checked-2026--09--30-informational.svg" in readme_en)
+    for readme in (readme_en, readme_de):
+        assert "1.1.4" in readme
+        assert "MIT" in readme
+        assert "THIRD_PARTY_LICENSES.md" in readme
+        assert "SECURITY.md" in readme
 
-    # German README badges & links
-    assert "badge/lizenz-MIT-green.svg" in readme_de
-    assert "badge/version-1.1.4-blue.svg" in readme_de
-    assert "badge/python-3.10%2B-blue.svg" in readme_de
-    assert "badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg" in readme_de
-    assert "badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg" in readme_de
-    assert re.search(r"badge/pytest-\d+%20bestanden", readme_de)
-    assert "badge/Drittanbieter--Lizenzen-auditiert-green.svg" in readme_de
-    assert "badge/Level%201%20SBOM-Klartext-success.svg" in readme_de
-    assert "badge/Attribution-NOTICE-informational.svg" in readme_de
-    assert "badge/Marketing--Log-aktiv-blue.svg" in readme_de
-    assert "badge/LLM--Ready-llms.txt-blueviolet.svg" in readme_de
-    assert "doc--bricks-orange.svg" in readme_de
-    assert "open--bricks-blue.svg" in readme_de
-    assert ("badge/zuletzt%20gepr%C3%BCft-2026--10--01-informational.svg" in readme_de) or ("badge/zuletzt%20gepr%C3%BCft-2026--09--30-informational.svg" in readme_de)
-
-    # Sibling ecosystem links in both
+    # Verified, related standalone tools in both active entry points.
     for readme in (readme_en, readme_de):
         assert "https://github.com/doc-bricks/DokuReader" in readme
-        assert "https://github.com/doc-bricks/MediaBrain" in readme
         assert "https://github.com/doc-bricks/UniversalDocsGrabber" in readme
         assert "https://github.com/doc-bricks/UniversalInvoiceMail" in readme
-        assert "https://github.com/doc-bricks/UniversalMailCleaner" in readme
-        assert "https://github.com/doc-bricks/CleanMarkdown" in readme
-        assert "https://github.com/doc-bricks/LitZentrum" in readme
-        assert "https://github.com/doc-bricks/MailProcessor" in readme
-        assert "https://github.com/file-bricks/ProFiler" in readme
-        assert "https://github.com/file-bricks/ExplorerPro" in readme
-        assert "https://github.com/dev-bricks/DevCenter" in readme
-        assert "https://github.com/dev-bricks/CodeBox" in readme
-        assert "https://github.com/open-bricks" in readme
 
 
 def test_llms_txt_currency_and_key_files() -> None:
     llms = (ROOT / "llms.txt").read_text(encoding="utf-8")
-    assert ("Last-checked: 2026-10-01" in llms) or ("Last-checked: 2026-09-30" in llms)
     assert "https://github.com/doc-bricks/PDFtoPDFocr" in llms
     assert "MIT" in llms
-    assert "NOTICE" in llms
-    assert "verified tests" in llms or "passed" in llms
     assert "1.1.4" in llms
-    assert "test_metadata.py" in llms
-    assert "test_i18n.py" in llms
-    assert "test_ui_accessibility.py" in llms
     assert "THIRD_PARTY_LICENSES.md" in llms
-    assert "MARKETING-LOG.txt" in llms
+    assert "PDFtoPDFocr_2.py" in llms
+    assert "EXPORTFORMAT.md" in llms
 
 
-def test_security_policy_bilingual_and_invariants() -> None:
+def test_security_policy_bilingual_and_report_channels() -> None:
     sec = (ROOT / "SECURITY.md").read_text(encoding="utf-8")
     assert "## Deutsch" in sec
     assert "## English" in sec
     assert "security@open-bricks.org" in sec
     assert "security@ellmos.ai" in sec
-    assert "48 Stunden" in sec or "48 hours" in sec
-    assert "Zero-Egress" in sec
-    assert "Non-Destructive" in sec or "Verlustfrei" in sec or "Original" in sec
-    assert "Non-Elevation" in sec or "Administrator" in sec or "user mode" in sec.lower()
+    assert "security/advisories/new" in sec
 
 
 def test_store_package_parity() -> None:
@@ -129,7 +89,8 @@ def test_store_package_parity() -> None:
 
 def test_changelog_parity() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert "Pfad B Marketing" in changelog or "MARKETING-LOG.txt" in changelog
+    assert "## [Unreleased]" in changelog
+    assert "## [1.1.4]" in changelog
     assert "Internationalisierung" in changelog or "i18n" in changelog.lower()
 
 
@@ -199,32 +160,10 @@ def test_readme_navigation_and_anchor_parity() -> None:
         assert f'<a id="{anchor_id}">' in readme_en, f"Missing reciprocal HTML anchor <a id=\"{anchor_id}\"> in README.md"
 
 
-def test_marketing_log_file_integrity() -> None:
-    log_path = ROOT / "MARKETING-LOG.txt"
-    assert log_path.exists(), "MARKETING-LOG.txt does not exist"
-    text = log_path.read_text(encoding="utf-8")
-
-    assert "PFAD_B_DISCOVERABILITY_AND_DESIGN" in text
-    assert "doc-bricks/PDFtoPDFocr" in text
-    assert "PERSONA-01" in text
-    assert "PERSONA-02" in text
-    assert "PERSONA-03" in text
-    assert "PERSONA-04" in text
-    assert "10-DIMENSION COMPARATIVE MATRIX" in text or "5-WAY COMPETITIVE MATRIX" in text
-    assert "Adobe Acrobat Pro" in text
-    assert "ABBYY FineReader" in text
-    assert "OCRmyPDF" in text
-    assert "INV-LOCAL-01" in text
-    assert "INV-SLA-10" in text
-
-
 def test_third_party_licenses_md_integrity() -> None:
     lic_path = ROOT / "THIRD_PARTY_LICENSES.md"
     assert lic_path.exists(), "THIRD_PARTY_LICENSES.md does not exist"
     text = lic_path.read_text(encoding="utf-8")
-
-    # Level 1 SBOM
-    assert "Level 1 Software Bill of Materials" in text or "Level 1 SBOM" in text
 
     # Direct dependencies
     assert "PySide6" in text
@@ -234,77 +173,11 @@ def test_third_party_licenses_md_integrity() -> None:
     assert "pikepdf" in text
     assert "requests" in text
 
-    # Bundled and engine tools
+    # External engine tools
     assert "Tesseract OCR Engine" in text
     assert "Leptonica" in text
     assert "Poppler Utilities" in text
-
-    # Invariants
-    for i in range(1, 11):
-        assert "INV-" in text
-
-    assert "INV-LOCAL-01" in text
-    assert "INV-UNPRIV-02" in text
-    assert "INV-NONDEST-03" in text
-    assert "INV-ISOLATION-04" in text
-    assert "INV-BOUNDED-05" in text
-    assert "INV-PORTABLE-06" in text
-    assert "INV-MANIFEST-07" in text
-    assert "INV-A11Y-08" in text
-    assert "INV-FAILCLOSED-09" in text
-    assert "INV-SLA-10" in text
-
-    # Invariant Cross-Reference Matrix & Non-Elevation
-    assert "Invariant Cross-Reference & Verification Matrix" in text
-    assert "Unprivileged RunAsInvoker Non-Elevation Certification" in text
-    assert "Subprocess Boundary & Copyleft Isolation Guarantee" in text
     assert "security@open-bricks.org" in text
-
-
-def test_mermaid_diagrams_dual_parity() -> None:
-    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
-    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
-
-    for content in (readme_en, readme_de):
-        assert "```mermaid" in content
-        assert "flowchart TD" in content or "graph TD" in content
-        assert "sequenceDiagram" in content
-        assert "autonumber" in content
-
-
-def test_target_personas_and_seo_queries() -> None:
-    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
-    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
-
-    for content in (readme_en, readme_de):
-        assert "[PERSONA-01]" in content
-        assert "[PERSONA-02]" in content
-        assert "[PERSONA-03]" in content
-        assert "[PERSONA-04]" in content
-
-
-def test_comparative_matrix_and_invariants() -> None:
-    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
-    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
-
-    for content in (readme_en, readme_de):
-        for _ in range(1, 11):
-            assert "INV-" in content
-        assert "INV-LOCAL-01" in content
-        assert "INV-SLA-10" in content
-        assert "Adobe Acrobat Pro" in content
-        assert "ABBYY FineReader" in content
-        assert "OCRmyPDF" in content
-
-
-def test_bgb_521_statutory_notice() -> None:
-    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
-    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
-
-    assert "§ 521 BGB" in readme_en
-    assert "Bürgerliches Gesetzbuch" in readme_en
-    assert "§ 521 BGB" in readme_de
-    assert "Gefälligkeitsrecht" in readme_de or "Schenkungsrecht" in readme_de
 
 
 def test_ci_workflows_timeout_and_concurrency() -> None:
@@ -449,81 +322,27 @@ def test_contributing_guide_quality_gates_and_version_freeze() -> None:
     assert "Plan D" in contrib
 
 
-def test_third_party_licenses_txt_level1_sbom_invariants() -> None:
+def test_third_party_license_text_inventory_structure() -> None:
     txt_path = ROOT / "THIRD_PARTY_LICENSES.txt"
     assert txt_path.exists()
     content = txt_path.read_text(encoding="utf-8")
-    assert ("Stand: 2026-10-01" in content) or ("Stand: 2026-09-30" in content)
+    assert "Inventory snapshot recorded:" in content
+    assert "Scope note updated:" in content
     assert "NOTICE" in content
     assert "THIRD_PARTY_LICENSES.md" in content
-    for inv in [
-        "INV-LOCAL-01",
-        "INV-UNPRIV-02",
-        "INV-NONDEST-03",
-        "INV-ISOLATION-04",
-        "INV-BOUNDED-05",
-        "INV-PORTABLE-06",
-        "INV-MANIFEST-07",
-        "INV-A11Y-08",
-        "INV-FAILCLOSED-09",
-        "INV-SLA-10",
-    ]:
-        assert f"{inv}:" in content
-        assert "(VERIFIED)" in content
+    assert "Package: PySide6" in content
+    assert "Package: Poppler" in content
+    assert "SPDX: GPL-2.0-or-later" in content
 
 
 def test_changelog_unreleased_pfad_a_hygiene() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     assert "## [Unreleased]" in changelog
-    assert "Pfad A: Repository-Hygiene, CI-Lifecycle-Workflows" in changelog
-    assert "NOTICE" in changelog
     assert "T-20260920-167562623" in changelog
-    assert "2026-09-30" in changelog
-
-
-def test_ascii_four_view_topology_projection() -> None:
-    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
-    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
-
-    # English 4-view topology
-    assert "Four-View Architectural Topology Projection" in readme_en
-    assert "[VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]" in readme_en
-    assert "[VIEW 2: ASYNC ORCHESTRATION, WORKER THREAD & DISPATCHER ENGINE]" in readme_en
-    assert "[VIEW 3: CORE OCR PIPELINE, POPPLER RASTERIZER & TESSERACT ENGINE]" in readme_en
-    assert "[VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]" in readme_en
-
-    # German 4-view topology
-    assert "Vier-Sichten Architektur-Topologie Projektion" in readme_de
-    assert "[SICHT 1: AUFNAHME, DRAG-AND-DROP-WARTESCHLANGE & BARRIEREFREIHEIT]" in readme_de
-    assert "[SICHT 2: ASYNCHRONE ORCHESTRIERUNG, WORKER-THREAD & DISPATCHER-ENGINE]" in readme_de
-    assert "[SICHT 3: KERN-OCR-PIPELINE, POPPLER-RASTERISIERER & TESSERACT-ENGINE]" in readme_de
-    assert "[SICHT 4: AIR-GAP-SICHERHEITSPERIMETER, ZERO-EGRESS & DATEISYSTEMGRENZE]" in readme_de
-
-    # Reciprocal anchors in both
-    for content in (readme_en, readme_de):
-        assert 'id="four-view-architectural-topology-projection"' in content
-        assert 'id="vier-sichten-architektur-topologie-projektion"' in content
+    assert "Documentation scope correction" in changelog
 
 
 def test_pep621_seo_keywords_expansion() -> None:
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    for keyword in ("zero-egress", "offline-first", "batch-ocr", "accessibility", "local-first", "pdf", "ocr"):
+    for keyword in ("batch-ocr", "accessibility", "local-first", "pdf", "ocr"):
         assert f'"{keyword}"' in content
-
-
-def test_marketing_log_pfad_b_recency() -> None:
-    log_path = ROOT / "MARKETING-LOG.txt"
-    assert log_path.exists()
-    content = log_path.read_text(encoding="utf-8")
-    assert "2026-10-01" in content
-    assert "[PFAD_B_DISCOVERABILITY_AND_DESIGN]" in content
-    assert "FOUR-VIEW ARCHITECTURAL TOPOLOGY" in content
-    assert "doc-bricks/PDFtoPDFocr" in content
-
-
-def test_changelog_pfad_b_recency() -> None:
-    changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert "## [Unreleased]" in changelog
-    assert "Pfad B: Discoverability, Visuelle Vier-Sichten-Architektur, Level 1 SBOM Re-Audit & Vertragstests (2026-10-01)" in changelog
-    assert "T-20260920-167562623" in changelog
-    assert "2026-10-01" in changelog

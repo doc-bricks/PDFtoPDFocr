@@ -24,7 +24,7 @@ Die Anwendung lädt fehlende Tesseract-Traineddata-Dateien bei aktiver Internetv
 Alternativ können `.traineddata`-Dateien manuell in den Ordner `tessdata/` im Anwendungsverzeichnis abgelegt werden.
 
 **Funktioniert die Anwendung offline?**
-Ja. Sobald die gewünschten Sprachpakete vorhanden sind, läuft die gesamte Texterkennung vollständig lokal ohne Internetverbindung ab. Es werden keine Daten an externe Server übertragen.
+Wenn die benötigten Werkzeuge und Sprachdaten lokal vorhanden sind, kann die OCR ohne Internetverbindung laufen. Fehlen ausgewählte Tesseract-Sprachdaten, kann die Anwendung sie von GitHub laden. Sie stellt keine Netzwerksperre bereit.
 
 **Was geschieht mit meinen Originaldateien?**
 Ihre Originaldateien bleiben unberührt. Die durchsuchbare PDF-Datei wird standardmäßig als neue Datei mit dem Suffix `_ocred.pdf` im gewählten Ausgabeordner gespeichert.
@@ -59,7 +59,7 @@ The application automatically downloads missing Tesseract traineddata packages f
 Alternatively, `.traineddata` files can be placed manually into the `tessdata/` folder in the application directory.
 
 **Does the application work offline?**
-Yes. Once the required language packages are downloaded, all OCR recognition runs completely locally without requiring an internet connection. No document data leaves your computer.
+OCR can run without an internet connection when the required tools and language data are already available locally. If selected Tesseract data is missing, the application can download it from GitHub. The application does not provide a network block.
 
 **What happens to my original files?**
 Your original files remain untouched. The searchable PDF is saved as a new file with the suffix `_ocred.pdf` in the designated output folder.

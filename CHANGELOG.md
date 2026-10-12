@@ -5,6 +5,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Documentation scope correction (2026-10-12)
+- Current documentation distinguishes local OCR processing from network enforcement: the application can request missing Tesseract language data from GitHub and does not provide a firewall or sandbox.
+- Third-party license pages are selected information, not a complete SBOM, compliance audit, or copyleft-isolation certification. Process boundaries do not establish a legal boundary.
+- These corrections supersede broad security, privacy, accessibility, and licensing descriptions in dated historical notes below; historical release dates and test counts remain unchanged. Version 1.1.4 remains frozen.
+
 ## [1.1.4] - 2026-10-04
 
 ### OCR completeness and safe output publication (2026-10-02)
