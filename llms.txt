@@ -1,81 +1,65 @@
 # PDFtoPDFocr
 
-## Last-checked: 2026-10-01
-
-## Canonical Links
+## Project
 
 - Repository: https://github.com/doc-bricks/PDFtoPDFocr
-- License: MIT (`LICENSE`)
-- Attribution & Notice: `NOTICE`
-- Contributing Guide: `CONTRIBUTING.md`
-- Primary app: `PDFtoPDFocr_2.py`
-- README languages: `README.md` (EN), `README_de.md`, `README_es.md`, `README_zh.md`, `README_ja.md`, `README_ru.md`
-- Localization: `translator.py`, `manage_translations.py`, `translations.json` (6 languages: DE, EN, ES, ZH, JA, RU)
-- Export contract: `EXPORTFORMAT.md`
-- Privacy policy: `PRIVACY_POLICY.md`
-- Security policy: `SECURITY.md`
-- Third-party licenses & Level 1 SBOM: `THIRD_PARTY_LICENSES.md` / `THIRD_PARTY_LICENSES.txt`
-- Marketing & discoverability log: `MARKETING-LOG.txt`
-- Store listing draft: `STORE_LISTING.md`
+- Project license: MIT (LICENSE)
+- Current source line: 1.1.4 (version frozen)
+- Python wheel: distribution metadata only; use the source checkout and requirements to run the desktop application.
+- Main application: PDFtoPDFocr_2.py
+- Export format: EXPORTFORMAT.md
+- Security and data-handling notes: SECURITY.md, PRIVACY_POLICY.md
+- Selected third-party license information: THIRD_PARTY_LICENSES.md and THIRD_PARTY_LICENSES.txt
+- Store listing draft: STORE_LISTING.md
 
 ## Summary
 
-PDFtoPDFocr is a local-first Windows desktop tool for converting scanned PDF files into searchable PDFs with Tesseract OCR. It uses PySide6 for the GUI, pdf2image/Poppler for page rasterization, pytesseract/Tesseract for OCR, and pikepdf/QPDF for PDF output.
+PDFtoPDFocr is a desktop application for turning scanned PDFs and images into searchable PDFs. The application uses PySide6 for its interface, Poppler through pdf2image for PDF rasterization, Tesseract through pytesseract for OCR, and pikepdf for PDF output.
 
-The app is designed for private document workflows such as invoices, letters, contracts, forms, and archive scans. PDF files are processed locally and are not uploaded. Network access is limited to downloading missing public Tesseract language packs from GitHub.
+The OCR and PDF-processing steps use local files and tools. The GUI source can request a missing Tesseract traineddata file from GitHub for the selected OCR language. This describes an application behavior; the program does not provide a firewall, network filter, or sandbox.
 
-## Architectural Topology (4 Views)
+## Related projects
 
-- **View 1 (Ingestion & UI)**: PySide6 Desktop GUI (`PDFtoPDFocr_2.py`), drag-and-drop batch queue (`PDFListWidget`), WCAG AA a11y, 6-language i18n, unprivileged execution (`INV-UNPRIV-02`).
-- **View 2 (Async Orchestration)**: Asynchronous non-blocking QThread worker execution, cancellation & safe lease guard, portable job manifest (`pdftopdfocr-job-v1.json`, `INV-MANIFEST-07`), fail-closed page error trapping (`INV-FAILCLOSED-09`).
-- **View 3 (Core OCR Pipeline)**: Poppler/pdf2image multi-page rasterizer (`INV-BOUNDED-05`), alpha-normalizer, Tesseract OCR engine with official GitHub traineddata auto-download, pikepdf lossless PDF assembler (`INV-NONDEST-03`).
-- **View 4 (Air-Gap Perimeter & Governance)**: 100% local-first zero-egress perimeter (`INV-LOCAL-01`), subprocess isolation (`INV-ISOLATION-04`), permissive MIT/Apache/MPL runtime, Level 1 SBOM (`THIRD_PARTY_LICENSES.txt`), 48h security SLA (`INV-SLA-10`).
+These are separately usable tools in the same project ecosystem; this list does not imply runtime integration:
 
-## Interfaces
+- [DokuReader](https://github.com/doc-bricks/DokuReader) — local document-reading library.
+- [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) — retrieves document attachments from email workflows.
+- [UniversalInvoiceMail](https://github.com/doc-bricks/UniversalInvoiceMail) — extracts invoice data and can export DATEV-style CSV; this is not a DATEV certification.
 
-- Desktop GUI: `python PDFtoPDFocr_2.py`
-- Windows launcher: `START.bat`
-- Translation Auditor & Scanner: `python manage_translations.py --check`
-- Portable build: `python build_release.py --clean`
-- Direct PyInstaller build: `python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec`
-- Test suite: `python -m pytest` (174 collected: 173 passed, 1 skipped) [2026-10-04]
-- Package configuration: `pyproject.toml` (PEP 621 metadata)
-- Key test files: `tests/test_assets_and_icons.py`, `tests/test_i18n.py`, `tests/test_ui_accessibility.py`, `tests/test_security_license_contract.py`, `tests/test_metadata.py`, `tests/test_tesseract_config.py`, `tests/test_export_format.py`, `tests/test_bug_regressions.py`, `tests/test_app_assets.py`, `tests/test_cli_file_arguments.py`
+## Application data and network behavior
 
-## Data And Export Format
+- Source documents are opened for local processing and output PDFs are written to the selected destination. The application does not provide a document-upload feature.
+- When the selected Tesseract language data is missing, the GUI can make an HTTPS GET request to GitHub for that language data. This request is for the public model file, not the selected PDF.
+- The UI language and export-folder preference are stored in a per-user configuration file under the platform configuration directory.
+- An exported pdftopdfocr-job-v1.json manifest can include local paths, language, status, messages, and output hints. Review it before sharing; it does not embed the PDF bytes.
+- The application does not restrict network access for the operating system or for other installed tools. Child processes inherit the launching process's permissions.
 
-- OCR outputs are written beside the source PDF with the `_ocred.pdf` suffix (or configured output folder).
-- `Job-Export` writes `pdftopdfocr-job-v1.json`.
-- The job manifest stores OCR language, local path references, file metadata, status, messages, and output hints.
-- The job manifest does not embed PDF bytes or Base64 document contents.
-- `EXPORTFORMAT.md` is the source of truth for the v1 manifest fields.
+## Main components
 
-## Packaging Notes
+- GUI, job queue, and worker: PDFtoPDFocr_2.py
+- Translation tables and language switching: translations.json, translator.py
+- Translation consistency checker: python manage_translations.py --check
+- Job export format: EXPORTFORMAT.md
+- Portable build workflow: build_release.py --clean
+- PyInstaller specification: PDFtoPDFocr.spec
 
-- `tesseract_portable/`, `tessdata/`, `poppler/`, `dist/`, `build/`, `.build_venv/`, and `releases/` are local runtime/build artifacts and stay out of Git.
-- `store_package.json`, `STORE_LISTING.md`, `PRIVACY_POLICY.md`, `THIRD_PARTY_LICENSES.md`, `THIRD_PARTY_LICENSES.txt`, and `RELEASES.md` document the Windows Store and release path.
-- The current release line is `1.1.4`.
+## Development commands
 
-## Safety Boundaries
+The project source supports Python 3.10 or newer. Install the dependencies listed in requirements.txt; development checks are listed in requirements-dev.txt.
 
-- Do not commit PDFs, OCR outputs, user job manifests, bundled runtime binaries, release bundles, credentials, or local maintenance notes.
-- Keep German end-user documentation with real umlauts when German text is edited.
-- Keep README claims aligned with the implementation: the app supports selectable OCR language, not automatic document language detection.
+- Run from a source checkout: python PDFtoPDFocr_2.py
+- Check translations: python manage_translations.py --check
+- Run tests: python -m pytest
+- Check lint: python -m ruff check .
+- Compile Python sources: python -m compileall -q .
+- Build a local release bundle: python build_release.py --clean
 
-## Audience
+pyproject.toml contains project and build metadata. Its metadata wheel is not a desktop application installer; use the documented source or Windows build path.
 
-- Windows users with scanned PDF documents (invoices, letters, contracts, forms, archive scans) who need full-text search without cloud upload
-- Developers looking for a PySide6 desktop app reference with portable Tesseract/Poppler bundling, PyInstaller packaging, and a fire-and-forget CLI/GUI workflow
-- IT automation engineers running batch OCR pipelines on managed Windows desktops using the `pdftopdfocr-job-v1.json` exchange format
+## Documentation languages
 
-## Search Phrases
+The README is available in English, German, Spanish, Simplified Chinese, Japanese, and Russian. Detailed guides are linked from each language entrypoint.
 
-```
-PDFtoPDFocr scanned PDF OCR searchable Windows
-Tesseract OCR batch PDF converter PySide6 Python
-PDF OCR converter portable Tesseract Poppler Windows desktop
-offline PDF OCR no cloud local file processing
-pdftopdfocr-job-v1.json offline batch pipeline
-PyInstaller PySide6 Tesseract portable Windows app
-scanned invoice OCR searchable PDF automation
-```
+## Search terms
+
+PDF OCR desktop application, searchable scanned PDF, Tesseract OCR, Poppler PDF rasterization, local document processing, multilingual desktop OCR, pdftopdfocr-job-v1.json

@@ -1,33 +1,35 @@
-# Privacy Policy / Datenschutzerklärung
+# Privacy Policy / Datenschutzhinweise
 
-**PDFtoPDFocr** - Last updated: 2026-05-15
+**PDFtoPDFocr** — implementation notes updated: 2026-10-12
 
 ---
 
 ## English
 
-**PDFtoPDFocr** is a local-first desktop application. We are committed to protecting your privacy.
+PDFtoPDFocr is a desktop application that processes selected PDFs and images with local OCR and PDF tools. The following describes the application behavior visible in the project source; it is not a guarantee that the operating system, installed tools, or the surrounding environment block all network traffic.
 
-- **No data collection:** PDFtoPDFocr does not collect, store, or transmit any personal data.
-- **No tracking:** The application contains no analytics, telemetry, or tracking mechanisms of any kind.
-- **Local file processing:** Your PDF files stay on your device and are processed locally.
-- **Local processing only:** All OCR processing is performed locally on your computer using the bundled Tesseract engine.
-- **Limited network use:** If a selected Tesseract language pack is missing, the app can download that public language data from GitHub. PDF files are not uploaded.
-- **Ignored local artifacts:** Build folders, release bundles, runtime binaries, logs, and local secrets are excluded from the repository.
+- **Document processing:** The GUI reads the selected source files for OCR and writes output PDFs to the configured destination. The application code does not provide a document-upload feature.
+- **Language data request:** If Tesseract data for the selected language is missing, the application can send an HTTPS GET request to GitHub for the corresponding public traineddata file. GitHub receives the requested model URL/language and ordinary connection and HTTP request metadata, including the source IP address. The request does not contain the selected PDF or its OCR text. This policy does not make claims about GitHub's retention practices.
+- **Local preferences:** The application stores the selected UI language and, when configured, the export folder in a JSON file under the user's platform configuration directory.
+- **Job manifests:** An exported job manifest can include local file paths, language, status, messages, and output hints. It does not embed PDF bytes. Review a manifest before sharing it because paths and metadata may identify files or users.
+- **Telemetry:** The reviewed GUI source does not define an analytics or telemetry client. This source-level observation does not cover third-party libraries, operating-system services, or separately installed tools.
+
+The application does not provide a firewall or sandbox. Network access is not blocked by this program.
 
 ---
 
 ## Deutsch
 
-**PDFtoPDFocr** ist eine lokal arbeitende Desktop-Anwendung. Der Schutz Ihrer Privatsphäre ist uns wichtig.
+PDFtoPDFocr ist eine Desktop-Anwendung, die ausgewählte PDFs und Bilder mit lokalen OCR- und PDF-Werkzeugen verarbeitet. Die folgenden Hinweise beschreiben das im Projektquellcode sichtbare Verhalten. Sie garantieren nicht, dass Betriebssystem, installierte Werkzeuge oder die übrige Umgebung sämtlichen Netzwerkverkehr sperren.
 
-- **Keine Datenerhebung:** PDFtoPDFocr erhebt, speichert oder überträgt keine personenbezogenen Daten.
-- **Kein Tracking:** Die Anwendung enthält keinerlei Analyse-, Telemetrie- oder Tracking-Mechanismen.
-- **Lokale Dateiverarbeitung:** Ihre PDF-Dateien bleiben auf Ihrem Gerät und werden lokal verarbeitet.
-- **Nur lokale Verarbeitung:** Alle OCR-Verarbeitungen erfolgen lokal auf Ihrem Computer mit der integrierten Tesseract-Engine.
-- **Begrenzter Netzwerkzugriff:** Wenn ein ausgewähltes Tesseract-Sprachpaket fehlt, kann die App diese öffentlichen Sprachdaten von GitHub herunterladen. PDF-Dateien werden nicht hochgeladen.
-- **Ausgeschlossene lokale Artefakte:** Build-Ordner, Release-Bundles, Runtime-Binaries, Logs und lokale Secrets sind vom Repository ausgeschlossen.
+- **Dokumentverarbeitung:** Die GUI liest ausgewählte Quelldateien für die OCR und schreibt Ergebnis-PDFs in den konfigurierten Zielordner. Der Anwendungscode bietet keine Funktion zum Hochladen von Dokumenten.
+- **Sprachdatenabruf:** Fehlen Tesseract-Daten für die ausgewählte Sprache, kann die Anwendung per HTTPS-GET die passende öffentliche traineddata-Datei von GitHub abrufen. GitHub erhält dabei die angefragte Modell-URL/Sprache sowie übliche Verbindungs- und HTTP-Metadaten einschließlich der Quell-IP-Adresse. Die Anfrage enthält weder das ausgewählte PDF noch dessen OCR-Text. Diese Hinweise treffen keine Aussage zu GitHubs Aufbewahrung dieser Daten.
+- **Lokale Einstellungen:** Die Anwendung speichert die UI-Sprache und, falls festgelegt, den Exportordner in einer JSON-Datei im plattformspezifischen Benutzer-Konfigurationsordner.
+- **Job-Manifeste:** Ein exportiertes Job-Manifest kann lokale Dateipfade, Sprache, Status, Meldungen und Ausgabehinweise enthalten. Es enthält keine PDF-Bytes. Prüfen Sie ein Manifest vor der Weitergabe, da Pfade und Metadaten Dateien oder Personen erkennen lassen können.
+- **Telemetrie:** Der geprüfte GUI-Quellcode enthält keinen Analytics- oder Telemetrie-Client. Diese Beobachtung auf Quellcodeebene umfasst keine Drittanbieterbibliotheken, Betriebssystemdienste oder separat installierten Werkzeuge.
+
+Die Anwendung stellt keine Firewall und keine Sandbox bereit. Dieses Programm sperrt den Netzwerkzugriff nicht.
 
 ---
 
-*Publisher: Geiger | CN=52596601-BAB4-4F3F-B182-E8F3F273B202*
+*Publisher identity for the Windows package: Geiger | CN=52596601-BAB4-4F3F-B182-E8F3F273B202*

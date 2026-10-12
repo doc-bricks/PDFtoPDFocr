@@ -41,13 +41,13 @@ def test_dependency_security_minimum_floors() -> None:
     assert "ruff>=0.9.0" in dev_requirements
 
 
-def test_third_party_license_inventory_completeness() -> None:
+def test_selected_third_party_license_inventory_structure() -> None:
     tp_file = ROOT / "THIRD_PARTY_LICENSES.txt"
     assert tp_file.exists()
     tp_text = tp_file.read_text(encoding="utf-8")
 
-    assert re.search(r"Stand:\s*2026-\d{2}-\d{2}", tp_text), "Must contain valid 2026 audit date"
-    assert ("Stand: 2026-10-01" in tp_text) or ("Stand: 2026-09-30" in tp_text) or ("Stand: 2026-09-26" in tp_text)
+    assert "Inventory snapshot recorded:" in tp_text
+    assert "Scope note updated:" in tp_text
 
     # Standard 5-field schema validation
     assert "Package:" in tp_text
@@ -58,6 +58,9 @@ def test_third_party_license_inventory_completeness() -> None:
 
     required_components = [
         "PySide6",
+        "PySide6_Essentials",
+        "PySide6_Addons",
+        "shiboken6",
         "Qt6",
         "pytesseract",
         "Pillow",
@@ -83,13 +86,29 @@ def test_third_party_license_inventory_completeness() -> None:
     for comp in required_components:
         assert comp in tp_text, f"Missing third party license declaration for: {comp}"
 
-    # SPDX identifier checks
-    assert "SPDX: LGPL-3.0-only" in tp_text
+    # Check the package-specific license expressions recorded from the inspected metadata.
+    pyside6_record = re.search(r"(?ms)^Package: PySide6\n(.*?)(?=^Package: |\Z)", tp_text)
+    shiboken_record = re.search(r"(?ms)^Package: shiboken6\n(.*?)(?=^Package: |\Z)", tp_text)
+    essentials_record = re.search(r"(?ms)^Package: PySide6_Essentials\n(.*?)(?=^Package: |\Z)", tp_text)
+    addons_record = re.search(r"(?ms)^Package: PySide6_Addons\n(.*?)(?=^Package: |\Z)", tp_text)
+    pyinstaller_record = re.search(r"(?ms)^Package: PyInstaller\n(.*?)(?=^Package: |\Z)", tp_text)
+    assert pyside6_record is not None
+    assert "SPDX: LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only" in pyside6_record.group(1)
+    assert shiboken_record is not None
+    assert "SPDX: LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only" in shiboken_record.group(1)
+    assert essentials_record is not None
+    assert "SPDX: LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only" in essentials_record.group(1)
+    assert addons_record is not None
+    assert "SPDX: LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only" in addons_record.group(1)
+    qt6_record = re.search(r"(?ms)^Package: Qt6\n(.*?)(?=^Package: |\Z)", tp_text)
+    assert qt6_record is not None
+    assert "SPDX: NOASSERTION" in qt6_record.group(1)
+    assert pyinstaller_record is not None
+    assert "SPDX: GPL-2.0-or-later WITH Bootloader-exception" in pyinstaller_record.group(1)
     assert "SPDX: Apache-2.0" in tp_text
     assert "SPDX: MIT" in tp_text
     assert "SPDX: HPND" in tp_text
     assert "SPDX: MPL-2.0" in tp_text
-    assert "SPDX: GPL-2.0-or-later" in tp_text
 
 
 def test_no_hardcoded_user_paths_in_repo() -> None:
@@ -131,7 +150,7 @@ def LOCAL_files_iter():
     for f in ROOT.rglob("*"):
         if not f.is_file():
             continue
-        if any(part in f.parts for part in (".git", ".pytest_cache", ".ruff_cache", "assets", "store_assets", "README", "build", "dist")):
+        if any(part in f.parts for part in (".git", ".pytest_cache", ".ruff_cache", ".build_venv", "assets", "store_assets", "README", "build", "dist")):
             continue
         if f.suffix.lower() in skip_suffixes:
             continue
@@ -163,7 +182,7 @@ def test_gitignore_security_and_conflict_rules() -> None:
     assert "*.bak" in gitignore
 
 
-def test_security_policy_bilingual_and_sla() -> None:
+def test_security_policy_bilingual_and_report_channels() -> None:
     sec_file = ROOT / "SECURITY.md"
     assert sec_file.is_file()
     sec = sec_file.read_text(encoding="utf-8")
@@ -175,14 +194,9 @@ def test_security_policy_bilingual_and_sla() -> None:
     assert "security@ellmos.ai" in sec
     assert "support@lukasgeiger.com" in sec
     assert "https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new" in sec
-    assert "48 Stunden" in sec or "48 hours" in sec
-    assert "5 Werktagen" in sec or "5 business days" in sec
-    assert "Zero-Egress" in sec
-    assert "Non-Destructive" in sec or "Verlustfrei" in sec or "Original" in sec
-    assert "Non-Elevation" in sec or "Administrator" in sec or "user mode" in sec.lower()
 
 
-def test_local_first_and_offline_invariants() -> None:
+def test_application_source_has_no_known_analytics_endpoints() -> None:
     disallowed_patterns = [
         re.compile(r"google-analytics\.com", re.IGNORECASE),
         re.compile(r"mixpanel\.com", re.IGNORECASE),
@@ -199,13 +213,10 @@ def test_local_first_and_offline_invariants() -> None:
             assert not pat.search(text), f"Disallowed telemetry pattern {pat.pattern} found in {py_file.name}"
 
 
-def test_license_compatibility_and_subprocesses() -> None:
+def test_license_inventory_names_project_and_external_tools() -> None:
     tp_text = (ROOT / "THIRD_PARTY_LICENSES.txt").read_text(encoding="utf-8")
-    md_text = (ROOT / "THIRD_PARTY_LICENSES.md").read_text(encoding="utf-8")
 
     assert "MIT-Lizenz" in tp_text or "MIT License" in tp_text
-    assert "dynamische Bindung" in tp_text or "Dynamically linked" in tp_text
-    assert "Subprozess-Isolation" in tp_text or "process boundary" in md_text
     assert "Bootloader" in tp_text
     assert "Poppler" in tp_text
     assert "Tesseract" in tp_text

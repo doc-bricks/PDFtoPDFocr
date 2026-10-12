@@ -2,472 +2,221 @@
 
 [English](README.md) | [Deutsch](README_de.md) | [Español](README_es.md) | [中文](README_zh.md) | [日本語](README_ja.md) | [Русский](README_ru.md)
 
-# PDFtoPDFocr - Local-First PDF OCR Converter
+# PDFtoPDFocr — searchable PDFs from scans and images
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Version 1.1.4](https://img.shields.io/badge/version-1.1.4-blue.svg)](pyproject.toml)
-[![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![UI Engine](https://img.shields.io/badge/UI%20Engine-PySide6%20%7C%20Qt-41cd52.svg)](https://www.qt.io/)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](#requirements--platform-matrix)
-[![Privacy](https://img.shields.io/badge/privacy-100%25%20Offline%20%2F%20Zero--Egress-success.svg)](#privacy--security-model)
-[![Security](https://img.shields.io/badge/security-Local--First-blue.svg)](SECURITY.md)
-[![i18n](https://img.shields.io/badge/i18n-DE%20%7C%20EN%20%7C%20ES%20%7C%20ZH%20%7C%20JA%20%7C%20RU-blue.svg)](#core-features)
-[![Pytest](https://img.shields.io/badge/pytest-173%20passed%20%7C%201%20skipped-brightgreen.svg)](tests/)
-[![Third-Party Audited](https://img.shields.io/badge/Third--Party-Audited-green.svg)](THIRD_PARTY_LICENSES.md)
-[![Level 1 SBOM](https://img.shields.io/badge/Level%201%20SBOM-Plain%20Text-success.svg)](THIRD_PARTY_LICENSES.txt)
-[![Attribution](https://img.shields.io/badge/Attribution-NOTICE-informational.svg)](NOTICE)
-[![Marketing Log](https://img.shields.io/badge/Marketing--Log-Active-blue.svg)](MARKETING-LOG.txt)
-[![LLM-Ready](https://img.shields.io/badge/LLM--Ready-llms.txt-blueviolet.svg)](llms.txt)
-[![Ecosystem](https://img.shields.io/badge/Ecosystem-doc--bricks-orange.svg)](https://github.com/doc-bricks)
-[![Umbrella](https://img.shields.io/badge/Umbrella-open--bricks-blue.svg)](https://github.com/open-bricks)
-[![Last Checked](https://img.shields.io/badge/last%20checked-2026--10--01-informational.svg)](tests/)
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#requirements--platform-matrix)
 
-Converts scanned PDF files and raw images into searchable PDFs using local OCR (optical character recognition) with Tesseract. Features multi-format batch processing, selectable OCR language with automatic language pack download, non-destructive original file preservation, accessible UI ergonomics, and portable Tesseract/Poppler integration.
+PDFtoPDFocr is a desktop application that turns scanned PDFs and image files into searchable PDFs using Tesseract OCR. It supports batch input, selectable OCR languages, and preservation of the original files.
 
-Machine-readable project context: [`llms.txt`](llms.txt) | [Deutsche Dokumentation](README_de.md) | [Security Policy](SECURITY.md)
+OCR and PDF assembly use local tools. When a selected Tesseract language file is missing, the application can download that file from GitHub. The application does not provide a network-blocking sandbox or firewall.
 
-> [!NOTE]
-> **AI & LLM Integration:** This repository contains a structured [`llms.txt`](llms.txt) file providing machine-readable context, architectural details, CLI/GUI interfaces, and test entry points for autonomous agents and developer tooling.
+> This concise entry point replaces the detailed predecessor [README-archive-2026-10-12.md](README-archive-2026-10-12.md). The detailed guide is archived there with current claims corrected; the unmodified source is available at [commit 3cfce468](https://github.com/doc-bricks/PDFtoPDFocr/blob/3cfce468f20307bcbc158dd969c3ad304f34b4fe/README.md).
 
-> [!TIP]
-> **Privacy & Local-First Processing:** PDF and image files are processed 100% locally on your machine. Documents and OCR texts are never uploaded to any remote server or cloud API (`INV-LOCAL-01`).
+Machine-readable context: [`llms.txt`](llms.txt) · [Security policy](SECURITY.md) · [Third-party license inventory](THIRD_PARTY_LICENSES.md)
 
----
+## Quick navigation
 
-## 🧭 Quick Navigation
-
-1. 📸 [Visual Showcase & Interface Overview](#visual-showcase)
-2. 🏛️ [System Architecture & 5-Layer Topology](#system-architecture--component-workflow)
-3. 🔄 [Local Data Flow & Document OCR Processing Lifecycle](#local-data-flow--privacy-isolation)
-4. 🚀 [Quick Start & Key Operations](#quick-start--key-operations)
-5. ✨ [Core Features & Performance Capabilities](#core-features)
-6. 🎯 [Target Personas & High-Intent Search Intent](#target-personas--discoverability)
-7. ⚖️ [10-Dimension Comparative Matrix vs. 5 Alternatives](#comparative-matrix--alternatives)
-8. ⌨️ [Accessibility, WCAG Ergonomics & Keyboard Shortcuts](#accessibility--keyboard-shortcuts)
-9. 💻 [Requirements & Platform Matrix](#requirements--platform-matrix)
-10. 📦 [Installation & Portable Setup](#installation--portable-setup)
-11. 🖥️ [Usage & Execution Guidelines](#usage--execution-guidelines)
-12. 🧪 [Automated Testing & Quality Verification](#tests--quality-verification)
-13. 🌐 [Sibling Tools & Ecosystem Integration](#sibling-tools--ecosystem)
-14. 📜 [Level 1 SBOM & Third-Party Licenses Transparency](#third-party-licenses--transparency)
-15. 🔒 [Privacy & Security Model (Invariants INV-LOCAL-01..INV-SLA-10)](#privacy--security-model)
-16. 🪟 [EXE & Distribution Packaging (Windows Store MSIX & Portable)](#exe--distribution-packaging)
-17. 🤖 [Machine-Readable LLM Context (llms.txt)](#machine-readable-llm-context)
-18. ⚖️ [Statutory Notice (§ 521 BGB) & License](#statutory-notice--license)
-
----
+1. [Visual showcase](#visual-showcase)
+2. [Architecture](#system-architecture--component-workflow)
+3. [Local data flow](#local-data-flow--privacy-isolation)
+4. [Quick start](#quick-start--key-operations)
+5. [Features](#core-features)
+6. [Use cases](#target-personas--discoverability)
+7. [Comparing tools](#comparative-matrix--alternatives)
+8. [Accessibility](#accessibility--keyboard-shortcuts)
+9. [Requirements](#requirements--platform-matrix)
+10. [Installation](#installation--portable-setup)
+11. [Usage](#usage--execution-guidelines)
+12. [Related projects](#sibling-tools--ecosystem)
+13. [Tests](#tests--quality-verification)
+14. [Third-party licenses](#third-party-licenses--transparency)
+15. [Privacy and security](#privacy--security-model)
+16. [Desktop packaging](#exe--distribution-packaging)
+17. [LLM context](#machine-readable-llm-context)
+18. [License and legal note](#statutory-notice--license)
 
 <a id="visual-showcase"></a>
 <a id="visuelle-showcase-galerie"></a>
-## 📸 Visual Showcase & Interface Overview
+## Visual showcase
 
-| Primary Interface | Visual Assets & App Identity |
-|:---:|:---:|
-| ![PDFtoPDFocr main window](README/screenshots/main.png)<br/><sub>**Batch Conversion Queue** — Drag-and-drop file ingestion, dynamic language selection, real-time item status badges, and non-blocking worker progress.</sub> | <img src="assets/banner.png" width="90%" alt="PDFtoPDFocr Branding Banner"><br/><sub>**High-Resolution App Identity** — Native Windows Store, MSIX package icon set, and accessible contrast palettes.</sub> |
-
----
+Screenshots and the detailed interface walkthrough are in the [archived guide](README-archive-2026-10-12.md#visual-showcase).
 
 <a id="system-architecture--component-workflow"></a>
 <a id="systemarchitektur--komponenten-workflow"></a>
-## 🏛️ System Architecture & 5-Layer Topology
+## Architecture
 
 ```mermaid
-flowchart TD
-    subgraph UI ["Layer 1: User Interface & Ingestion"]
-        GUI["PySide6 Desktop Application<br/>(PDFtoPDFocr_2.py)"]
-        QUEUE["Drag & Drop File Queue<br/>(PDFListWidget & Path Sanitizer)"]
-        I18N["Dynamic Localization Engine<br/>(translations.json - DE/EN/ES/ZH/JA/RU)"]
-        A11Y["WCAG AA Accessibility Layer<br/>(Screen-Reader Names, High-Contrast Badges)"]
-    end
-
-    subgraph Router ["Layer 2: Async Orchestration & Dispatcher"]
-        DISPATCHER["Task Dispatcher & Worker Thread<br/>(Non-blocking QThread execution)"]
-        CANCEL["Cancellation & Safe Lease Guard<br/>(Thread-safe interruption traps)"]
-        MANIFEST["Job Manifest Generator<br/>(pdftopdfocr-job-v1.json)"]
-    end
-
-    subgraph Core ["Layer 3: Core OCR & Transformation Pipeline"]
-        RASTER["pdf2image Rasterizer<br/>(Poppler Engine Subprocess)"]
-        IMGNORM["Image Normalizer<br/>(Alpha Compositing & EXIF Transposition)"]
-        OCR["Tesseract OCR Engine<br/>(Portable Binary & Auto Language Pack DL)"]
-        ASSEMBLER["pikepdf Output Assembler<br/>(Lossless Searchable PDF Generation)"]
-    end
-
-    subgraph Storage ["Layer 4: Local Storage & Security Boundary"]
-        FS["Local File System Boundary<br/>(Zero-Egress / 100% Offline)"]
-        NONDEST["Non-Destructive Target Preserver<br/>(*_ocred.pdf / Output Folder)"]
-        SEC["Security & Invariants Engine<br/>(INV-LOCAL-01 to INV-SLA-10)"]
-    end
-
-    subgraph Packaging ["Layer 5: Packaging & Distribution Artifacts"]
-        PYINSTALLER["PyInstaller Bundle Engine<br/>(Single-File / Portable Onedir)"]
-        MSIX["Windows Store MSIX Bridge<br/>(store_package.json & AppxManifest)"]
-    end
-
-    GUI --> DISPATCHER
-    QUEUE --> DISPATCHER
-    I18N --> GUI
-    A11Y --> GUI
-    DISPATCHER --> RASTER
-    DISPATCHER --> IMGNORM
-    IMGNORM --> OCR
-    RASTER --> OCR
-    OCR --> ASSEMBLER
-    ASSEMBLER --> NONDEST
-    NONDEST --> FS
-    DISPATCHER --> MANIFEST
-    MANIFEST --> FS
-    SEC -.-> FS
-    PYINSTALLER -.-> GUI
-    MSIX -.-> GUI
+flowchart LR
+    User --> App["PDFtoPDFocr desktop app"]
+    App --> Poppler["Poppler: PDF pages to images"]
+    App --> Tesseract["Tesseract: OCR text"]
+    App --> Output["Searchable PDF"]
+    App -. "if selected language data is missing" .-> GitHub["GitHub language-data download"]
 ```
 
 <a id="four-view-architectural-topology-projection"></a>
 <a id="vier-sichten-architektur-topologie-projektion"></a>
-### Four-View Architectural Topology Projection
+### Architecture details
 
-```
-+===================================================================================================================+
-|                                    PDFtoPDFocr ARCHITECTURAL TOPOLOGY (4 VIEWS)                                   |
-+===================================================================================================================+
-| [VIEW 1: INGESTION, DRAG-AND-DROP QUEUE & ACCESSIBILITY]                                                          |
-|  * PySide6 Desktop GUI (PDFtoPDFocr_2.py) with drag-and-drop batch file queue (PDFListWidget)                      |
-|  * WCAG AA Screen-reader accessibility (QAccessibleInterface), high-contrast badges & keyboard hotkeys            |
-|  * Dynamic 6-Language Localization Engine (DE / EN / ES / ZH / JA / RU) via translations.json                     |
-|  * Unprivileged user-mode execution [INV-UNPRIV-02] -- Strict RunAsInvoker, zero UAC elevation prompts            |
-+-------------------------------------------------------------------------------------------------------------------+
-                                                          |
-                                                          v
-+-------------------------------------------------------------------------------------------------------------------+
-| [VIEW 2: ASYNC ORCHESTRATION, WORKER THREAD & DISPATCHER ENGINE]                                                  |
-|  * Asynchronous non-blocking QThread worker execution for seamless UI responsiveness and batch processing        |
-|  * Cancellation & Safe Lease Guard with thread-safe interruption traps & real-time progress reporting             |
-|  * Portable Job Manifest Generator producing verifiable pdftopdfocr-job-v1.json [INV-MANIFEST-07]                 |
-|  * Fail-Closed per-page error trapping [INV-FAILCLOSED-09] preventing document corruption                         |
-+-------------------------------------------------------------------------------------------------------------------+
-                                                          |
-                                                          v
-+-------------------------------------------------------------------------------------------------------------------+
-| [VIEW 3: CORE OCR PIPELINE, POPPLER RASTERIZER & TESSERACT ENGINE]                                                |
-|  * Poppler / pdf2image multi-page rasterizer with stream memory buffering [INV-BOUNDED-05]                         |
-|  * Alpha-compositing image normalizer for multi-frame TIFF, PNG, and JPG scans                                    |
-|  * Tesseract OCR engine (portable binary + on-demand official GitHub traineddata auto-download)                    |
-|  * pikepdf lossless PDF assembler injecting searchable full-text OCR layer into non-destructive targets [INV-03] |
-+-------------------------------------------------------------------------------------------------------------------+
-                                                          |
-                                                          v
-+-------------------------------------------------------------------------------------------------------------------+
-| [VIEW 4: AIR-GAP DEFENSE PERIMETER, ZERO-EGRESS & GOVERNANCE BOUNDARY]                                            |
-|  * 100% Local-first & Zero-Egress Perimeter [INV-LOCAL-01] -- zero document uploads or telemetry                  |
-|  * Strict subprocess isolation [INV-ISOLATION-04] keeping external binaries cleanly separated                     |
-|  * Zero-Copyleft & Permissive Runtime (MIT, Apache-2.0, HPND, MPL-2.0, dynamic LGPL-3.0 linking)                   |
-|  * Level 1 SBOM text companion (THIRD_PARTY_LICENSES.txt) audited with 10 runtime invariants [INV-LOCAL-01..10]   |
-|  * Dual Security Response SLA [INV-SLA-10] -- 48h initial response & 5-day triage commitment                      |
-+===================================================================================================================+
-```
-
----
+The detailed component and workflow views are in the [archived guide](README-archive-2026-10-12.md#four-view-architectural-topology-projection).
 
 <a id="local-data-flow--privacy-isolation"></a>
 <a id="lokaler-datenfluss--datenschutz-isolation"></a>
-## 🔄 Local Data Flow & Document OCR Processing Lifecycle
+## Local data flow
 
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as User / Batch Operator
-    participant GUI as PySide6 Desktop GUI
-    participant Worker as Background Worker Thread
-    participant Normalizer as Image Normalizer
-    participant Poppler as Poppler / pdf2image
-    participant Tesseract as Tesseract OCR Engine
-    participant Assembler as pikepdf PDF Assembler
-    participant FS as Local Filesystem Boundary
-
-    User->>GUI: Add PDF or Image Files (Drag & Drop / File Dialog)
-    User->>GUI: Select Target OCR Language (e.g. deu, eng, fra, spa)
-    User->>GUI: Trigger Batch Conversion (Ctrl+Return or Button)
-    GUI->>Worker: Launch asynchronous conversion task
-    loop For Each Document in Queue
-        alt Input is Scanned PDF
-            Worker->>Poppler: Rasterize PDF pages into memory bitmaps
-            Poppler-->>Worker: High-resolution rendered page buffers
-        else Input is Direct Image (PNG, JPG, multi-frame TIFF)
-            Worker->>Normalizer: Alpha-composite transparency onto white background
-            Normalizer-->>Worker: Standardized RGB image frames
-        end
-        loop For Each Page / Frame
-            Worker->>Tesseract: Extract text & bounding boxes via local engine
-            Tesseract-->>Worker: Return OCR text & hOCR / PDF layers
-        end
-        Worker->>Assembler: Inject searchable full-text layer into PDF structure
-        Assembler->>FS: Save output as <filename>_ocred.pdf (Non-destructive)
-        Worker-->>GUI: Update progress bar & color-coded status badge
-    end
-    opt Portable Job Manifest Export
-        GUI->>FS: Write pdftopdfocr-job-v1.json (Zero raw document bytes)
-    end
-    Note over User,FS: 100% Local-First / Zero-Egress Operation (No Cloud Network Egress)
-```
-
----
+PDF processing uses local tools. The source includes a GitHub request to obtain missing Tesseract language data. This describes the application path; it does not establish a system-wide network restriction. See [`SECURITY.md`](SECURITY.md) for the project’s security contact and scope.
 
 <a id="quick-start--key-operations"></a>
 <a id="schnelleinstieg--kernabläufe"></a>
-## 🚀 Quick Start & Key Operations
-
-| Task | Interface / Command | Output / Result |
-|---|---|---|
-| **Launch Desktop App** | `python PDFtoPDFocr_2.py` or `START.bat` | PySide6 Desktop GUI with drag & drop file queue |
-| **Convert Scanned PDFs** | Add files, select language, click "Start" (`Ctrl+Return`) | Non-destructive `*_ocred.pdf` with full-text search layer |
-| **Direct Image OCR** | Drop JPG, PNG, or multi-frame TIFF images | Assembled searchable PDF document |
-| **Merge into Single PDF** | Enable "Auto-Merge" in toolbar | Consolidated multi-document searchable PDF |
-| **Export Job Manifest** | Click "Job-Export" (`Ctrl+E`) | Portable `pdftopdfocr-job-v1.json` manifest |
-| **Run Verification Suite** | `python -m pytest` | 170+ verified unit, regression, accessibility, and metadata tests |
-| **Portable Build** | `python build_release.py --clean` | Self-contained executable in `dist/PDFtoPDFocr/` |
-
----
-
-<a id="core-features"></a>
-<a id="funktionen--features"></a>
-## ✨ Core Features & Performance Capabilities
-
-- **Batch Processing** — Convert multiple PDFs and images simultaneously via file picker or drag & drop.
-- **Direct Image Import** — Convert JPG, PNG, and multi-frame TIFF scans directly into searchable PDFs without extra tooling.
-- **Selectable OCR Language** — Quick selection for German, English, French, Spanish, and dozens of other languages.
-- **Auto-Download** — Missing Tesseract language packs (`.traineddata`) are downloaded automatically on-demand from official GitHub repositories.
-- **Auto-Merge & Stacking** — Merge multiple processed OCR results into a single consolidated PDF document.
-- **Portable Tesseract & Poppler** — Portable builds (`python build_release.py`) bundle Tesseract and Poppler; when running from source, Tesseract and Poppler must be installed or placed in `tesseract_portable/` and `poppler/` next to the app.
-- **Original File Preserved** — Results are saved with the `_ocred.pdf` suffix or in a configured output folder; source files remain untouched.
-- **Job Manifest Export** — Save portable `pdftopdfocr-job-v1.json` manifests containing job settings, execution status, and file metadata.
-- **Full Accessibility (A11y) & Ergonomics** — Screen-reader accessible names and descriptions across all controls, informative tooltips in active language, and complete keyboard shortcuts (`Ctrl+O`, `Ctrl+Return`, `Ctrl+E`, `F5`, `Ctrl+Shift+O`, `Del`/`Backspace`).
-- **High-Contrast Progress** — WCAG-compliant color coding (`#0b6e4f` / `#b45309`) and per-item hover tooltips with real-time status.
-
----
-
-<a id="target-personas--discoverability"></a>
-<a id="zielgruppen--auffindbarkeit"></a>
-## 🎯 Target Personas & High-Intent Search Intent
-
-### Target Personas
-
-- **[PERSONA-01] Legal, Healthcare & Regulatory Compliance Officers:**
-  - *Context:* Managing confidential contracts, medical patient files, tax records, or court filings subject to strict GDPR / HIPAA mandates.
-  - *Pain Point:* Uploading confidential documents to cloud OCR providers (e.g. Adobe Cloud, Google Cloud Vision, Smallpdf) violates zero-egress data privacy mandates and exposes sensitive personal data to third parties.
-  - *How PDFtoPDFocr Solves It:* 100% local, air-gapped OCR processing on-device (`INV-LOCAL-01`). Unprivileged user-mode operation (`INV-UNPRIV-02`). Source files remain strictly untouched (`INV-NONDEST-03`).
-
-- **[PERSONA-02] Archivists, Historians & Academic Researchers:**
-  - *Context:* Digitizing large historical collections of scanned books, multi-frame TIFF manuscripts, and multilingual archives.
-  - *Pain Point:* Cloud-based OCR services incur prohibitive per-page SaaS subscription fees and fail on multi-gigabyte batch queues or multi-frame TIFF scans.
-  - *How PDFtoPDFocr Solves It:* Unlimited local batch conversion for PDFs and raw image queues (JPG, PNG, multi-page TIFF), selectable language models with automated GitHub download of official `.traineddata`, and optional single-PDF consolidation.
-
-- **[PERSONA-03] Privacy-Conscious Knowledge Workers & Desktop Enthusiasts:**
-  - *Context:* Professionals processing receipts, invoices, and study materials on Windows workstations or portable laptops.
-  - *Pain Point:* Commercial desktop suites (Adobe Acrobat Pro, ABBYY FineReader) demand expensive recurring subscriptions, online logins, intrusive background updater daemons, and administrative rights.
-  - *How PDFtoPDFocr Solves It:* Free and open-source MIT desktop tool with zero telemetry, unprivileged standard user execution, portable zero-install directory options (`INV-PORTABLE-06`), and accessible keyboard shortcuts (`INV-A11Y-08`).
-
-- **[PERSONA-04] Automated Pipeline Integrators & Document Workflow Engineers:**
-  - *Context:* Engineers integrating OCR steps into local document ingestion systems, backup archives, or desktop automation pipelines.
-  - *Pain Point:* Most consumer GUI tools lack structured introspection, making it difficult to verify batch processing outcomes or integrate results with downstream automation.
-  - *How PDFtoPDFocr Solves It:* Structured job manifest export (`pdftopdfocr-job-v1.json` / `INV-MANIFEST-07`), fail-closed per-page error recovery (`INV-FAILCLOSED-09`), and comprehensive AI-context indexing via `llms.txt`.
-
-### High-Intent Search Intent Queries
-
-| Locale | Core Search Query | Target Intent & Persona |
-|---|---|---|
-| **EN** | `local pdf ocr converter windows 10 11` | Local-first, offline searchable PDF creation without cloud accounts ([PERSONA-01], [PERSONA-03]) |
-| **EN** | `tesseract ocr batch desktop gui python pyside6` | Developer & power-user desktop workflow with queue processing ([PERSONA-02], [PERSONA-04]) |
-| **EN** | `offline searchable pdf creator zero egress gdpr` | Air-gapped privacy-preserving document compliance ([PERSONA-01]) |
-| **EN** | `convert scanned tiff to searchable pdf desktop free` | Archival scan ingestion from multi-frame TIFF to searchable PDF ([PERSONA-02]) |
-| **EN** | `portable pdf ocr tesseract without cloud` | Zero-install portable workflow on managed workstations ([PERSONA-03], [PERSONA-04]) |
-| **DE** | `gescannte pdf durchsuchbar machen lokal kostenlos` | Kostenlose lokale Texterkennung für gescannte Rechnungen und Dokumente ([PERSONA-03]) |
-| **DE** | `offline pdf ocr texterkennung windows tesseract` | Lokales Tesseract-Desktop-Tool mit deutscher Benutzeroberfläche ([PERSONA-02], [PERSONA-03]) |
-| **DE** | `datenschutzkonforme ocr software ohne cloud dsgvo` | 100% DSGVO-konforme Texterkennung für Kanzleien und Arztpraxen ([PERSONA-01]) |
-| **DE** | `tiff mehrseitig in durchsuchbare pdf umwandeln` | Stapelverarbeitung für historische Scan-Archive ([PERSONA-02]) |
-| **DE** | `portable ocr software ohne installation windows` | Portable Ausführung ohne Administratorrechte ([PERSONA-03], [PERSONA-04]) |
-
----
-
-<a id="comparative-matrix--alternatives"></a>
-<a id="vergleichsmatrix--alternativen"></a>
-## ⚖️ 10-Dimension Comparative Matrix vs. 5 Alternatives
-
-| Evaluation Dimension | Governance Invariant | PDFtoPDFocr (doc-bricks) | Adobe Acrobat Pro | ABBYY FineReader PDF | OCRmyPDF (CLI) | Cloud SaaS (Smallpdf/iLovePDF) |
-|---|---|:---:|:---:|:---:|:---:|:---:|
-| **Zero-Egress Privacy** | `INV-LOCAL-01` | **100% Offline (Local)** | Cloud sync default | Cloud options | **100% Offline (Local)** | No (Cloud Upload Mandatory) |
-| **Privilege Non-Elevation** | `INV-UNPRIV-02` | **Standard User Mode** | Admin daemon / Services | Admin daemon / Services | Depends on host/Docker | Remote Cloud Host |
-| **Non-Destructive Safety** | `INV-NONDEST-03` | **Strict `_ocred.pdf`** | Overwrites / Prompts | Overwrites / Prompts | In-place or new file | Creates cloud object |
-| **Process & Copyleft Isolation**| `INV-ISOLATION-04`| **Subprocess Boundary** | Closed-source proprietary | Closed-source proprietary | MPL-2.0 / Subprocesses | Closed SaaS backend |
-| **Memory Boundedness** | `INV-BOUNDED-05` | **Bounded Page Stream** | Heavy background cache | Heavy background cache | Large PDF memory spikes | Server-side allocation |
-| **Portability / Zero-Install** | `INV-PORTABLE-06` | **Portable folder / exe**| Heavy system installer | Heavy system installer | Requires package manager | Browser client |
-| **Verifiable Job Manifests** | `INV-MANIFEST-07` | **`pdftopdfocr-job-v1.json`**| Proprietary app logs | Proprietary app logs | Terminal stdout/stderr | JSON REST response |
-| **Screen-Reader & Keyboard A11y**| `INV-A11Y-08` | **Full WCAG AA & Hotkeys**| Standard accessibility | Standard accessibility | CLI terminal a11y only | Web UI varies |
-| **Fail-Closed Error Trapping** | `INV-FAILCLOSED-09` | **Per-Page Error Skip** | Modal dialog interruptions| Modal dialog interruptions| CLI non-zero exit code | HTTP 5xx error responses |
-| **Security Response SLA** | `INV-SLA-10` | **48h Response / 5d Triage**| Standard enterprise | Standard enterprise | Best-effort GitHub | Ticket queue |
-
----
-
-<a id="accessibility--keyboard-shortcuts"></a>
-<a id="barrierefreiheit--tastenkürzel"></a>
-## ⌨️ Accessibility, WCAG Ergonomics & Keyboard Shortcuts
-
-| Action | Shortcut | Description |
-|---|---|---|
-| **Add Files** | `Ctrl+O` | Open file selector dialog |
-| **Start OCR** | `Ctrl+Return` | Start batch OCR processing |
-| **Export Job Manifest** | `Ctrl+E` | Export job state as JSON manifest |
-| **Clear List & Reset** | `F5` | Reset file list and status display |
-| **Select Output Folder** | `Ctrl+Shift+O` | Choose custom output directory |
-| **Remove Selected File** | `Del` or `Backspace` | Remove selected item from queue |
-
----
-
-<a id="requirements--platform-matrix"></a>
-<a id="voraussetzungen--plattformmatrix"></a>
-## 💻 Requirements & Platform Matrix
-
-- Python 3.10+
-- Windows 10/11 (Primary release target)
-- macOS / Linux (Source & smoke-test targets)
-
----
-
-<a id="installation--portable-setup"></a>
-<a id="installation--portables-setup"></a>
-## 📦 Installation & Portable Setup
+## Quick start
 
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/doc-bricks/PDFtoPDFocr.git
+cd PDFtoPDFocr
+python -m venv .venv
 ```
 
-Tesseract OCR and Poppler must be available when running from source: either on `PATH` (Tesseract can also be set via `TESSERACT_CMD`) or portable inside the project directory (`tesseract_portable/`, `poppler/`). Missing language packs are downloaded automatically.
+Activate the environment using exactly one command for your shell:
 
----
+PowerShell:
 
-<a id="usage--execution-guidelines"></a>
-<a id="nutzung--ausführungsrichtlinien"></a>
-## 🖥️ Usage & Execution Guidelines
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Command Prompt:
+
+```bat
+.\.venv\Scripts\activate.bat
+```
+
+macOS or Linux:
 
 ```bash
+source .venv/bin/activate
+```
+
+Then install the requirements and launch the application:
+
+```bash
+python -m pip install -r requirements.txt
 python PDFtoPDFocr_2.py
 ```
 
-On Windows, `START.bat` also serves as a double-click desktop launcher.
+The Python wheel built from this repository contains distribution metadata only; it does not install the desktop application. Use this source checkout to run the app.
 
-1. Add PDFs or images via file picker or drag & drop.
-2. Select OCR language (missing language packs are downloaded automatically).
-3. Click "Start" — done.
-4. Optionally use `Job-Export` to save a portable `pdftopdfocr-job-v1.json` manifest.
+Install Tesseract OCR and Poppler separately; see [requirements](#requirements--platform-matrix). On Windows, `START.bat` is also available.
 
----
+<a id="core-features"></a>
+<a id="funktionen--features"></a>
+## Features
+
+- Process scanned PDF and image inputs in batches.
+- Select an OCR language; missing Tesseract language data can be downloaded from GitHub.
+- Create searchable PDF output while keeping source files intact.
+- Export a job manifest from the application.
+
+See the [archived feature guide](README-archive-2026-10-12.md#core-features) for the detailed walkthrough.
+
+<a id="target-personas--discoverability"></a>
+<a id="zielgruppen--auffindbarkeit"></a>
+## Use cases
+
+The application is intended for desktop workflows that convert scans or images into searchable PDFs. It is not a legal, medical, or compliance certification.
+
+<a id="comparative-matrix--alternatives"></a>
+<a id="vergleichsmatrix--alternativen"></a>
+## Comparing tools
+
+We do not maintain a verified feature or compliance comparison with other products. Evaluate alternatives using their current documentation and your own requirements.
+
+<a id="accessibility--keyboard-shortcuts"></a>
+<a id="barrierefreiheit--tastenkürzel"></a>
+## Accessibility
+
+The application includes keyboard shortcuts and accessibility metadata. No independent WCAG conformance audit is claimed. See the [detailed UI notes](README-archive-2026-10-12.md#accessibility--keyboard-shortcuts).
+
+<a id="requirements--platform-matrix"></a>
+<a id="voraussetzungen--plattformmatrix"></a>
+## Requirements
+
+Source runs require Python 3.10 or newer. The declared Python package minimums are:
+
+| Package | Minimum version |
+| --- | ---: |
+| PySide6 | 6.5.0 |
+| pytesseract | 0.3.13 |
+| Pillow | 10.4.0 |
+| pdf2image | 1.17.0 |
+| pikepdf | 8.15.1 |
+| requests | 2.33.1 |
+
+The same requirements are listed in `requirements.txt` and `pyproject.toml`. Tesseract OCR and Poppler must also be available on `PATH` or configured through the supported local paths. Windows is the primary packaged target; macOS and Linux are source-run targets.
+
+<a id="installation--portable-setup"></a>
+<a id="installation--portables-setup"></a>
+## Installation
+
+Clone the repository and install the Python requirements listed in `requirements.txt` into the active virtual environment. Native tools Tesseract and Poppler must be installed separately. Missing selected language data may be downloaded from GitHub at runtime.
+
+<a id="usage--execution-guidelines"></a>
+<a id="nutzung--ausführungsrichtlinien"></a>
+## Usage
+
+1. Start `python PDFtoPDFocr_2.py` or use `START.bat` on Windows.
+2. Add PDF or image files and choose an OCR language.
+3. Start OCR and review the searchable PDF output.
+4. Use the application’s job export if you need a portable job manifest.
 
 <a id="tests--quality-verification"></a>
 <a id="tests--qualitätsprüfung"></a>
-## 🧪 Automated Testing & Quality Verification
+## Tests
 
-```bash
-python -m pip install -r requirements-dev.txt
-python -m pytest
-```
-
-The test suite covers:
-- **UI Accessibility & Shortcuts** (`tests/test_ui_accessibility.py`)
-- **Tesseract Configuration** (`tests/test_tesseract_config.py`)
-- **Job Export Format & Manifest Schema** (`tests/test_export_format.py`)
-- **Language Switching & Multi-Language Support** (`tests/test_language_switch.py`)
-- **Bug Regressions & Resource Lifecycle** (`tests/test_bug_regressions.py`)
-- **App Icons & Visual Asset Verification** (`tests/test_app_assets.py`)
-- **Platform Packaging & Release Validation** (`tests/test_build_release.py`, `tests/test_platform_package_gate.py`)
-- **Metadata, Security & Parity Governance** (`tests/test_metadata.py`, `tests/test_security_license_contract.py`)
-
----
+With the virtual environment active, install development dependencies using `python -m pip install -r requirements-dev.txt`; this file includes `requirements.txt`, pytest, and ruff. Run `python -m pytest`. The repository also provides `python manage_translations.py --check` for translation consistency.
 
 <a id="sibling-tools--ecosystem"></a>
 <a id="geschwister-tools--ökosystem"></a>
-## 🌐 Sibling Tools & Ecosystem Integration
+## Related projects
 
-PDFtoPDFocr is part of the **doc-bricks** document utilities family and the wider **open-bricks** open-source desktop ecosystem:
+| Project | Adjacent task |
+| --- | --- |
+| [DokuReader](https://github.com/doc-bricks/DokuReader) | Local document library and PDF organization. |
+| [UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) | Downloading email attachments and organizing documents on Windows. |
+| [UniversalInvoiceMail](https://github.com/doc-bricks/UniversalInvoiceMail) | Invoice extraction and DATEV-style CSV export. |
 
-| Tool | Ecosystem | Purpose | Repository |
-|---|---|---|---|
-| **DokuReader** | `doc-bricks` | Local document library, reading workspace & cross-format viewer | [doc-bricks/DokuReader](https://github.com/doc-bricks/DokuReader) |
-| **MediaBrain** | `doc-bricks` | Local media metadata inspector, EXIF analyzer & batch classifier | [doc-bricks/MediaBrain](https://github.com/doc-bricks/MediaBrain) |
-| **UniversalDocsGrabber** | `doc-bricks` | Automated email document extractor & OCR batch ingestion pipeline | [doc-bricks/UniversalDocsGrabber](https://github.com/doc-bricks/UniversalDocsGrabber) |
-| **UniversalInvoiceMail** | `doc-bricks` | Intelligent invoice extraction, date/amount parsing & DATEV export | [doc-bricks/UniversalInvoiceMail](https://github.com/doc-bricks/UniversalInvoiceMail) |
-| **UniversalMailCleaner** | `doc-bricks` | Privacy-first mailbox cleaner, newsletter unsubscriber & safe pruner | [doc-bricks/UniversalMailCleaner](https://github.com/doc-bricks/UniversalMailCleaner) |
-| **CleanMarkdown** | `doc-bricks` | Markdown sanitization, table formatting & documentation linter | [doc-bricks/CleanMarkdown](https://github.com/doc-bricks/CleanMarkdown) |
-| **LitZentrum** | `doc-bricks` | Academic literature manager, BibTeX citation binder & research workspace | [doc-bricks/LitZentrum](https://github.com/doc-bricks/LitZentrum) |
-| **MailProcessor** | `doc-bricks` | Rule-based local email archiving, attachment filtering & sorting engine | [doc-bricks/MailProcessor](https://github.com/doc-bricks/MailProcessor) |
-| **ProFiler** | `file-bricks` | Fast multi-criteria file search, regex filtering & batch renaming | [file-bricks/ProFiler](https://github.com/file-bricks/ProFiler) |
-| **ExplorerPro** | `file-bricks` | Dual-pane desktop file manager with tabs, bookmarks & hex preview | [file-bricks/ExplorerPro](https://github.com/file-bricks/ExplorerPro) |
-| **DevCenter** | `dev-bricks` | Developer environment manager, toolchain orchestrator & project launcher | [dev-bricks/DevCenter](https://github.com/dev-bricks/DevCenter) |
-| **CodeBox** | `dev-bricks` | Offline multi-language code playground, snippet organizer & sandbox | [dev-bricks/CodeBox](https://github.com/dev-bricks/CodeBox) |
-| **open-bricks** | `open-bricks` | Umbrella organization & curated catalog of privacy-first desktop tools | [open-bricks](https://github.com/open-bricks) |
-
----
+These are separate projects; the links describe adjacent tasks, not a shared runtime or data flow.
 
 <a id="third-party-licenses--transparency"></a>
 <a id="drittanbieter-lizenzen--transparenz"></a>
-## 📜 Level 1 SBOM & Third-Party Licenses Transparency
+## Third-party licenses
 
-PDFtoPDFocr enforces 100% open-source transparency, verified supply-chain hygiene, and strict copyleft boundary isolation:
-- **Zero AGPL / SSPL Contamination:** The application is free from network copyleft or restrictive commercial dual-licensing.
-- **Dynamic Linking LGPL-3.0 Compliance:** `PySide6` (Qt for Python) is dynamically linked in accordance with LGPLv3 Section 4; users may substitute their own Qt builds.
-- **Strict Process Boundaries for Subprocess Tools:** External tools (`Poppler` utilities like `pdftoppm` and `pdfinfo`) run exclusively via isolated OS subprocesses with bounded arguments and sanitization, keeping GPL code strictly segregated (`INV-ISOLATION-04`).
-- **Permissive Core Runtime:** `pytesseract` (Apache-2.0), `Pillow` (HPND), `pdf2image` (MIT), `pikepdf` (MPL-2.0), and `requests` (Apache-2.0) are fully compatible with the primary **MIT License**.
-
-For the complete software inventory, dependency version floors, and governance invariants, see [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) and [`MARKETING-LOG.txt`](MARKETING-LOG.txt).
-
----
+[`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) and [`THIRD_PARTY_LICENSES.txt`](THIRD_PARTY_LICENSES.txt) list selected dependency and bundled-tool license information. They are an informational inventory, not a certification of compliance for every distribution or use.
 
 <a id="privacy--security-model"></a>
 <a id="datenschutz--sicherheitsmodell"></a>
-## 🔒 Privacy & Security Model (Invariants INV-LOCAL-01..INV-SLA-10)
+## Privacy and security
 
-PDF files and images are processed locally and are never uploaded. Network access is strictly limited to downloading missing public Tesseract language data from GitHub upon user request. See [`SECURITY.md`](SECURITY.md) for full security and privacy invariants.
-
----
+The application uses local OCR and PDF tools, and its source includes a request for missing Tesseract language data. It does not provide a firewall, sandbox, or operating-system privilege boundary. See [`PRIVACY_POLICY.md`](PRIVACY_POLICY.md) for data-flow details and [`SECURITY.md`](SECURITY.md) for the maintainer’s reporting policy.
 
 <a id="exe--distribution-packaging"></a>
 <a id="exe--distributions-packaging"></a>
-## 🪟 EXE & Distribution Packaging (Windows Store MSIX & Portable)
+## Desktop packaging
 
-```bash
-python build_release.py --clean
-
-# or on Windows via double-click / terminal:
-build_exe.bat
-
-# or directly via PyInstaller with dependencies installed:
-python -m PyInstaller --noconfirm --clean PDFtoPDFocr.spec
-```
-
-The packaged build is written to `dist/PDFtoPDFocr/`. When present, `tesseract_portable/` and `poppler/` are bundled automatically.
-
----
+A local Windows build can be prepared with `python build_release.py --clean` or `build_exe.bat`. The `--clean` option removes `dist/`, `build/`, and `.build_venv/` before creating a fresh build environment and running PyInstaller. The script uses its own build dependency list. It creates local artifacts and does not publish a release.
 
 <a id="machine-readable-llm-context"></a>
 <a id="maschinenlesbarer-llm-kontext"></a>
-## 🤖 Machine-Readable LLM Context (llms.txt)
+## LLM context
 
-For autonomous AI coding agents, pair programmers, and automated CI pipelines, this repository provides a dedicated [`llms.txt`](llms.txt) index following modern LLM context conventions. It includes:
-- Architecture summary and component roles
-- Testsuite commands and verification gates
-- Security and runtime invariants (`INV-LOCAL-01` through `INV-SLA-10`)
-- Key files map and dependency matrices
-
----
+[`llms.txt`](llms.txt) is a short machine-readable index of repository files and development commands.
 
 <a id="statutory-notice--license"></a>
 <a id="contributing--license"></a>
 <a id="gesetzlicher-hinweis--lizenz"></a>
 <a id="mitwirken--lizenz"></a>
-## ⚖️ Statutory Notice (§ 521 BGB) & License
+## License and legal note
 
-> [!IMPORTANT]
-> **Limitation of Liability for Gratuitous Software Provision (§ 521 BGB):**
-> As this software is provided free of charge as open-source software, the authors and contributors are liable only for intent and gross negligence pursuant to § 521 of the German Civil Code (Bürgerliches Gesetzbuch - BGB). The software is provided "as is", without warranty of any kind, express or implied.
-
-Contributions, bug reports, and pull requests are welcome! Please ensure all pull requests pass `pytest` and `ruff check .` before submission.
-
-This project is licensed under the [MIT License](LICENSE).
+The project is provided under the [MIT license](LICENSE). Whether statutory rules such as section 521 BGB apply depends on the legal relationship and applicable law; this documentation does not provide a blanket exemption from liability.

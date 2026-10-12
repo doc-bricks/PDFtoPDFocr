@@ -2,58 +2,58 @@
 
 ## Deutsch
 
-### Sicherheitsmodell & Invarianten
+### Umfang und technisches Verhalten
 
-PDFtoPDFocr ist als lokales, datenschutzorientiertes Desktop-Werkzeug zur OCR-Texterkennung und Durchsuchbarmachung von PDF-Dokumenten und Bilddateien für Windows (sowie macOS/Linux aus Quellcode) konzipiert. Folgende Sicherheits- und Datenschutzprinzipien sind fest in der Architektur verankert:
+PDFtoPDFocr verarbeitet ausgewählte PDFs und Bilder mit lokalen Bibliotheken und Werkzeugen wie Poppler, Tesseract und pikepdf. Der Anwendungscode kann fehlende Tesseract-Sprachdaten für die ausgewählte Sprache von GitHub abrufen. Das Programm stellt keine Firewall, Netzwerksperre oder Sandbox bereit.
 
-1. **100% Lokale Verarbeitung & Zero-Egress für Dokumentendaten**: Sämtliche Dokumenten-, Bild- und OCR-Verarbeitungsoperationen (Seitenrasterisierung mit Poppler, OCR-Textextraktion mit Tesseract, PDF-Assemblierung mit pikepdf) finden zu 100% lokal auf dem Rechner des Benutzers statt. Es findet keinerlei Übertragung von Dokumenten, Dateinamen, extrahiertem Text oder Telemetriedaten an Cloud-Server statt.
-2. **Kontrollierter Netzwerkzugriff (Nur Sprachpakete)**: Die Anwendung initiiert ausschließlich dann ausgehende HTTPS-Netzwerkverbindungen, wenn der Benutzer ein noch nicht lokal vorhandenes Tesseract-Sprachpaket auswählt und dieses von den offiziellen öffentlichen GitHub-Tesseract-Repositories geladen werden muss.
-3. **Originaldatei-Schutz (Non-Destructive Processing)**: Originale Quelldokumente werden niemals verändert oder überschrieben. OCR-Ergebnisse werden stets als separate Dateien (Standard: Suffix `_ocred.pdf`) oder in einem explizit gewählten Zielverzeichnis gespeichert.
-4. **Zustands- & Job-Manifest-Isolation**: Über die Job-Export-Funktion erstellte Manifeste (`pdftopdfocr-job-v1.json`) enthalten strukturierte Pfadreferenzen und Auftragsmetadaten. Es werden niemals rohe PDF-Binärdaten oder Base64-Inhalte in Manifesten abgelegt.
-5. **Non-Elevation & Least Privilege**: PDFtoPDFocr läuft vollständig im Standard-Benutzerkontext und erfordert zu keinem Zeitpunkt Administrator- oder Root-Rechte.
+Die Anwendung speichert die UI-Sprache und den Exportordner in einer Konfigurationsdatei im Benutzerprofil. Ein exportiertes Job-Manifest kann lokale Pfade, Sprache, Statusmeldungen und Ausgabehinweise enthalten; es enthält keine PDF-Bytes. Prüfen Sie ein Manifest, bevor Sie es weitergeben.
+
+Der Ausgabepfad wird gegen Quelldateien und Dateialiasse geprüft. Für unterstützte OCR- und Merge-Schreibvorgänge werden Staging-Dateien verwendet und die geschriebene PDF-Seitenzahl vor der Veröffentlichung geprüft. Diese implementierten Prüfungen sind kein Schutz gegen andere Prozesse, Datenträgerfehler oder manuelle Änderungen.
+
+Gestartete externe Prozesse erben die Berechtigungen des aufrufenden Prozesses. PDFtoPDFocr setzt keine Betriebssystem-Sandbox und senkt keine Berechtigungen herab. Die tatsächliche Netzwerk- und Zugriffssteuerung hängt daher von Betriebssystem, Installation und Umgebung ab.
 
 ### Unterstützte Versionen
 
 | Version | Status |
 | --- | --- |
-| Aktueller `master` (1.1.4) | Unterstützt (Security Fixes & Updates) |
+| Quellstand master (1.1.4) | Maintainer nehmen Meldungen zu Sicherheitsproblemen entgegen. |
 
 ### Sicherheitslücken melden
 
-Wenn Sie eine Sicherheitslücke oder ein Datenschutzproblem finden, melden Sie dies bitte verantwortungsvoll und vertraulich:
+Wenn Sie eine Sicherheitslücke oder ein Datenschutzproblem finden, melden Sie dies bitte vertraulich:
 
-1. **GitHub Private Vulnerability Reporting**: Nutzen Sie direkt das vertrauliche GitHub-Sicherheitsformular unter [https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new](https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new) oder navigieren Sie zu `Security` -> `Advisories` -> `Report a vulnerability`.
-2. **Direkte Sicherheits-E-Mail**: Schreiben Sie vertraulich an [security@doc-bricks.org](mailto:security@doc-bricks.org), [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai), [support@lukasgeiger.com](mailto:support@lukasgeiger.com) oder [lukas@open-bricks.org](mailto:lukas@open-bricks.org) mit dem Betreff `[SECURITY] PDFtoPDFocr Vulnerability Report`.
-3. **Reaktions- & Triage-SLA**: Wir bestätigen den Eingang innerhalb von **48 Stunden** und stellen eine qualifizierte Triage-Bewertung innerhalb von **5 Werktagen** bereit.
-4. Beschreiben Sie Reproduktionsschritte, betroffene Plattformen/Versionen und das Bedrohungsszenario.
-5. Bitte veröffentlichen Sie keine technischen Details in öffentlichen GitHub-Issues, bis eine Behebung bereitsteht.
+1. **GitHub Private Vulnerability Reporting**: Nutzen Sie das vertrauliche Formular unter [GitHub Security Advisories](https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new).
+2. **E-Mail**: Schreiben Sie an [security@doc-bricks.org](mailto:security@doc-bricks.org), [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai), [support@lukasgeiger.com](mailto:support@lukasgeiger.com) oder [lukas@open-bricks.org](mailto:lukas@open-bricks.org) mit dem Betreff [SECURITY] PDFtoPDFocr Vulnerability Report.
+3. **Reaktionsrichtlinie**: Die Maintainer nennen derzeit Zielzeiten von 48 Stunden für eine Eingangsbestätigung und 5 Werktagen für eine erste qualifizierte Triage. Dies beschreibt die Maintainer-Richtlinie, keine zugesicherte Softwarefunktion.
+4. Beschreiben Sie Reproduktionsschritte, betroffene Plattformen und Versionen sowie das mögliche Bedrohungsszenario.
+5. Veröffentlichen Sie technische Details möglichst nicht in öffentlichen Issues, bevor eine Behebung bereitsteht.
 
 ---
 
 ## English
 
-### Security Model & Invariants
+### Scope and technical behavior
 
-PDFtoPDFocr is designed as a local-first, privacy-focused desktop application for OCR text recognition and searchable PDF creation on Windows (as well as macOS/Linux from source). The following core security and privacy invariants guide its design:
+PDFtoPDFocr processes selected PDFs and images with local libraries and tools such as Poppler, Tesseract, and pikepdf. The application source can retrieve missing Tesseract language data for the selected language from GitHub. The program does not provide a firewall, network block, or sandbox.
 
-1. **100% Local Processing & Zero-Egress for Document Data**: All document, image, and OCR operations (page rasterization via Poppler, text extraction via Tesseract, PDF assembly via pikepdf) execute 100% locally on the user's machine. No documents, filenames, extracted text, or telemetry data are ever transmitted to remote servers or cloud services.
-2. **Controlled Network Access (Language Packs Only)**: Network access is strictly restricted to downloading missing public Tesseract language data (`.traineddata`) from official GitHub repositories upon explicit user selection.
-3. **Non-Destructive File Safety**: Source PDF and image files are never altered or overwritten. Output files are saved alongside the original with the `_ocred.pdf` suffix or in a configured output directory.
-4. **Structured Manifest Isolation**: Exported job manifests (`pdftopdfocr-job-v1.json`) contain structured path references and job metadata without embedding raw binary document contents or Base64 payloads.
-5. **Non-Elevation & Least Privilege**: PDFtoPDFocr runs entirely in standard user mode without requiring administrative elevation.
+The application stores the UI language and export-folder preference in a configuration file under the user's profile. An exported job manifest can contain local paths, language, status messages, and output hints; it does not contain PDF bytes. Review a manifest before sharing it.
 
-### Supported Versions
+The output-path resolver checks source files and file aliases before choosing a destination. Supported OCR and merge writes use staging files and verify the written PDF page count before publication. These implemented checks do not protect against other processes, storage failures, or manual changes.
+
+Launched external processes inherit the permissions of the process that starts them. PDFtoPDFocr does not provide an operating-system sandbox or drop privileges. Actual network and access controls therefore depend on the operating system, installation, and environment.
+
+### Supported versions
 
 | Version | Status |
 | --- | --- |
-| Current `master` (1.1.4) | Supported (Security Fixes & Updates) |
+| Source line master (1.1.4) | Maintainers accept reports about security issues. |
 
-### Reporting a Vulnerability
+### Reporting a vulnerability
 
-If you discover a potential vulnerability or security issue, please report it responsibly and confidentially:
+If you discover a security or privacy issue, please report it confidentially:
 
-1. **GitHub Private Vulnerability Reporting**: Use the confidential GitHub advisory form directly at [https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new](https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new) or navigate to `Security` -> `Advisories` -> `Report a vulnerability`.
-2. **Direct Security Email**: Send details confidentially to [security@doc-bricks.org](mailto:security@doc-bricks.org), [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai), [support@lukasgeiger.com](mailto:support@lukasgeiger.com) or [lukas@open-bricks.org](mailto:lukas@open-bricks.org) with subject `[SECURITY] PDFtoPDFocr Vulnerability Report`.
-3. **Response & Triage SLA**: We acknowledge receipt within **48 hours** and provide an initial qualified triage determination within **5 business days**.
-4. Include clear reproduction steps, affected environment/version, and an impact assessment.
-5. Please do not publish exploit details in public issues before a patch is available.
+1. **GitHub Private Vulnerability Reporting**: Use the confidential form at [GitHub Security Advisories](https://github.com/doc-bricks/PDFtoPDFocr/security/advisories/new).
+2. **Email**: Contact [security@doc-bricks.org](mailto:security@doc-bricks.org), [security@open-bricks.org](mailto:security@open-bricks.org), [security@ellmos.ai](mailto:security@ellmos.ai), [support@lukasgeiger.com](mailto:support@lukasgeiger.com), or [lukas@open-bricks.org](mailto:lukas@open-bricks.org) with the subject [SECURITY] PDFtoPDFocr Vulnerability Report.
+3. **Response policy**: Maintainers currently state target times of 48 hours for acknowledging reports and 5 business days for initial qualified triage. This describes maintainer policy, not a software feature.
+4. Include reproduction steps, affected platforms and versions, and the potential threat scenario.
+5. Please avoid publishing technical details in public issues before a fix is available.
