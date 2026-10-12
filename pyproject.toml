@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=77.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "PDFtoPDFocr"
 version = "1.1.4"
-description = "Local-first Windows desktop tool for converting scanned PDF files into searchable PDFs using Tesseract OCR."
+description = "Metadata distribution for PDFtoPDFocr; use the source checkout to install and run the desktop application."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_LICENSES.md", "THIRD_PARTY_LICENSES.txt"]
 authors = [
     { name = "doc-bricks Team", email = "support@lukasgeiger.com" }
@@ -22,15 +22,12 @@ keywords = [
     "poppler",
     "desktop",
     "local-first",
-    "zero-egress",
-    "offline-first",
     "batch-ocr",
     "accessibility",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -51,6 +48,7 @@ dependencies = [
 dev = [
     "pytest>=9.1.1",
     "ruff>=0.9.0",
+    "tomli>=2.0; python_version < '3.11'",
 ]
 build = [
     "pyinstaller>=6.10.0",
@@ -67,10 +65,11 @@ Changelog = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/CHANGELOG.md"
 "Plain-Text License" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/LICENSE"
 "Third-Party Licenses" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.md"
 "Third-Party Licenses (Text)" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.txt"
-"Level 1 SBOM" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/THIRD_PARTY_LICENSES.txt"
-"Marketing Log" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/MARKETING-LOG.txt"
 "LLM Ready" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/llms.txt"
 "Notice" = "https://github.com/doc-bricks/PDFtoPDFocr/blob/master/NOTICE"
+
+[tool.setuptools]
+packages = []
 
 [tool.pytest.ini_options]
 minversion = "7.0"
