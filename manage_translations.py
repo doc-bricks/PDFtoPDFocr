@@ -26,6 +26,21 @@ TR_CALL_PATTERN = re.compile(r'\btr\(\s*["\']([^"\']+)["\']')
 PLACEHOLDER_PATTERN = re.compile(r"\{([a-zA-Z0-9_]+)\}")
 
 
+def _ensure_utf8_streams() -> None:
+    """Rekonfiguriert sys.stdout und sys.stderr defensiv auf UTF-8 fuer Windows CLI."""
+    if sys.platform == "win32":
+        try:
+            if hasattr(sys.stdout, "reconfigure"):
+                sys.stdout.reconfigure(encoding="utf-8")
+            if hasattr(sys.stderr, "reconfigure"):
+                sys.stderr.reconfigure(encoding="utf-8")
+        except (AttributeError, OSError, ValueError):
+            pass
+
+
+_ensure_utf8_streams()
+
+
 def load_translations(base_dir: Path) -> Dict[str, Dict[str, str]]:
     """Lädt translations.json."""
     trans_path = base_dir / TRANSLATION_FILE
@@ -95,8 +110,10 @@ def audit_translations(base_dir: Path) -> Tuple[bool, List[str], Dict[str, int]]
 
 
 def main() -> int:
+    _ensure_utf8_streams()
+    default_dir = str(Path(__file__).resolve().parent)
     parser = argparse.ArgumentParser(description="Multi-Language Translation Auditor für PDFtoPDFocr")
-    parser.add_argument("--dir", type=str, default=".", help="Projektverzeichnis (Default: .)")
+    parser.add_argument("--dir", type=str, default=default_dir, help=f"Projektverzeichnis (Default: {default_dir})")
     parser.add_argument("--check", action="store_true", help="Gibt Non-Zero Exit Code bei Fehlern zurück (CI-Gate)")
     args = parser.parse_args()
 

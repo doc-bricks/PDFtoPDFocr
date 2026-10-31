@@ -231,6 +231,10 @@ def test_gitignore_multihost_conflict_and_lock_defense() -> None:
     assert "uv.lock" in gitignore
     assert "!package-lock.json" in gitignore
 
+    # Internal log & processing file protection (T-20260926-455218633 / GITHUB-POLICY.md §4)
+    assert "MARKETING-LOG.txt" in gitignore
+    assert "*MARKETING-LOG.txt" in gitignore
+
     # Test temp & cache protection
     assert ".pytest_temp/" in gitignore
     assert ".pytest_tmp*" in gitignore
@@ -346,3 +350,10 @@ def test_pep621_seo_keywords_expansion() -> None:
     content = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
     for keyword in ("batch-ocr", "accessibility", "local-first", "pdf", "ocr"):
         assert f'"{keyword}"' in content
+
+
+def test_internal_marketing_log_not_tracked() -> None:
+    """Policy T-20260926-455218633: MARKETING-LOG.txt must never be tracked in git."""
+    import subprocess
+    proc = subprocess.run(["git", "ls-files", "MARKETING-LOG.txt"], cwd=ROOT, capture_output=True, text=True)
+    assert proc.stdout.strip() == "", "MARKETING-LOG.txt must not be tracked in git"
