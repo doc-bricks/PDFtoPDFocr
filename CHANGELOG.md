@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Repository and gitignore hygiene (2026-10-31)
+- Untracked internal marketing and processing document (`MARKETING-LOG.txt`) in compliance with user policy T-20260926-455218633 and GITHUB-POLICY.md §4.
+- Added pattern protection for `MARKETING-LOG.txt`, `*MARKETING-LOG.txt`, and `*STATUS-LOG.txt` in `.gitignore`.
+- Hardened `manage_translations.py` for UTF-8 stream output on Windows consoles and set default project directory dynamically to the script's root path.
+- Added automated contract test in `tests/test_metadata.py` verifying that internal marketing logs remain untracked.
+
 ### Documentation scope correction (2026-10-12)
 - Current documentation distinguishes local OCR processing from network enforcement: the application can request missing Tesseract language data from GitHub and does not provide a firewall or sandbox.
 - Third-party license pages are selected information, not a complete SBOM, compliance audit, or copyleft-isolation certification. Process boundaries do not establish a legal boundary.
