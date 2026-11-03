@@ -190,11 +190,15 @@ def test_ci_workflows_timeout_and_concurrency() -> None:
     assert "concurrency:" in tests_yml
     assert "cancel-in-progress: true" in tests_yml
 
+    assert "ruff check ." in tests_yml
+    assert "pip install --upgrade pip" in tests_yml
+
     smoke_yml = (workflows_dir / "source-platform-smoke.yml").read_text(encoding="utf-8")
     assert "timeout-minutes: 15" in smoke_yml
     assert "contents: read" in smoke_yml
     assert "concurrency:" in smoke_yml
     assert "cancel-in-progress: true" in smoke_yml
+    assert "pip install --upgrade pip" in smoke_yml
 
 
 def test_stale_workflow_present_and_configured() -> None:
@@ -357,3 +361,34 @@ def test_internal_marketing_log_not_tracked() -> None:
     import subprocess
     proc = subprocess.run(["git", "ls-files", "MARKETING-LOG.txt"], cwd=ROOT, capture_output=True, text=True)
     assert proc.stdout.strip() == "", "MARKETING-LOG.txt must not be tracked in git"
+
+
+def test_manifest_in_tracked_files_parity() -> None:
+    """Verifies that all tracked repository files are explicitly declared in MANIFEST.in and exist on disk."""
+    import subprocess
+    manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
+    manifest_includes = {
+        line.split("include ", 1)[1].strip()
+        for line in manifest.splitlines()
+        if line.strip().startswith("include ")
+    }
+    missing_files = [f for f in manifest_includes if not (ROOT / f).exists()]
+    assert not missing_files, f"Files declared in MANIFEST.in do not exist on disk: {missing_files}"
+
+    proc = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True)
+    tracked_files = [f.replace("\\", "/") for f in proc.stdout.splitlines() if f.strip()]
+    unmanifested = [f for f in tracked_files if f not in manifest_includes]
+    assert not unmanifested, f"Tracked files missing from MANIFEST.in: {unmanifested}"
+
+
+def test_no_tracked_files_ignored_by_gitignore() -> None:
+    """Verifies that no git-tracked file is matched by .gitignore patterns."""
+    import subprocess
+    proc = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True)
+    tracked_files = [f.strip() for f in proc.stdout.splitlines() if f.strip()]
+    ignored_tracked = []
+    for rel_path in tracked_files:
+        res = subprocess.run(["git", "check-ignore", "--no-index", rel_path], cwd=ROOT, capture_output=True, text=True)
+        if res.returncode == 0:
+            ignored_tracked.append(rel_path)
+    assert not ignored_tracked, f"Tracked files match .gitignore patterns: {ignored_tracked}"

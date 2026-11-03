@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### CI matrix hardening, gitignore hygiene & contract test extension (2026-11-03)
+- Hardened GitHub Actions test workflow `.github/workflows/tests.yml` with automated pip upgrade and explicit `ruff check .` linter validation prior to running pytest.
+- Hardened `.github/workflows/source-platform-smoke.yml` dependency installation with automated pip upgrade.
+- Resolved `.gitignore` pattern contradiction by removing tracked project document `PORTIERUNGSPLAN.md` from the ignored steering files list.
+- Extended `tests/test_metadata.py` with contract tests verifying 100% parity between tracked repository files and `MANIFEST.in` (`test_manifest_in_tracked_files_parity`), ensuring zero tracked files are accidentally ignored by `.gitignore` (`test_no_tracked_files_ignored_by_gitignore`), and validating CI linter execution and dependency tooling.
+
 ### Repository and gitignore hygiene (2026-10-31)
 - Untracked internal marketing and processing document (`MARKETING-LOG.txt`) in compliance with user policy T-20260926-455218633 and GITHUB-POLICY.md §4.
 - Added pattern protection for `MARKETING-LOG.txt`, `*MARKETING-LOG.txt`, and `*STATUS-LOG.txt` in `.gitignore`.

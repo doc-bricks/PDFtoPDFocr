@@ -130,7 +130,6 @@ pytest*.txt
 
 # ---- Interne Steuerungsdateien ----
 DECISIONS.md
-PORTIERUNGSPLAN.md
 TODO.md
 DONE.md
 
