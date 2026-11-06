@@ -1,0 +1,92 @@
+{
+  "app_name": "PDFtoPDFocr",
+  "publisher": "CN=52596601-BAB4-4F3F-B182-E8F3F273B202",
+  "publisher_display": "Geiger",
+  "identity_name": "Geiger.PDFtoPDFocr",
+  "version": "1.1.4.0",
+  "description": "PDF-Dateien per OCR durchsuchbar machen. Batch-Processing, auswählbare OCR-Sprache, portable Tesseract-Integration.",
+  "executable": "PDFtoPDFocr.exe",
+  "capabilities": "internetClient,runFullTrust",
+  "category": "Productivity",
+  "age_rating": "3+",
+  "license": "MIT",
+  "privacy_url": "https://raw.githubusercontent.com/doc-bricks/PDFtoPDFocr/master/PRIVACY_POLICY.md",
+  "support_url": "https://github.com/doc-bricks/PDFtoPDFocr/issues",
+  "languages": [
+    "de-DE",
+    "en-US",
+    "es-ES",
+    "zh-CN",
+    "ja-JP",
+    "ru-RU"
+  ],
+  "file_types": {
+    "name": "pdf",
+    "display_name": "PDF-Dokument",
+    "info_tip": "Mit PDFtoPDFocr durchsuchbar machen",
+    "extensions": [
+      ".pdf"
+    ]
+  },
+  "execution_alias": "pdftopdfocr.exe",
+  "description_de": "Gescannte PDF-Dokumente und Bilder per lokaler Tesseract-OCR durchsuchbar machen.",
+  "description_en": "Make scanned PDF documents and images searchable using local Tesseract OCR.",
+  "description_es": "Haga que los documentos PDF e imágenes escaneados sean buscables con OCR local.",
+  "description_zh": "通过本地Tesseract OCR将扫描的PDF文档和图像转换为可搜索文本。",
+  "description_ja": "ローカルTesseract OCRを使用して、スキャンしたPDF文書や画像を検索可能に変換。",
+  "description_ru": "Преобразование сканированных PDF и изображений в доступный для поиска текст с OCR.",
+  "keywords_de": [
+    "pdf",
+    "ocr",
+    "texterkennung",
+    "scanner",
+    "konverter",
+    "durchsuchbar",
+    "dokumente"
+  ],
+  "keywords_en": [
+    "pdf",
+    "ocr",
+    "text recognition",
+    "scanner",
+    "converter",
+    "searchable",
+    "documents"
+  ],
+  "keywords_es": [
+    "pdf",
+    "ocr",
+    "reconocimiento de texto",
+    "escaner",
+    "convertidor",
+    "busqueda",
+    "documentos"
+  ],
+  "keywords_zh": [
+    "pdf",
+    "ocr",
+    "文本识别",
+    "扫描文档",
+    "文档转换",
+    "全文搜索",
+    "本地处理"
+  ],
+  "keywords_ja": [
+    "pdf",
+    "ocr",
+    "文字認識",
+    "スキャナー",
+    "コンバーター",
+    "全文検索",
+    "ドキュメント"
+  ],
+  "keywords_ru": [
+    "pdf",
+    "ocr",
+    "распознавание текста",
+    "сканирование",
+    "конвертер",
+    "поиск",
+    "документы"
+  ]
+}

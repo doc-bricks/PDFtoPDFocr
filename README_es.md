@@ -1,6 +1,6 @@
 <img src="assets/banner.png" width="100%" alt="Banner de PDFtoPDFocr">
 
-[English](README.md) | [Deutsch](README_de.md) | [Español](README_es.md) | [中文](README_zh.md) | [日本語](README_ja.md) | [Русский](README_ru.md)
+[English](README.md) · [Deutsch](README_de.md) · [Español](README_es.md) · [简体中文](README_zh.md) · [日本語](README_ja.md) · [Русский](README_ru.md)
 
 # PDFtoPDFocr — PDFs con texto buscable a partir de escaneos e imágenes
 

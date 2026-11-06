@@ -110,25 +110,45 @@ class TestStoreReadiness(unittest.TestCase):
         content = listing_path.read_text(encoding="utf-8")
 
         import re
-        # Find German keywords
-        de_match = re.search(r"### Schlüsselwörter\s*\n([^\n#]+)", content)
-        self.assertIsNotNone(de_match, "Deutsche Schlüsselwörter nicht gefunden")
-        de_keywords = [k.strip() for k in de_match.group(1).split(",") if k.strip()]
-        self.assertLessEqual(
-            len(de_keywords),
-            7,
-            f"Zu viele deutsche Keywords ({len(de_keywords)} > 7, Microsoft Partner Center Policy 10.1.3)",
-        )
+        lang_sections = [
+            ("DE", r"## Deutsch[\s\S]*?(?:### Suchbegriffe|### Schlüsselwörter)[^\n]*\n([\s\S]*?)(?=---|\Z)"),
+            ("EN", r"## English[\s\S]*?(?:### Search Keywords|### Keywords)[^\n]*\n([\s\S]*?)(?=---|\Z)"),
+            ("ES", r"## Español[\s\S]*?### Palabras clave[^\n]*\n([\s\S]*?)(?=---|\Z)"),
+            ("ZH", r"## 简体中文[\s\S]*?### 关键词[^\n]*\n([\s\S]*?)(?=---|\Z)"),
+            ("JA", r"## 日本語[\s\S]*?### キーワード[^\n]*\n([\s\S]*?)(?=---|\Z)"),
+            ("RU", r"## Русский[\s\S]*?### Ключевые слова[^\n]*\n([\s\S]*?)(?=\Z)"),
+        ]
 
-        # Find English keywords
-        en_match = re.search(r"### Keywords\s*\n([^\n#]+)", content)
-        self.assertIsNotNone(en_match, "Englische Keywords nicht gefunden")
-        en_keywords = [k.strip() for k in en_match.group(1).split(",") if k.strip()]
-        self.assertLessEqual(
-            len(en_keywords),
-            7,
-            f"Zu viele englische Keywords ({len(en_keywords)} > 7, Microsoft Partner Center Policy 10.1.3)",
-        )
+        for lang, pattern in lang_sections:
+            match = re.search(pattern, content)
+            self.assertIsNotNone(match, f"Keywords für {lang} nicht gefunden")
+            lines = [l.strip() for l in match.group(1).strip().splitlines() if l.strip()]
+            keywords = []
+            for line in lines:
+                m = re.match(r"^\d+\.\s*(.+)$", line)
+                if m:
+                    keywords.append(m.group(1).strip())
+                elif "," in line:
+                    for k in line.split(","):
+                        if k.strip():
+                            keywords.append(k.strip())
+            self.assertLessEqual(
+                len(keywords),
+                7,
+                f"Zu viele {lang} Keywords ({len(keywords)} > 7, Microsoft Partner Center Policy 10.1.3)",
+            )
+            self.assertEqual(len(keywords), 7, f"Keywords für {lang} unvollständig ({len(keywords)} != 7)")
+
+    def test_store_package_has_six_tier2_languages(self):
+        pkg_path = PROJECT_ROOT / "store_package.json"
+        data = json.loads(pkg_path.read_text(encoding="utf-8"))
+        for lang in ["de-DE", "en-US", "es-ES", "zh-CN", "ja-JP", "ru-RU"]:
+            self.assertIn(lang, data.get("languages", []))
+        for code in ["de", "en", "es", "zh", "ja", "ru"]:
+            self.assertIn(f"description_{code}", data)
+            self.assertLessEqual(len(data[f"description_{code}"]), 100)
+            self.assertIn(f"keywords_{code}", data)
+            self.assertEqual(len(data[f"keywords_{code}"]), 7)
 
     def test_check_store_readiness_script_passes(self):
         from scripts.check_store_readiness import run_store_readiness_check

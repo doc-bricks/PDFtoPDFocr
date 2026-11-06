@@ -9,7 +9,6 @@ Unterstützte Sprachen: DE, EN, ES, ZH (Vereinfacht), JA, RU
 from __future__ import annotations
 
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -74,16 +73,23 @@ class TranslationManager:
         self.translations: Dict[str, Dict[str, str]] = self._load_translations()
 
     def _load_translations(self) -> Dict[str, Dict[str, str]]:
-        """Lädt translations.json aus dem Base- oder Bundle-Verzeichnis."""
-        try:
-            base = getattr(sys, "_MEIPASS", str(self.base_path))
-            path = os.path.join(base, "translations.json")
-            if not os.path.exists(path):
-                path = os.path.join(str(self.base_path), "translations.json")
-            with open(path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return {}
+        """Lädt translations.json aus locales/ oder Root (Base- oder Bundle-Verzeichnis)."""
+        candidates = [
+            Path(getattr(sys, "_MEIPASS", str(self.base_path))) / "locales" / "translations.json",
+            Path(getattr(sys, "_MEIPASS", str(self.base_path))) / "translations.json",
+            self.base_path / "locales" / "translations.json",
+            self.base_path / "translations.json",
+            Path(__file__).resolve().parent / "locales" / "translations.json",
+            Path(__file__).resolve().parent / "translations.json",
+        ]
+        for p in candidates:
+            try:
+                if p.is_file():
+                    with open(p, "r", encoding="utf-8") as f:
+                        return json.load(f)
+            except Exception:
+                continue
+        return {}
 
     def set_language(self, lang: str) -> None:
         """Setzt die aktive UI-Sprache."""

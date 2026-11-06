@@ -104,6 +104,17 @@ def main() -> int:
         app.processEvents()
         print("PASS: OCRConverterGUI opened and closed headlessly\n")
 
+        # ── Check 7: Tier-2 6-Sprachen i18n & Store Readiness ────────────────
+        print("Check 7: Tier-2 6-Sprachen i18n & Store Readiness")
+        for code in ("de", "en", "es", "zh", "ja", "ru"):
+            app_mod.set_language(code)
+            t = app_mod.tr("window_title")
+            assert isinstance(t, str) and t, f"Missing title for {code}"
+        from scripts.check_store_readiness import run_store_readiness_check
+        ok, findings = run_store_readiness_check(PROJECT_ROOT)
+        assert ok, f"Store readiness check failed: {findings}"
+        print("PASS: Tier-2 6-Sprachen i18n & Store Readiness verified\n")
+
         print("=== ALL CHECKS PASSED ===")
         return EXIT_SUCCESS
 

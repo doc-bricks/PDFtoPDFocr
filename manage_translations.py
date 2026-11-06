@@ -42,12 +42,21 @@ _ensure_utf8_streams()
 
 
 def load_translations(base_dir: Path) -> Dict[str, Dict[str, str]]:
-    """Lädt translations.json."""
-    trans_path = base_dir / TRANSLATION_FILE
-    if not trans_path.exists():
-        return {}
-    with open(trans_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    """Lädt translations.json aus locales/translations.json oder translations.json."""
+    candidates = [
+        base_dir / "locales" / "translations.json",
+        base_dir / "translations.json",
+        Path(__file__).resolve().parent / "locales" / "translations.json",
+        Path(__file__).resolve().parent / "translations.json",
+    ]
+    for p in candidates:
+        if p.is_file():
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                continue
+    return {}
 
 
 def find_tr_keys_in_code(base_dir: Path) -> Set[str]:

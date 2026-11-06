@@ -5,6 +5,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Tier-2 Mehrsprachigkeits- und Store-Harmonisierung (TW-PDF-05..10) (2026-11-07)
+- **Store-Packaging & Manifest-Harmonisierung (TW-PDF-05)**: `store_package.json` um alle 6 Tier-2 Sprachen (`de-DE`, `en-US`, `es-ES`, `zh-CN`, `ja-JP`, `ru-RU`) mit Kurzbeschreibungen (<= 100 Zeichen) und exakt 7 Richtlinien-konformen Keywords je Sprache (<= 30 Zeichen, keine Marken) nach Microsoft Partner Center Policy 10.1.3 erweitert.
+- **6-Sprachen Store-Listing & Staging (TW-PDF-06)**: `STORE_LISTING.md` um vollständige Abschnitte für `## Español`, `## 简体中文`, `## 日本語` und `## Русский` erweitert; Staging-Verzeichnis `releases/windowsstore/` mit `store_settings.json`, `BUILD.md`, `WACK_PROTOCOL.md`, `StoreLogo.png` und `store_listing_<lang>.md` für alle 6 Sprachen angelegt; `.gitignore` für Staging freigegeben.
+- **Store-Readiness Linter- & Test-Härtung (TW-PDF-07)**: `scripts/check_store_readiness.py` auf alle 6 Tier-2 Sprachen, Keyword-Längen, Keyword-Anzahl und Staging gehärtet (52/52 Checks PASS); `tests/test_store_readiness.py` und neue Testsuite `tests/test_store_materials.py` (9 Tests) um hermetische Vertragstests ausgebaut.
+- **Lokalisierungs-Dateistruktur-Harmonisierung (TW-PDF-08)**: Standardisierung auf `locales/translations.json` mit 100% Parität über 66 Keys in 6 Sprachen; `translator.py` und `manage_translations.py` um duale Pfadauflösung (bevorzugt `locales/translations.json`, Fallback `translations.json`) mit CWD-Unabhängigkeit gehärtet.
+- **Dokumentations-Parität & Reziproke Sprachleisten (TW-PDF-09)**: Reziproke Sprachumschalter in allen 6 README-Dateien (`README.md`, `README_de.md`, `README_es.md`, `README_zh.md`, `README_ja.md`, `README_ru.md`) harmonisiert.
+- **CI-Vertragstests & Source-Platform-Smoke (TW-PDF-10)**: `source_platform_smoke.py` um Check 7 (Tier-2 6-Sprachen i18n & Store Readiness) erweitert; `MANIFEST.in` synchronisiert. Versionsnummer 1.1.4 unverändert (T-20260920-167562623).
+
 ### CI matrix hardening, gitignore hygiene & contract test extension (2026-11-03)
 - Hardened GitHub Actions test workflow `.github/workflows/tests.yml` with automated pip upgrade and explicit `ruff check .` linter validation prior to running pytest.
 - Hardened `.github/workflows/source-platform-smoke.yml` dependency installation with automated pip upgrade.
@@ -146,6 +154,14 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Eingereicht am 2026-08-23, Submission `1152921505701721467`, Status `Certification`.
 
 ## [Unreleased]
+
+### Tier-2 Mehrsprachigkeits- und Store-Harmonisierung (TW-PDF-05..10) (2026-11-07)
+- **Store-Packaging & Manifest-Harmonisierung (TW-PDF-05)**: `store_package.json` um alle 6 Tier-2 Sprachen (`de-DE`, `en-US`, `es-ES`, `zh-CN`, `ja-JP`, `ru-RU`) mit Kurzbeschreibungen (<= 100 Zeichen) und exakt 7 Richtlinien-konformen Keywords je Sprache (<= 30 Zeichen, keine Marken) nach Microsoft Partner Center Policy 10.1.3 erweitert.
+- **6-Sprachen Store-Listing & Staging (TW-PDF-06)**: `STORE_LISTING.md` um vollständige Abschnitte für `## Español`, `## 简体中文`, `## 日本語` und `## Русский` erweitert; Staging-Verzeichnis `releases/windowsstore/` mit `store_settings.json`, `BUILD.md`, `WACK_PROTOCOL.md`, `StoreLogo.png` und `store_listing_<lang>.md` für alle 6 Sprachen angelegt; `.gitignore` für Staging freigegeben.
+- **Store-Readiness Linter- & Test-Härtung (TW-PDF-07)**: `scripts/check_store_readiness.py` auf alle 6 Tier-2 Sprachen, Keyword-Längen, Keyword-Anzahl und Staging gehärtet (52/52 Checks PASS); `tests/test_store_readiness.py` und neue Testsuite `tests/test_store_materials.py` (9 Tests) um hermetische Vertragstests ausgebaut.
+- **Lokalisierungs-Dateistruktur-Harmonisierung (TW-PDF-08)**: Standardisierung auf `locales/translations.json` mit 100% Parität über 66 Keys in 6 Sprachen; `translator.py` und `manage_translations.py` um duale Pfadauflösung (bevorzugt `locales/translations.json`, Fallback `translations.json`) mit CWD-Unabhängigkeit gehärtet.
+- **Dokumentations-Parität & Reziproke Sprachleisten (TW-PDF-09)**: Reziproke Sprachumschalter in allen 6 README-Dateien (`README.md`, `README_de.md`, `README_es.md`, `README_zh.md`, `README_ja.md`, `README_ru.md`) harmonisiert.
+- **CI-Vertragstests & Source-Platform-Smoke (TW-PDF-10)**: `source_platform_smoke.py` um Check 7 (Tier-2 6-Sprachen i18n & Store Readiness) erweitert; `MANIFEST.in` synchronisiert. Versionsnummer 1.1.4 unverändert (T-20260920-167562623).
 
 ### Marketing, Discoverability & Visual Architecture (Pfad B) - 2026-09-21
 - **18-Punkte-Schnellnavigation mit reziproken HTML-Ankern**: `README.md` und `README_de.md` auf 18 standardisierte Abschnitte mit beidseitig auflösbaren HTML-Ankern (`<a id="..."></a>`) erweitert.
