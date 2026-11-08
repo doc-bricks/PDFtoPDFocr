@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Pfad B: Repository-Discoverability, zweisprachige README-Architektur, Badges & Sequenzdiagramme (2026-11-08)
+- **Zweisprachige Mermaid-Sequenzdiagramme**: Asynchroner Verarbeitungslebenszyklus (`QThread` Worker, Poppler-Seitenrasterisierung, Bildnormalisierung, Tesseract OCR-Textextraktion und pikepdf Volltext-PDF-Assembly) in Abschnitt `Local data flow` / `Lokaler Datenfluss` von `README.md` und `README_de.md` integriert; Mermaid-Syntax mit `_tools/lint_mermaid.py` validiert (0 Syntaxfehler).
+- **Badges & Verifikations-Transparenz**: Verifiziertes Test-Badge auf 180 bestandene Tests aktualisiert, Code-Stil-Badge (`Ruff`) und Local-First Verarbeitungs-Badge (`processing: local-first`) in beiden Sprachausgaben ergänzt.
+- **PEP 621 SEO-Keywords**: `pyproject.toml` um `multilingual-ocr`, `document-scanner`, `offline-first` und `privacy-first` erweitert.
+- **Vertragstests**: `tests/test_metadata.py` um `test_readme_sequence_diagram_and_badges_parity` zur dauerhaften Absicherung von Diagramm- und Badge-Parität erweitert.
+
 ### Tier-2 Mehrsprachigkeits- und Store-Harmonisierung (TW-PDF-05..10) (2026-11-07)
 - **Store-Packaging & Manifest-Harmonisierung (TW-PDF-05)**: `store_package.json` um alle 6 Tier-2 Sprachen (`de-DE`, `en-US`, `es-ES`, `zh-CN`, `ja-JP`, `ru-RU`) mit Kurzbeschreibungen (<= 100 Zeichen) und exakt 7 Richtlinien-konformen Keywords je Sprache (<= 30 Zeichen, keine Marken) nach Microsoft Partner Center Policy 10.1.3 erweitert.
 - **6-Sprachen Store-Listing & Staging (TW-PDF-06)**: `STORE_LISTING.md` um vollständige Abschnitte für `## Español`, `## 简体中文`, `## 日本語` und `## Русский` erweitert; Staging-Verzeichnis `releases/windowsstore/` mit `store_settings.json`, `BUILD.md`, `WACK_PROTOCOL.md`, `StoreLogo.png` und `store_listing_<lang>.md` für alle 6 Sprachen angelegt; `.gitignore` für Staging freigegeben.
@@ -154,6 +160,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Eingereicht am 2026-08-23, Submission `1152921505701721467`, Status `Certification`.
 
 ## [Unreleased]
+
+### Pfad B: Repository-Discoverability, zweisprachige README-Architektur, Badges & Sequenzdiagramme (2026-11-08)
+- **Zweisprachige Mermaid-Sequenzdiagramme**: Asynchroner Verarbeitungslebenszyklus (`QThread` Worker, Poppler-Seitenrasterisierung, Bildnormalisierung, Tesseract OCR-Textextraktion und pikepdf Volltext-PDF-Assembly) in Abschnitt `Local data flow` / `Lokaler Datenfluss` von `README.md` und `README_de.md` integriert; Mermaid-Syntax mit `_tools/lint_mermaid.py` validiert (0 Syntaxfehler).
+- **Badges & Verifikations-Transparenz**: Verifiziertes Test-Badge auf 180 bestandene Tests aktualisiert, Code-Stil-Badge (`Ruff`) und Local-First Verarbeitungs-Badge (`processing: local-first`) in beiden Sprachausgaben ergänzt.
+- **PEP 621 SEO-Keywords**: `pyproject.toml` um `multilingual-ocr`, `document-scanner`, `offline-first` und `privacy-first` erweitert.
+- **Vertragstests**: `tests/test_metadata.py` um `test_readme_sequence_diagram_and_badges_parity` zur dauerhaften Absicherung von Diagramm- und Badge-Parität erweitert.
 
 ### Tier-2 Mehrsprachigkeits- und Store-Harmonisierung (TW-PDF-05..10) (2026-11-07)
 - **Store-Packaging & Manifest-Harmonisierung (TW-PDF-05)**: `store_package.json` um alle 6 Tier-2 Sprachen (`de-DE`, `en-US`, `es-ES`, `zh-CN`, `ja-JP`, `ru-RU`) mit Kurzbeschreibungen (<= 100 Zeichen) und exakt 7 Richtlinien-konformen Keywords je Sprache (<= 30 Zeichen, keine Marken) nach Microsoft Partner Center Policy 10.1.3 erweitert.

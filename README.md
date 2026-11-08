@@ -8,6 +8,9 @@
 [![Version 1.1.4](https://img.shields.io/badge/version-1.1.4-blue.svg)](pyproject.toml)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#requirements--platform-matrix)
+[![Tests: 180 passed](https://img.shields.io/badge/tests-180%20passed-brightgreen.svg)](#tests--quality-verification)
+[![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Local-First](https://img.shields.io/badge/processing-local--first-success.svg)](#local-data-flow--privacy-isolation)
 
 PDFtoPDFocr is a desktop application that turns scanned PDFs and image files into searchable PDFs using Tesseract OCR. It supports batch input, selectable OCR languages, and preservation of the original files.
 
@@ -68,6 +71,44 @@ The detailed component and workflow views are in the [archived guide](README-arc
 ## Local data flow
 
 PDF processing uses local tools. The source includes a GitHub request to obtain missing Tesseract language data. This describes the application path; it does not establish a system-wide network restriction. See [`SECURITY.md`](SECURITY.md) for the project’s security contact and scope.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / Batch Operator
+    participant GUI as PySide6 Desktop GUI
+    participant Worker as Background Worker Thread
+    participant Normalizer as Image Normalizer
+    participant Poppler as Poppler / pdf2image
+    participant Tesseract as Tesseract OCR Engine
+    participant Assembler as pikepdf PDF Assembler
+    participant FS as Local Filesystem Boundary
+
+    User->>GUI: Add PDF or Image Files (Drag & Drop / File Dialog)
+    User->>GUI: Select Target OCR Language (e.g. deu, eng, fra, spa)
+    User->>GUI: Trigger Batch Conversion (Ctrl+Return or Button)
+    GUI->>Worker: Launch asynchronous conversion task
+    loop For Each Document in Queue
+        alt Input is Scanned PDF
+            Worker->>Poppler: Rasterize PDF pages into memory bitmaps
+            Poppler-->>Worker: High-resolution rendered page buffers
+        else Input is Direct Image (PNG, JPG, multi-frame TIFF)
+            Worker->>Normalizer: Alpha-composite transparency onto white background
+            Normalizer-->>Worker: Standardized RGB image frames
+        end
+        loop For Each Page / Frame
+            Worker->>Tesseract: Extract text and bounding boxes via local engine
+            Tesseract-->>Worker: Return OCR text and hOCR / PDF layers
+        end
+        Worker->>Assembler: Inject searchable full-text layer into PDF structure
+        Assembler->>FS: Save output as <filename>_ocred.pdf (Non-destructive)
+        Worker-->>GUI: Update progress bar and color-coded status badge
+    end
+    opt Portable Job Manifest Export
+        GUI->>FS: Write pdftopdfocr-job-v1.json (job settings and file metadata)
+    end
+    Note over User,FS: Local OCR/PDF processing - missing language data request may use GitHub
+```
 
 <a id="quick-start--key-operations"></a>
 <a id="schnelleinstieg--kernabläufe"></a>

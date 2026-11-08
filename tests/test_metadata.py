@@ -392,3 +392,28 @@ def test_no_tracked_files_ignored_by_gitignore() -> None:
         if res.returncode == 0:
             ignored_tracked.append(rel_path)
     assert not ignored_tracked, f"Tracked files match .gitignore patterns: {ignored_tracked}"
+
+
+def test_readme_sequence_diagram_and_badges_parity() -> None:
+    """Verifies that both README.md and README_de.md include the lifecycle sequence diagram and verified badges."""
+    readme_en = (ROOT / "README.md").read_text(encoding="utf-8")
+    readme_de = (ROOT / "README_de.md").read_text(encoding="utf-8")
+
+    for readme in (readme_en, readme_de):
+        assert "sequenceDiagram" in readme
+        assert "autonumber" in readme
+        assert "Poppler" in readme
+        assert "Tesseract" in readme
+        assert "pikepdf" in readme
+        assert "pdftopdfocr-job-v1.json" in readme
+
+    # Badge parity
+    assert "badge/tests-180%20passed-brightgreen.svg" in readme_en
+    assert "badge/tests-180%20bestanden-brightgreen.svg" in readme_de
+    assert "badge/processing-local--first-success.svg" in readme_en
+    assert "badge/verarbeitung-lokal--zuerst-success.svg" in readme_de
+
+    # Extended SEO keywords
+    pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    for kw in ("multilingual-ocr", "document-scanner", "offline-first", "privacy-first"):
+        assert f'"{kw}"' in pyproject
