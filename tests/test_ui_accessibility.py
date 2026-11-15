@@ -344,3 +344,49 @@ def test_ui_label_buddies_and_tab_order():
     finally:
         gui.close()
 
+
+def test_export_folder_label_elides_long_paths_without_expanding_window():
+    """Long custom export paths must not inflate the window width and stay readable via tooltip/A11y."""
+    qapp = _qapp()
+    gui = app.OCRConverterGUI()
+    try:
+        gui.show()
+        qapp.processEvents()
+        initial_width = gui.sizeHint().width()
+
+        long_path = (
+            "C:\\Users\\lukas\\OneDrive\\Dokumente\\Projekte\\Kunden\\2026\\"
+            "Sehr_Langer_Ordnername_fuer_OCR_Ausgaben_und_Archivierung\\Export_Final"
+        )
+        gui.export_folder = long_path
+        gui._update_export_folder_label()
+        qapp.processEvents()
+
+        assert gui.sizeHint().width() <= initial_width + 40
+        assert gui.width() <= initial_width + 40
+        assert long_path in gui.export_folder_label.toolTip()
+        assert long_path in gui.export_folder_label.accessibleDescription()
+        assert len(gui.export_folder_label.text()) < len(gui.export_folder_label.toolTip())
+        assert "…" in gui.export_folder_label.text() or "..." in gui.export_folder_label.text()
+    finally:
+        gui.close()
+
+
+def test_reset_export_folder_button_enabled_only_when_custom_folder_set(tmp_path):
+    """Reset button reflects whether a custom export folder is active."""
+    _qapp()
+    gui = app.OCRConverterGUI()
+    try:
+        assert gui.export_folder is None
+        assert not gui.btn_reset_export_folder.isEnabled()
+
+        gui.export_folder = str(tmp_path)
+        gui._update_export_folder_label()
+        assert gui.btn_reset_export_folder.isEnabled()
+
+        gui.on_reset_export_folder()
+        assert gui.export_folder is None
+        assert not gui.btn_reset_export_folder.isEnabled()
+    finally:
+        gui.close()
+

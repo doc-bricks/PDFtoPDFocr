@@ -26,7 +26,7 @@ import requests
 
 # PySide6
 from PySide6.QtCore import Qt, QThread, QUrl, Signal
-from PySide6.QtGui import QAction, QColor, QDesktopServices, QIcon, QKeySequence
+from PySide6.QtGui import QAction, QColor, QDesktopServices, QFontMetrics, QIcon, QKeySequence
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -38,6 +38,7 @@ from PySide6.QtWidgets import (
     QMenu,
     QMessageBox,
     QPushButton,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -1127,6 +1128,8 @@ class OCRConverterGUI(QWidget):
 
         export_layout = QHBoxLayout()
         self.export_folder_label = QLabel("")
+        self.export_folder_label.setMinimumWidth(0)
+        self.export_folder_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         self.btn_choose_export_folder = QPushButton(tr("btn_export_folder"))
         self.btn_choose_export_folder.setShortcut("Ctrl+Shift+O")
         self.btn_reset_export_folder = QPushButton(tr("btn_export_folder_reset"))
@@ -1328,9 +1331,27 @@ class OCRConverterGUI(QWidget):
     # ===== Exportordner-Einstellung (U4) =====
 
     def _update_export_folder_label(self):
-        """Refreshes the label that shows the currently configured export folder."""
+        """Refreshes the export-folder label, full-path tooltip/description, and reset state."""
         folder_text = self.export_folder or tr("label_export_folder_default")
-        self.export_folder_label.setText(tr("label_export_folder", folder=folder_text))
+        full_text = tr("label_export_folder", folder=folder_text)
+        self.export_folder_label.setToolTip(full_text)
+        self.export_folder_label.setAccessibleDescription(full_text)
+        self.btn_reset_export_folder.setEnabled(bool(self.export_folder))
+
+        if self.export_folder:
+            avail_width = self.export_folder_label.width()
+            if avail_width <= 0:
+                avail_width = max(360, self.width() - 260)
+            metrics = QFontMetrics(self.export_folder_label.font())
+            display_text = metrics.elidedText(full_text, Qt.ElideMiddle, avail_width)
+        else:
+            display_text = full_text
+        self.export_folder_label.setText(display_text)
+
+    def resizeEvent(self, event):
+        """Refreshes middle-elided export folder text when the window width changes."""
+        super().resizeEvent(event)
+        self._update_export_folder_label()
 
     def on_choose_export_folder(self):
         """Opens a folder dialog and persists the chosen export folder (U4)."""
