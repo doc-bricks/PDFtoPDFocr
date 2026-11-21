@@ -24,6 +24,10 @@ keywords = [
     "local-first",
     "batch-ocr",
     "accessibility",
+    "multilingual-ocr",
+    "document-scanner",
+    "offline-first",
+    "privacy-first",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",

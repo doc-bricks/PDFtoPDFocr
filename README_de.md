@@ -8,6 +8,9 @@
 [![Version 1.1.4](https://img.shields.io/badge/version-1.1.4-blue.svg)](pyproject.toml)
 [![MIT-Lizenz](https://img.shields.io/badge/lizenz-MIT-green.svg)](LICENSE)
 [![Plattformen](https://img.shields.io/badge/plattform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#voraussetzungen--plattformmatrix)
+[![Tests: 180 bestanden](https://img.shields.io/badge/tests-180%20bestanden-brightgreen.svg)](#tests--qualitätsprüfung)
+[![Code-Stil: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Lokal-Zuerst](https://img.shields.io/badge/verarbeitung-lokal--zuerst-success.svg)](#lokaler-datenfluss--datenschutz-isolation)
 
 PDFtoPDFocr ist eine Desktop-Anwendung, die gescannte PDFs und Bilddateien mit Tesseract-OCR in durchsuchbare PDFs umwandelt. Sie unterstützt Stapelverarbeitung, wählbare OCR-Sprachen und den Erhalt der Quelldateien.
 
@@ -68,6 +71,44 @@ Die ausführlichen Komponenten- und Ablaufansichten stehen in der [archivierten 
 ## Lokaler Datenfluss
 
 Die PDF-Verarbeitung verwendet lokale Werkzeuge. Der Quellcode enthält eine GitHub-Anfrage zum Abruf fehlender Tesseract-Sprachdaten. Das beschreibt den Anwendungspfad, keine systemweite Netzwerksperre. Kontakt und Geltungsbereich der Sicherheitsrichtlinie stehen in [`SECURITY.md`](SECURITY.md).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Nutzer as Nutzer / Stapel-Bediener
+    participant GUI as PySide6 Desktop-GUI
+    participant Worker as Hintergrund-Worker-Thread
+    participant Normalizer as Bild-Normalisierer
+    participant Poppler as Poppler / pdf2image
+    participant Tesseract as Tesseract-OCR-Engine
+    participant Assembler as pikepdf PDF-Assembler
+    participant FS as Lokales Dateisystem
+
+    Nutzer->>GUI: PDF- oder Bilddateien hinzufügen (Drag & Drop / Dateidialog)
+    Nutzer->>GUI: Ziel-OCR-Sprache wählen (z. B. deu, eng, fra, spa)
+    Nutzer->>GUI: Stapelverarbeitung starten (Strg+Eingabe oder Schaltfläche)
+    GUI->>Worker: Asynchronen Konvertierungs-Task starten
+    loop Für jedes Dokument in der Warteschlange
+        alt Eingabe ist gescanntes PDF
+            Worker->>Poppler: PDF-Seiten in Speicher-Bitmaps rasterisieren
+            Poppler-->>Worker: Hochauflösende gerenderte Seitenpuffer
+        else Eingabe ist Direktbild (PNG, JPG, Multiframe-TIFF)
+            Worker->>Normalizer: Alpha-Transparenz auf weißem Hintergrund zusammenführen
+            Normalizer-->>Worker: Standardisierte RGB-Bildframes
+        end
+        loop Für jede Seite / jeden Frame
+            Worker->>Tesseract: Text und Bounding Boxes über lokale Engine extrahieren
+            Tesseract-->>Worker: OCR-Text und hOCR / PDF-Ebenen zurückliefern
+        end
+        Worker->>Assembler: Durchsuchbare Volltextebene in PDF-Struktur einfügen
+        Assembler->>FS: Ausgabe als <dateiname>_ocred.pdf speichern (Zerstörungsfrei)
+        Worker-->>GUI: Fortschrittsbalken und farbcodierten Status aktualisieren
+    end
+    opt Portabler Jobmanifest-Export
+        GUI->>FS: pdftopdfocr-job-v1.json schreiben (Jobeinstellungen und Metadaten)
+    end
+    Note over Nutzer,FS: Lokale OCR/PDF-Verarbeitung - fehlende Sprachdaten können von GitHub geladen werden
+```
 
 <a id="quick-start--key-operations"></a>
 <a id="schnelleinstieg--kernabläufe"></a>
