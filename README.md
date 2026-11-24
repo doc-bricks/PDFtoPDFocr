@@ -8,7 +8,7 @@
 [![Version 1.1.4](https://img.shields.io/badge/version-1.1.4-blue.svg)](pyproject.toml)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#requirements--platform-matrix)
-[![Tests: 180 passed](https://img.shields.io/badge/tests-180%20passed-brightgreen.svg)](#tests--quality-verification)
+[![Tests: 191 passed](https://img.shields.io/badge/tests-191%20passed-brightgreen.svg)](#tests--quality-verification)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Local-First](https://img.shields.io/badge/processing-local--first-success.svg)](#local-data-flow--privacy-isolation)
 
@@ -18,7 +18,7 @@ OCR and PDF assembly use local tools. When a selected Tesseract language file is
 
 > This concise entry point replaces the detailed predecessor [README-archive-2026-10-12.md](README-archive-2026-10-12.md). The detailed guide is archived there with current claims corrected; the unmodified source is available at [commit 3cfce468](https://github.com/doc-bricks/PDFtoPDFocr/blob/3cfce468f20307bcbc158dd969c3ad304f34b4fe/README.md).
 
-Machine-readable context: [`llms.txt`](llms.txt) · [Security policy](SECURITY.md) · [Third-party license inventory](THIRD_PARTY_LICENSES.md)
+Machine-readable context: [`SKILL.md`](SKILL.md) · [`llms.txt`](llms.txt) · [`llm.txt`](llm.txt) · [Security policy](SECURITY.md) · [Third-party license inventory](THIRD_PARTY_LICENSES.md)
 
 ## Quick navigation
 
@@ -252,7 +252,7 @@ A local Windows build can be prepared with `python build_release.py --clean` or 
 <a id="maschinenlesbarer-llm-kontext"></a>
 ## LLM context
 
-[`llms.txt`](llms.txt) is a short machine-readable index of repository files and development commands.
+[`SKILL.md`](SKILL.md) describes human and LLM dual-use workflows and headless CLI commands (`languages`, `check`, `export-job`, `merge`, `ocr` with `--json`). [`llms.txt`](llms.txt) (compatibility pointer [`llm.txt`](llm.txt)) is a short machine-readable index of repository files and development commands.
 
 <a id="statutory-notice--license"></a>
 <a id="contributing--license"></a>

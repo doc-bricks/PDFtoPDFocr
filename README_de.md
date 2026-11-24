@@ -8,7 +8,7 @@
 [![Version 1.1.4](https://img.shields.io/badge/version-1.1.4-blue.svg)](pyproject.toml)
 [![MIT-Lizenz](https://img.shields.io/badge/lizenz-MIT-green.svg)](LICENSE)
 [![Plattformen](https://img.shields.io/badge/plattform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](#voraussetzungen--plattformmatrix)
-[![Tests: 180 bestanden](https://img.shields.io/badge/tests-180%20bestanden-brightgreen.svg)](#tests--qualitätsprüfung)
+[![Tests: 191 bestanden](https://img.shields.io/badge/tests-191%20bestanden-brightgreen.svg)](#tests--qualitätsprüfung)
 [![Code-Stil: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Lokal-Zuerst](https://img.shields.io/badge/verarbeitung-lokal--zuerst-success.svg)](#lokaler-datenfluss--datenschutz-isolation)
 
@@ -18,7 +18,7 @@ OCR und PDF-Erstellung verwenden lokale Werkzeuge. Fehlt eine ausgewählte Tesse
 
 > Diese kompakte Einstiegsseite ersetzt die ausführliche Vorgängerdatei [README_de-archive-2026-10-12.md](README_de-archive-2026-10-12.md). Die Detailanleitung ist dort mit korrigierten aktuellen Aussagen archiviert; die unveränderte Quelle steht unter [Commit 3cfce468](https://github.com/doc-bricks/PDFtoPDFocr/blob/3cfce468f20307bcbc158dd969c3ad304f34b4fe/README_de.md).
 
-Maschinenlesbarer Kontext: [`llms.txt`](llms.txt) · [Sicherheitsrichtlinie](SECURITY.md) · [Drittanbieter-Lizenzinventar](THIRD_PARTY_LICENSES.md)
+Maschinenlesbarer Kontext: [`SKILL.md`](SKILL.md) · [`llms.txt`](llms.txt) · [`llm.txt`](llm.txt) · [Sicherheitsrichtlinie](SECURITY.md) · [Drittanbieter-Lizenzinventar](THIRD_PARTY_LICENSES.md)
 
 ## Schnellnavigation
 
@@ -252,7 +252,7 @@ Ein lokaler Windows-Build lässt sich mit `python build_release.py --clean` oder
 <a id="maschinenlesbarer-llm-kontext"></a>
 ## LLM-Kontext
 
-[`llms.txt`](llms.txt) ist ein kompakter, maschinenlesbarer Index der Projektdateien und Entwicklungsbefehle.
+[`SKILL.md`](SKILL.md) beschreibt die gemeinsame Nutzung durch Mensch und LLM sowie die Headless-CLI-Befehle (`languages`, `check`, `export-job`, `merge`, `ocr` mit `--json`). [`llms.txt`](llms.txt) (Kompatibilitätsverweis [`llm.txt`](llm.txt)) ist ein kompakter, maschinenlesbarer Index der Projektdateien und Entwicklungsbefehle.
 
 <a id="statutory-notice--license"></a>
 <a id="contributing--license"></a>

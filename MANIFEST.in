@@ -42,6 +42,7 @@ include README_zh.md
 include RELEASES.md
 include SAVE_SAFETY.md
 include SECURITY.md
+include SKILL.md
 include START.bat
 include STORE_LISTING.md
 include SUPPORT.md
@@ -70,6 +71,7 @@ include favicon.ico
 include favicon.png
 include icon.ico
 include icon.png
+include llm.txt
 include llms.txt
 include locales/translations.json
 include manage_translations.py
@@ -123,6 +125,7 @@ include tests/test_assets_and_icons.py
 include tests/test_bug_regressions.py
 include tests/test_bugsweep_exif_merge_worker_resilience_20261003.py
 include tests/test_build_release.py
+include tests/test_cli_and_p022.py
 include tests/test_cli_file_arguments.py
 include tests/test_export_format.py
 include tests/test_i18n.py
