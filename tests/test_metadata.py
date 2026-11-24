@@ -408,8 +408,8 @@ def test_readme_sequence_diagram_and_badges_parity() -> None:
         assert "pdftopdfocr-job-v1.json" in readme
 
     # Badge parity
-    assert "badge/tests-180%20passed-brightgreen.svg" in readme_en
-    assert "badge/tests-180%20bestanden-brightgreen.svg" in readme_de
+    assert "badge/tests-191%20passed-brightgreen.svg" in readme_en
+    assert "badge/tests-191%20bestanden-brightgreen.svg" in readme_de
     assert "badge/processing-local--first-success.svg" in readme_en
     assert "badge/verarbeitung-lokal--zuerst-success.svg" in readme_de
 

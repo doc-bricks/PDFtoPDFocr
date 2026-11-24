@@ -5,6 +5,12 @@ import pytest
 import PDFtoPDFocr_2 as app
 
 
+def pytest_configure(config):
+    """Setzt basetemp CWD-unabhaengig relativ zum Repo-Root (T-20261114-932985855)."""
+    if config.option.basetemp is None:
+        config.option.basetemp = str(config.rootpath / ".pytest_temp")
+
+
 @pytest.fixture(autouse=True)
 def _isolate_app_config(tmp_path, monkeypatch):
     """Isoliert die App-Konfiguration (UI-Sprache U6, Exportordner U4) je Test.

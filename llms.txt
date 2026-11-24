@@ -5,8 +5,11 @@
 - Repository: https://github.com/doc-bricks/PDFtoPDFocr
 - Project license: MIT (LICENSE)
 - Current source line: 1.1.4 (version frozen)
+- Last-checked: 2026-11-24
 - Python wheel: distribution metadata only; use the source checkout and requirements to run the desktop application.
-- Main application: PDFtoPDFocr_2.py
+- Main application (GUI & headless CLI): PDFtoPDFocr_2.py
+- Product skill (P-022): SKILL.md
+- Compatibility pointer: llm.txt
 - Export format: EXPORTFORMAT.md
 - Security and data-handling notes: SECURITY.md, PRIVACY_POLICY.md
 - Selected third-party license information: THIRD_PARTY_LICENSES.md and THIRD_PARTY_LICENSES.txt
@@ -47,7 +50,8 @@ These are separately usable tools in the same project ecosystem; this list does 
 
 The project source supports Python 3.10 or newer. Install the dependencies listed in requirements.txt; development checks are listed in requirements-dev.txt.
 
-- Run from a source checkout: python PDFtoPDFocr_2.py
+- Run GUI from a source checkout: python PDFtoPDFocr_2.py
+- Run headless CLI (--help / --version / languages / check / export-job / merge / ocr): python PDFtoPDFocr_2.py --help
 - Check translations: python manage_translations.py --check
 - Run tests: python -m pytest
 - Check lint: python -m ruff check .

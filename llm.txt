@@ -1,0 +1,4 @@
+# PDFtoPDFocr — LLM Compatibility Pointer
+
+Canonical LLM index: [`llms.txt`](llms.txt)
+Product skill & CLI specification: [`SKILL.md`](SKILL.md)

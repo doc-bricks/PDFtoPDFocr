@@ -5,6 +5,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 
 ## [Unreleased]
 
+### Dual-Use CLI, P-022 Skill & Bug/Test Hardening (2026-11-24)
+- **Headless CLI & Policy P-022 (`PDFtoPDFocr_2.py`, `SKILL.md`, `llm.txt`, `llms.txt`)**: Added headless subcommands (`languages`, `check`, `export-job`, `merge`, `ocr`, `--version`, `--help`, `--json`) sharing the core OCR/merge/export logic while preserving plain file-path GUI startup ("Open with"). Added product `SKILL.md` and `llm.txt`, updated `llms.txt`, `MANIFEST.in`, `README.md`, and `README_de.md` (version `1.1.4` frozen).
+- **Bug fixes (`PDFtoPDFocr_2.py`)**: `_load_translations()` now prefers `locales/translations.json` with fallback to `translations.json`; `merge_ocr_outputs()` checks `valid_paths` with `OSError`-guarded `os.path.samefile()` so missing trailing inputs cannot trigger `FileNotFoundError`; `OCRWorker.run()` skips emitting `finished_all` when cancelled via `stop()`; `ensure_tesseract(..., headless=True)` logs diagnostics without opening GUI `QMessageBox` dialogs and closes HTTP response handles cleanly.
+- **CWD-safe Pytest configuration (`T-20261114-932985855`)**: Removed relative `--basetemp=.pytest_temp` from `addopts` in `pyproject.toml` and `pytest.ini`, and configured `basetemp` relative to `config.rootpath` in `tests/conftest.py`.
+- **Tests (`tests/test_cli_and_p022.py`)**: Added 10 contract and regression tests covering CLI subcommands, P-022 artifacts, dual translation loading, worker cancellation, headless Tesseract checks, and `merge_ocr_outputs` path resilience.
+
 ### Pfad B: Repository-Discoverability, zweisprachige README-Architektur, Badges & Sequenzdiagramme (2026-11-08)
 - **Zweisprachige Mermaid-Sequenzdiagramme**: Asynchroner Verarbeitungslebenszyklus (`QThread` Worker, Poppler-Seitenrasterisierung, Bildnormalisierung, Tesseract OCR-Textextraktion und pikepdf Volltext-PDF-Assembly) in Abschnitt `Local data flow` / `Lokaler Datenfluss` von `README.md` und `README_de.md` integriert; Mermaid-Syntax mit `_tools/lint_mermaid.py` validiert (0 Syntaxfehler).
 - **Badges & Verifikations-Transparenz**: Verifiziertes Test-Badge auf 180 bestandene Tests aktualisiert, Code-Stil-Badge (`Ruff`) und Local-First Verarbeitungs-Badge (`processing: local-first`) in beiden Sprachausgaben ergänzt.
@@ -160,6 +166,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/).
 - Eingereicht am 2026-08-23, Submission `1152921505701721467`, Status `Certification`.
 
 ## [Unreleased]
+
+### Dual-Use CLI, P-022 Skill & Bug/Test Hardening (2026-11-24)
+- **Headless CLI & Policy P-022 (`PDFtoPDFocr_2.py`, `SKILL.md`, `llm.txt`, `llms.txt`)**: Added headless subcommands (`languages`, `check`, `export-job`, `merge`, `ocr`, `--version`, `--help`, `--json`) sharing the core OCR/merge/export logic while preserving plain file-path GUI startup ("Open with"). Added product `SKILL.md` and `llm.txt`, updated `llms.txt`, `MANIFEST.in`, `README.md`, and `README_de.md` (version `1.1.4` frozen).
+- **Bug fixes (`PDFtoPDFocr_2.py`)**: `_load_translations()` now prefers `locales/translations.json` with fallback to `translations.json`; `merge_ocr_outputs()` checks `valid_paths` with `OSError`-guarded `os.path.samefile()` so missing trailing inputs cannot trigger `FileNotFoundError`; `OCRWorker.run()` skips emitting `finished_all` when cancelled via `stop()`; `ensure_tesseract(..., headless=True)` logs diagnostics without opening GUI `QMessageBox` dialogs and closes HTTP response handles cleanly.
+- **CWD-safe Pytest configuration (`T-20261114-932985855`)**: Removed relative `--basetemp=.pytest_temp` from `addopts` in `pyproject.toml` and `pytest.ini`, and configured `basetemp` relative to `config.rootpath` in `tests/conftest.py`.
+- **Tests (`tests/test_cli_and_p022.py`)**: Added 10 contract and regression tests covering CLI subcommands, P-022 artifacts, dual translation loading, worker cancellation, headless Tesseract checks, and `merge_ocr_outputs` path resilience.
 
 ### Pfad B: Repository-Discoverability, zweisprachige README-Architektur, Badges & Sequenzdiagramme (2026-11-08)
 - **Zweisprachige Mermaid-Sequenzdiagramme**: Asynchroner Verarbeitungslebenszyklus (`QThread` Worker, Poppler-Seitenrasterisierung, Bildnormalisierung, Tesseract OCR-Textextraktion und pikepdf Volltext-PDF-Assembly) in Abschnitt `Local data flow` / `Lokaler Datenfluss` von `README.md` und `README_de.md` integriert; Mermaid-Syntax mit `_tools/lint_mermaid.py` validiert (0 Syntaxfehler).

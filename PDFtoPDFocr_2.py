@@ -9,6 +9,7 @@ Uses pdf2image + pytesseract + pikepdf (no PyMuPDF required).
 Missing Tesseract language packs are automatically downloaded from GitHub.
 """
 
+import argparse
 import glob
 from contextlib import contextmanager
 import io
@@ -184,16 +185,18 @@ def detect_system_language() -> str:
 
 
 def _load_translations() -> dict:
-    """Lädt translations.json aus dem Skript- oder Bundle-Verzeichnis."""
-    try:
-        base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
-        path = os.path.join(base, "translations.json")
-        with open(path, "r", encoding="utf-8") as f:
-            import json
-
-            return json.load(f)
-    except Exception:
-        return {}
+    """Lädt translations.json bevorzugt aus locales/, Fallback auf Root-translations.json."""
+    base = Path(getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__))))
+    for candidate in (base / "locales" / "translations.json", base / "translations.json"):
+        try:
+            if candidate.is_file():
+                with open(candidate, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    return data
+        except Exception:
+            continue
+    return {}
 
 
 _TRANSLATIONS = _load_translations()
@@ -384,13 +387,14 @@ def get_tessdata_dir() -> str:
     return str(fallback)
 
 
-def ensure_tesseract(lang: str) -> bool:
+def ensure_tesseract(lang: str, headless: bool = False) -> bool:
     """Verifies that Tesseract and the requested language pack are available.
 
     Downloads the language traineddata file from tesseract-ocr/tessdata_best if missing.
 
     Args:
         lang: Tesseract language code (e.g. "deu", "eng").
+        headless: If True, log diagnostics instead of opening GUI message boxes.
 
     Returns:
         True if Tesseract and the language pack are ready, False otherwise.
@@ -403,8 +407,11 @@ def ensure_tesseract(lang: str) -> bool:
     lang = cleaned_lang
 
     if not configure_tesseract():
-        QMessageBox.critical(None, tr("error_title"),
-            tr("error_tesseract_not_found"))
+        msg = tr("error_tesseract_not_found")
+        if headless:
+            logging.error(msg)
+        else:
+            QMessageBox.critical(None, tr("error_title"), msg)
         return False
 
     tessdata_dir = get_tessdata_dir()
@@ -418,6 +425,7 @@ def ensure_tesseract(lang: str) -> bool:
                 os.unlink(target)
             except OSError:
                 pass
+        r = None
         try:
             url = f"https://github.com/tesseract-ocr/tessdata_best/raw/main/{lang}.traineddata"
             r = requests.get(url, stream=True, timeout=30)
@@ -442,16 +450,31 @@ def ensure_tesseract(lang: str) -> bool:
                     except OSError:
                         pass
                     raise
-                QMessageBox.information(None, tr("info_download_title"),
-                    tr("info_lang_downloaded", lang=lang))
+                info_msg = tr("info_lang_downloaded", lang=lang)
+                if headless:
+                    logging.info(info_msg)
+                else:
+                    QMessageBox.information(None, tr("info_download_title"), info_msg)
             else:
-                QMessageBox.critical(None, tr("error_title"),
-                    tr("error_lang_download_failed", lang=lang, status=r.status_code))
+                err_msg = tr("error_lang_download_failed", lang=lang, status=r.status_code)
+                if headless:
+                    logging.error(err_msg)
+                else:
+                    QMessageBox.critical(None, tr("error_title"), err_msg)
                 return False
         except Exception as e:
-            QMessageBox.critical(None, tr("error_title"),
-                tr("error_lang_load_failed", lang=lang, error=e))
+            err_msg = tr("error_lang_load_failed", lang=lang, error=e)
+            if headless:
+                logging.error(err_msg)
+            else:
+                QMessageBox.critical(None, tr("error_title"), err_msg)
             return False
+        finally:
+            if r is not None and hasattr(r, "close") and callable(r.close):
+                try:
+                    r.close()
+                except Exception:
+                    pass
 
     return True
 
@@ -656,10 +679,14 @@ def merge_ocr_outputs(
 
     export_folder = Path(export_folder)
     merged_path = export_folder / merged_name
-    for source in output_paths:
-        if merged_path.resolve() == Path(source).resolve() or (
-            merged_path.exists() and os.path.samefile(merged_path, source)
-        ):
+    for source in valid_paths:
+        is_same = merged_path.resolve() == Path(source).resolve()
+        if not is_same and merged_path.exists():
+            try:
+                is_same = os.path.samefile(merged_path, source)
+            except OSError:
+                is_same = False
+        if is_same:
             raise ValueError("Merge-Ausgabe darf keine Quelldatei ersetzen")
     export_folder.mkdir(parents=True, exist_ok=True)
     subfolder = export_folder / subfolder_name
@@ -863,7 +890,8 @@ class OCRWorker(QThread):
             if self._is_cancelled:
                 break
             self.file_done.emit(path, success)
-        self.finished_all.emit()
+        if not self._is_cancelled:
+            self.finished_all.emit()
 
     def _load_source_images(self, src_path: str) -> List[Image.Image]:
         """Loads the page images for a source file: PDF pages via Poppler, or the
@@ -1742,7 +1770,252 @@ class OCRConverterGUI(QWidget):
             )
         return written_path
 
+CLI_SUBCOMMANDS = ("languages", "check", "export-job", "merge", "ocr")
+CLI_META_FLAGS = ("-h", "--help", "--version", "-V")
+OCR_LANGUAGES = ("deu", "eng", "fra", "spa")
+
+
+def is_cli_invocation(argv: list[str] | None = None) -> bool:
+    """Returns True when argv targets the headless CLI instead of GUI file-open mode."""
+    args = list(sys.argv[1:] if argv is None else argv)
+    if not args:
+        return False
+    first = str(args[0]).strip()
+    if first in CLI_SUBCOMMANDS or first in CLI_META_FLAGS:
+        return True
+    if first == "--json" and len(args) > 1 and str(args[1]).strip() in (*CLI_SUBCOMMANDS, *CLI_META_FLAGS):
+        return True
+    return False
+
+
+def _emit_cli(payload: dict | str, as_json: bool, stream=None) -> None:
+    out = stream or sys.stdout
+    if as_json:
+        text = json.dumps(payload, ensure_ascii=False, indent=2) if isinstance(payload, dict) else json.dumps({"message": payload}, ensure_ascii=False)
+        print(text, file=out)
+    elif isinstance(payload, dict):
+        print(json.dumps(payload, ensure_ascii=False, indent=2), file=out)
+    else:
+        print(payload, file=out)
+
+
+def _expand_cli_inputs(raw_paths: list[str]) -> list[Path]:
+    """Expands file and non-recursive folder paths to existing supported files."""
+    resolved: list[Path] = []
+    seen: set[str] = set()
+    for raw in raw_paths:
+        cleaned = str(raw or "").strip().strip("\"'")
+        if not cleaned:
+            continue
+        candidate = Path(os.path.abspath(os.path.expandvars(os.path.expanduser(cleaned))))
+        if candidate.is_dir():
+            try:
+                children = sorted(candidate.iterdir(), key=lambda p: p.name.lower())
+            except OSError:
+                continue
+            targets = [child for child in children if child.is_file()]
+        elif candidate.is_file():
+            targets = [candidate]
+        else:
+            continue
+        for item in targets:
+            if item.suffix.lower() not in SUPPORTED_EXTS:
+                continue
+            key = os.path.normcase(str(item))
+            if key not in seen:
+                seen.add(key)
+                resolved.append(item)
+    return resolved
+
+
+def _build_cli_parser() -> argparse.ArgumentParser:
+    json_parent = argparse.ArgumentParser(add_help=False)
+    json_parent.add_argument("--json", action="store_true", help="Emit machine-readable JSON output")
+
+    parser = argparse.ArgumentParser(
+        prog="PDFtoPDFocr_2.py",
+        description="PDFtoPDFocr dual-use GUI & headless CLI for local OCR, job manifests, and PDF merging.",
+        parents=[json_parent],
+    )
+    parser.add_argument("-V", "--version", action="store_true", help="Print version and exit")
+    subparsers = parser.add_subparsers(dest="command")
+
+    subparsers.add_parser("languages", parents=[json_parent], help="List supported UI and OCR languages")
+
+    p_check = subparsers.add_parser("check", parents=[json_parent], help="Check Tesseract/tessdata/Poppler readiness")
+    p_check.add_argument("--ocr-lang", default="deu", help="Tesseract language code (default: deu)")
+
+    p_export = subparsers.add_parser("export-job", parents=[json_parent], help="Export pdftopdfocr-job-v1 JSON manifest")
+    p_export.add_argument("paths", nargs="*", help="Input PDF/image paths")
+    p_export.add_argument("--out", required=True, help="Target manifest JSON path")
+    p_export.add_argument("--ocr-lang", default="deu", help="OCR language code (default: deu)")
+    p_export.add_argument("--export-folder", default=None, help="Optional configured export folder")
+
+    p_merge = subparsers.add_parser("merge", parents=[json_parent], help="Merge existing OCRed PDFs and archive singles")
+    p_merge.add_argument("paths", nargs="+", help="At least 2 existing PDF files to merge in order")
+    p_merge.add_argument("--out", required=True, help="Target collective PDF path")
+
+    p_ocr = subparsers.add_parser("ocr", parents=[json_parent], help="Run headless local OCR on PDF/image files")
+    p_ocr.add_argument("paths", nargs="+", help="Input PDF/image files or folders")
+    p_ocr.add_argument("--lang", default="deu", help="Tesseract OCR language code (default: deu)")
+    p_ocr.add_argument("--poppler-path", default="", help="Optional Poppler bin directory")
+    return parser
+
+
+def run_cli(argv: list[str] | None = None) -> int:
+    """Executes headless CLI commands and returns POSIX exit code (0=ok, 1=runtime, 2=usage/input)."""
+    parser = _build_cli_parser()
+    args_list = list(sys.argv[1:] if argv is None else argv)
+    try:
+        args = parser.parse_args(args_list)
+    except SystemExit as exc:
+        code = exc.code if isinstance(exc.code, int) else 2
+        return 0 if code == 0 else 2
+
+    as_json = bool(getattr(args, "json", False))
+
+    if getattr(args, "version", False):
+        payload = {"ok": True, "app": APP_NAME, "version": APP_VERSION, "schema": EXPORT_SCHEMA}
+        _emit_cli(payload if as_json else f"{APP_NAME} {APP_VERSION}", as_json)
+        return 0
+
+    if not args.command:
+        parser.print_help()
+        return 0
+
+    if args.command == "languages":
+        payload = {
+            "ok": True,
+            "ui_languages": list(SUPPORTED_LANGUAGES),
+            "language_names": LANGUAGE_NAMES,
+            "ocr_languages": list(OCR_LANGUAGES),
+        }
+        _emit_cli(payload, as_json)
+        return 0
+
+    if args.command == "check":
+        cleaned_lang = "".join(c for c in str(args.ocr_lang or "").strip() if c.isalnum() or c in ("_", "-"))
+        if not cleaned_lang:
+            _emit_cli({"ok": False, "error": "Invalid OCR language code"}, as_json, stream=sys.stderr if not as_json else sys.stdout)
+            return 2
+        tess_cmd = configure_tesseract()
+        tessdata_dir = get_tessdata_dir()
+        traineddata_path = Path(tessdata_dir) / f"{cleaned_lang}.traineddata"
+        traineddata_ok = traineddata_path.is_file() and traineddata_path.stat().st_size > 0
+        pdftoppm_cmd = shutil.which("pdftoppm")
+        ready = bool(tess_cmd and traineddata_ok)
+        payload = {
+            "ok": ready,
+            "ocr_lang": cleaned_lang,
+            "tesseract_found": bool(tess_cmd),
+            "tesseract_cmd": tess_cmd,
+            "tessdata_dir": tessdata_dir,
+            "traineddata_found": traineddata_ok,
+            "pdftoppm_found": bool(pdftoppm_cmd),
+            "pdftoppm_cmd": pdftoppm_cmd,
+        }
+        _emit_cli(payload, as_json)
+        return 0 if ready else 1
+
+    if args.command == "export-job":
+        out_path = Path(args.out)
+        if out_path.exists() and out_path.is_dir():
+            _emit_cli({"ok": False, "error": f"Output path is a directory: {out_path}"}, as_json)
+            return 2
+        entries = [{"path": p, "status": "pending", "message": "", "output_path": ""} for p in args.paths]
+        try:
+            payload = build_job_export_payload(entries, args.ocr_lang, export_folder=args.export_folder)
+            written = write_job_export(out_path, payload)
+        except Exception as exc:
+            _emit_cli({"ok": False, "error": str(exc)}, as_json)
+            return 1
+        _emit_cli(
+            {
+                "ok": True,
+                "schema": payload["schema"],
+                "output_path": str(written),
+                "input_count": len(payload["input_files"]),
+            },
+            as_json,
+        )
+        return 0
+
+    if args.command == "merge":
+        valid_files = [str(p) for p in _expand_cli_inputs(args.paths) if p.suffix.lower() == ".pdf"]
+        if len(valid_files) < 2:
+            _emit_cli({"ok": False, "error": "merge requires at least 2 existing PDF files"}, as_json)
+            return 2
+        out_path = Path(args.out)
+        if out_path.exists() and out_path.is_dir():
+            _emit_cli({"ok": False, "error": f"Output path is a directory: {out_path}"}, as_json)
+            return 2
+        warnings: list[str] = []
+        try:
+            merged_path = merge_ocr_outputs(valid_files, out_path.name, out_path.parent, archive_warnings=warnings)
+            with pikepdf.Pdf.open(merged_path) as pdf:
+                page_count = len(pdf.pages)
+        except Exception as exc:
+            _emit_cli({"ok": False, "error": str(exc)}, as_json)
+            return 1
+        _emit_cli(
+            {
+                "ok": True,
+                "merged_path": str(merged_path),
+                "pages": page_count,
+                "inputs": valid_files,
+                "archive_warnings": warnings,
+            },
+            as_json,
+        )
+        return 0
+
+    if args.command == "ocr":
+        files = _expand_cli_inputs(args.paths)
+        if not files:
+            _emit_cli({"ok": False, "error": "No valid input PDF or image files found"}, as_json)
+            return 2
+        cleaned_lang = "".join(c for c in str(args.lang or "").strip() if c.isalnum() or c in ("_", "-"))
+        if not cleaned_lang:
+            _emit_cli({"ok": False, "error": "Invalid OCR language code"}, as_json)
+            return 2
+        if not ensure_tesseract(cleaned_lang, headless=True):
+            _emit_cli({"ok": False, "error": f"Tesseract or language pack '{cleaned_lang}' unavailable"}, as_json)
+            return 1
+        worker = OCRWorker([str(f) for f in files], cleaned_lang, poppler_path=args.poppler_path)
+        results = []
+        succeeded = 0
+        failed = 0
+        for f in files:
+            ok = worker._ocr_pdf(str(f), cleaned_lang)
+            out_file = Path(os.path.splitext(str(f))[0] + "_ocred.pdf")
+            if ok:
+                succeeded += 1
+            else:
+                failed += 1
+            results.append(
+                {
+                    "input_path": str(f),
+                    "output_path": str(out_file) if out_file.is_file() else None,
+                    "ok": bool(ok),
+                }
+            )
+        payload = {
+            "ok": failed == 0,
+            "lang": cleaned_lang,
+            "processed": len(files),
+            "succeeded": succeeded,
+            "failed": failed,
+            "results": results,
+        }
+        _emit_cli(payload, as_json)
+        return 0 if failed == 0 else 1
+
+    return 2
+
+
 if __name__ == "__main__":
+    if is_cli_invocation(sys.argv[1:]):
+        sys.exit(run_cli(sys.argv[1:]))
     app = QApplication(sys.argv)
     app_icon = get_app_icon()
     if not app_icon.isNull():
